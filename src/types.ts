@@ -1,19 +1,15 @@
 /**
  * src/types.ts
- * Browser-side type definitions for The Press game.
- *
- * These mirror scripts/types.ts. Redeclared (not imported) because
- * tsconfig.app.json and tsconfig.node.json are separate compilation units.
- * If scripts/types.ts changes, update this file to match.
+ * Shared browser-side type definitions.
+ * Redeclared (not imported) from scripts/types.ts to avoid cross-tsconfig-boundary imports.
+ * Shape is the D-01 contract — do not add an `answers` field to PuzzleEntry.
  */
 
-// ─── Puzzle Contract ──────────────────────────────────────────────────────────
-
-/** One puzzle entry as stored in public/schedule.json */
+/** One puzzle entry stored in public/schedule.json */
 export interface PuzzleEntry {
   /** Days since game epoch (2026-05-12 local midnight). Index 0 = first puzzle. */
   index: number;
-  /** All 7 puzzle letters, uppercase, alphabetically sorted. */
+  /** All 7 puzzle letters, uppercase, alphabetically sorted. E.g. ["A","B","C","D","E","F","G"] */
   letters: string[];
   /** The required center letter. Must appear in every valid submission. Uppercase. */
   centerLetter: string;
@@ -21,9 +17,9 @@ export interface PuzzleEntry {
 
 /** Root structure of public/schedule.json */
 export interface Schedule {
-  /** Game epoch ISO date string — client uses this for date-to-index calculation */
+  /** Game epoch ISO date — client uses this as the base for date-to-index calculation */
   epoch: string; // "2026-05-12"
-  /** Seed used for deterministic shuffle */
+  /** Seed used for deterministic shuffle — store for reproducibility */
   seed: number;
   /** Total count of puzzles */
   count: number;
