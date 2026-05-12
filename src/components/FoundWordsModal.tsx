@@ -19,7 +19,7 @@ interface FoundWordsModalProps {
 
 // ─── Component ────────────────────────────────────────────────────────────────
 
-export function FoundWordsModal({ onClose }: FoundWordsModalProps): JSX.Element {
+export function FoundWordsModal({ onClose }: FoundWordsModalProps): React.JSX.Element {
   const state = useGameState();
   const { foundWords, puzzle } = state;
 
