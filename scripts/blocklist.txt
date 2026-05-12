@@ -1,0 +1,3 @@
+# Manual offensive word additions — one word per line, lowercase
+# Merged with LDNOOBW at puzzle generation time (generate-puzzles.ts)
+# Add words here before running: npm run puzzle:generate
