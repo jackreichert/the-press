@@ -1,0 +1,16 @@
+{
+  "name": "byebee",
+  "version": "0.0.1",
+  "description": "The Press — a browser-based daily word puzzle game",
+  "scripts": {
+    "dict:build": "tsx scripts/process-dict.ts",
+    "puzzle:generate": "tsx scripts/generate-puzzles.ts",
+    "puzzle:check": "tsx scripts/check-puzzles.ts",
+    "pipeline": "npm run dict:build && npm run puzzle:generate"
+  },
+  "devDependencies": {
+    "@types/node": "^25.7.0",
+    "tsx": "^4.21.0",
+    "typescript": "^6.0.3"
+  }
+}
