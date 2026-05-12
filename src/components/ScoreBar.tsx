@@ -10,6 +10,7 @@
  * D-17: Daily streak omitted entirely from Phase 2.
  */
 
+import React from 'react';
 import { getRank, getProgressPct } from '../utils/scoring';
 import { useGameState } from '../context/GameContext';
 
@@ -21,7 +22,7 @@ interface ScoreBarProps {
 
 // ─── Component ────────────────────────────────────────────────────────────────
 
-export function ScoreBar({ onOpenModal }: ScoreBarProps): JSX.Element {
+export function ScoreBar({ onOpenModal }: ScoreBarProps): React.JSX.Element {
   const state = useGameState();
   const { score, maxScore, foundWords, allWords } = state;
 
