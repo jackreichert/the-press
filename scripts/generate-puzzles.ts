@@ -167,13 +167,12 @@ async function loadBlocklist(): Promise<Set<string>> {
 function findValidPuzzles(words: string[]): PuzzleCandidate[] {
   const wordMasks = words.map(wordMask);
 
-  // Step 1: Distinct 7-letter puzzle sets from pangram words
+  // Step 1: Distinct 7-letter puzzle sets from pangram words.
+  // Filter wordMasks directly (not words-then-remap) to avoid off-by-one index bug:
+  // after .filter() the callback index `i` is the filtered-array position, not the
+  // original wordMasks position — filtering masks directly avoids that mismatch.
   const distinctSets = Array.from(
-    new Set(
-      words
-        .filter((_, i) => bitCount(wordMasks[i]) === 7) // exact 7 distinct letters
-        .map((_, i) => wordMasks[i])
-    )
+    new Set(wordMasks.filter((m) => bitCount(m) === 7))
   );
 
   const candidates: PuzzleCandidate[] = [];
