@@ -12,13 +12,14 @@
  * Phase 3 will add share button below the score summary.
  */
 
+import React from 'react';
 import { useGameState } from '../context/GameContext';
 import { getRank } from '../utils/scoring';
 import { isFoundWordPangram } from '../utils/puzzle';
 
 // ─── Component ────────────────────────────────────────────────────────────────
 
-export function GameOverScreen(): JSX.Element {
+export function GameOverScreen(): React.JSX.Element {
   const state = useGameState();
   const { score, maxScore, foundWords, allWords, puzzle } = state;
 
