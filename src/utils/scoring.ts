@@ -83,22 +83,17 @@ export function getRank(
 }
 
 /**
- * Progress bar fill percentage toward next rank tier.
- * D-16 formula: (score_pct - currentTierThreshold) / (nextTierThreshold - currentTierThreshold) * 100
- * Returns 0 when maxScore === 0 (pre-dict-load guard).
- * Returns 100 when current === next (Grand Colophon).
+ * Progress bar fill: overall score as a percentage of max score (0–100).
+ * Within-tier formula was discarded — first tier spans only 2% of max score,
+ * making the bar jump to 50% after earning just 1% of total score.
+ * The rank name already communicates tier; the bar shows raw completion progress.
  */
 export function getProgressPct(
   score: number,
   maxScore: number,
-  foundCount: number,
-  totalCount: number,
+  _foundCount: number,
+  _totalCount: number,
 ): number {
   if (maxScore === 0) return 0;
-  const rank = getRank(score, maxScore, foundCount, totalCount);
-  if (rank.current === rank.next) return 100;
-  const scorePct = Math.floor((score / maxScore) * 100);
-  return Math.min(100, Math.max(0,
-    ((scorePct - rank.current) / (rank.next - rank.current)) * 100
-  ));
+  return Math.min(100, Math.max(0, Math.floor((score / maxScore) * 100)));
 }

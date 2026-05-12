@@ -8,7 +8,7 @@
  *       Letter keys use onChange, NOT onKeyDown (iOS Safari virtual keyboard unreliable for keydown).
  */
 
-import React, { useRef } from 'react';
+import React, { useRef, useEffect } from 'react';
 import { LetterTile } from './LetterTile';
 import { useGameState, useGameDispatch } from '../context/GameContext';
 
@@ -16,6 +16,13 @@ export function LetterGrid(): React.JSX.Element {
   const state = useGameState();
   const dispatch = useGameDispatch();
   const hiddenInputRef = useRef<HTMLInputElement>(null);
+
+  // Focus hidden input when puzzle loads so keyboard works immediately (no tile tap required)
+  useEffect(() => {
+    if (state.puzzle) {
+      hiddenInputRef.current?.focus();
+    }
+  }, [state.puzzle]);
 
   if (!state.puzzle) return <></>;
 
@@ -45,11 +52,14 @@ export function LetterGrid(): React.JSX.Element {
   }
 
   function handleHiddenKeyDown(e: React.KeyboardEvent<HTMLInputElement>): void {
-    // Enter fires reliably on all platforms (including iOS Safari) — D-02 restriction
-    // is for letter keys only, not non-character keys like Enter.
+    // Non-printable keys (Enter, Backspace) are reliable on all platforms via onKeyDown.
+    // Letter keys use onChange instead (iOS Safari virtual keyboard keydown is unreliable).
     if (e.key === 'Enter') {
       e.preventDefault();
       dispatch({ type: 'WORD_SUBMIT' });
+    } else if (e.key === 'Backspace') {
+      e.preventDefault();
+      dispatch({ type: 'LETTER_DELETE' });
     }
   }
 

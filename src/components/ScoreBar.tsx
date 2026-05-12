@@ -54,7 +54,7 @@ export function ScoreBar({ onOpenModal }: ScoreBarProps): React.JSX.Element {
         aria-label={`Score ${score}, ${foundWords.length} words found. Tap to see found words.`}
         style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0, font: 'inherit' }}
       >
-        Score: {score} · {foundWords.length} words ▾
+        Score: {score} · {foundWords.length}/{allWords.length} words ▾
       </button>
     </div>
   );
