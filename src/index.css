@@ -1,10 +1,386 @@
-/* index.css — base styles; replaced in Plan 03 with Gutenberg theme */
-* {
+/* ─── Design tokens ─────────────────────────────────────────────────────── */
+
+:root {
+  /* Spacing scale (multiples of 4px) */
+  --space-xs:  4px;
+  --space-sm:  8px;
+  --space-md:  16px;
+  --space-lg:  24px;
+  --space-xl:  32px;
+  --space-2xl: 48px;
+
+  /* Color palette — Gutenberg letterpress placeholder */
+  --color-bg:       #F5F0E8; /* Aged ivory page */
+  --color-surface:  #EAE4D6; /* Tile and bar backgrounds */
+  --color-hover:    #D9D1C0; /* Hover state for tiles and buttons */
+  --color-ink:      #1A1610; /* Near-black text */
+  --color-accent:   #8B2500; /* Center tile, pressed state, progress fill, error text */
+  --color-border:   #C4BAA8; /* Tile borders, modal border, progress track */
+
+  /* Typography */
+  --font-serif: Georgia, 'Times New Roman', serif;
+}
+
+/* ─── Reset / base ──────────────────────────────────────────────────────── */
+
+*, *::before, *::after {
   box-sizing: border-box;
   margin: 0;
   padding: 0;
 }
 
 body {
-  font-family: sans-serif;
+  font-family: var(--font-serif);
+  font-size: 16px;
+  line-height: 1.5;
+  color: var(--color-ink);
+  background-color: var(--color-bg);
+}
+
+/* ─── App layout ────────────────────────────────────────────────────────── */
+
+.app {
+  max-width: 480px;
+  margin: 0 auto;
+  padding: var(--space-2xl) var(--space-md);
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+}
+
+/* ─── Loading / error states ─────────────────────────────────────────────── */
+
+.loading-state {
+  text-align: center;
+  font-size: 16px;
+  color: var(--color-ink);
+  padding: var(--space-2xl) 0;
+}
+
+.error-state {
+  text-align: center;
+  padding: var(--space-2xl) 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-md);
+}
+
+.retry-btn {
+  font-family: var(--font-serif);
+  font-size: 14px;
+  font-weight: 600;
+  padding: var(--space-sm) var(--space-md);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 4px;
+  cursor: pointer;
+  color: var(--color-ink);
+}
+
+.retry-btn:hover { background: var(--color-hover); border-color: var(--color-ink); }
+.retry-btn:active { background: var(--color-accent); border-color: var(--color-accent); color: var(--color-bg); }
+
+/* ─── Score bar ─────────────────────────────────────────────────────────── */
+
+.score-bar {
+  background: var(--color-surface);
+  padding: var(--space-sm) var(--space-md);
+  border-radius: 4px;
+  cursor: pointer;
+  user-select: none;
+}
+
+.rank-name {
+  font-size: 20px;
+  font-weight: 600;
+  line-height: 1.2;
+  color: var(--color-ink);
+}
+
+.rank-progress {
+  height: 8px;
+  background: var(--color-border);
+  border-radius: 4px;
+  margin: var(--space-xs) 0;
+  overflow: hidden;
+}
+
+.rank-progress__fill {
+  height: 100%;
+  background: var(--color-accent);
+  border-radius: 4px;
+  transition: width 200ms ease-out;
+}
+
+.score-count {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--color-ink);
+}
+
+/* ─── Word display ──────────────────────────────────────────────────────── */
+
+.word-display-area {
+  margin-top: var(--space-xl);
+  text-align: center;
+  min-height: 56px; /* prevent layout shift when empty */
+}
+
+.word-display {
+  font-size: 28px;
+  font-weight: 600;
+  line-height: 1.1;
+  letter-spacing: 0.05em;
+  color: var(--color-ink);
+  min-height: 1.1em;
+}
+
+.word-display--placeholder {
+  opacity: 0.5;
+}
+
+.error-msg {
+  font-size: 16px;
+  font-weight: 400;
+  color: var(--color-accent);
+  margin-top: var(--space-xs);
+  min-height: 1.5em;
+}
+
+/* ─── Letter grid ────────────────────────────────────────────────────────── */
+
+.letter-grid {
+  padding: var(--space-lg);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-sm);
+}
+
+.grid-row {
+  display: flex;
+  gap: var(--space-xs);
+  align-items: center;
+  justify-content: center;
+}
+
+/* ─── Letter tile ────────────────────────────────────────────────────────── */
+
+.tile {
+  font-family: var(--font-serif);
+  font-size: 20px;
+  font-weight: 600;
+  min-width: 48px;
+  min-height: 48px;
+  padding: var(--space-sm);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 4px;
+  cursor: pointer;
+  color: var(--color-ink);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-transform: uppercase;
+  /* No transition on press — snappy feel required per UI-SPEC */
+}
+
+.tile:hover {
+  background: var(--color-hover);
+  border-color: var(--color-accent);
+}
+
+.tile:active {
+  background: var(--color-accent);
+  border-color: var(--color-accent);
+  color: var(--color-bg);
+}
+
+.tile:focus-visible {
+  outline: 2px solid var(--color-ink);
+  outline-offset: 2px;
+}
+
+.tile--center {
+  min-width: 56px;
+  min-height: 56px;
+  background: var(--color-accent);
+  border-color: var(--color-accent);
+  color: var(--color-bg);
+}
+
+.tile--center:hover {
+  background: var(--color-accent);
+  border-color: var(--color-accent);
+  opacity: 0.9;
+}
+
+/* ─── Action row ─────────────────────────────────────────────────────────── */
+
+.action-row {
+  display: flex;
+  gap: var(--space-sm);
+  justify-content: center;
+  margin-bottom: var(--space-2xl);
+}
+
+.action-btn {
+  font-family: var(--font-serif);
+  font-size: 14px;
+  font-weight: 600;
+  min-width: 80px;
+  min-height: 48px;
+  padding: var(--space-sm) var(--space-md);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 4px;
+  cursor: pointer;
+  color: var(--color-ink);
+  flex: 1;
+}
+
+.action-btn:hover {
+  background: var(--color-hover);
+  border-color: var(--color-ink);
+}
+
+.action-btn:active {
+  background: var(--color-accent);
+  border-color: var(--color-accent);
+  color: var(--color-bg);
+}
+
+.action-btn:focus-visible {
+  outline: 2px solid var(--color-ink);
+  outline-offset: 2px;
+}
+
+.action-btn:disabled {
+  background: var(--color-surface);
+  border-color: var(--color-border);
+  color: var(--color-border);
+  cursor: not-allowed;
+}
+
+/* ─── Modal ──────────────────────────────────────────────────────────────── */
+
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(26, 22, 16, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+}
+
+.modal-card {
+  background: var(--color-bg);
+  border: 1px solid var(--color-border);
+  border-radius: 4px;
+  max-width: 360px;
+  width: 90%;
+  padding: var(--space-lg);
+  position: relative;
+  max-height: 80dvh;
+  overflow-y: auto;
+}
+
+.modal-title {
+  font-size: 20px;
+  font-weight: 600;
+  margin-bottom: var(--space-md);
+}
+
+.modal-close {
+  font-family: var(--font-serif);
+  font-size: 20px;
+  font-weight: 600;
+  position: absolute;
+  top: var(--space-sm);
+  right: var(--space-sm);
+  min-width: 44px;
+  min-height: 44px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--color-ink);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+}
+
+.modal-close:hover { background: var(--color-surface); }
+.modal-close:focus-visible { outline: 2px solid var(--color-ink); outline-offset: 2px; }
+
+.found-words-list {
+  list-style: none;
+  padding: 0;
+}
+
+.found-word {
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 1.5;
+  color: var(--color-ink);
+  padding: 2px 0;
+}
+
+.found-word.pangram-word {
+  font-weight: 600;
+  color: var(--color-accent);
+}
+
+/* ─── Game-over screen ───────────────────────────────────────────────────── */
+
+.game-over {
+  text-align: center;
+  padding: var(--space-lg) 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+}
+
+.game-over__rank {
+  font-size: 28px;
+  font-weight: 600;
+  color: var(--color-accent);
+  line-height: 1.1;
+}
+
+.game-over__score {
+  font-size: 20px;
+  font-weight: 600;
+  color: var(--color-ink);
+}
+
+/* ─── Shake animation ────────────────────────────────────────────────────── */
+
+@keyframes shake {
+  0%   { transform: translateX(0); }
+  20%  { transform: translateX(-6px); }
+  40%  { transform: translateX(6px); }
+  60%  { transform: translateX(-4px); }
+  80%  { transform: translateX(4px); }
+  100% { transform: translateX(0); }
+}
+
+.word-display.shake {
+  animation: shake 0.35s ease-in-out;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .word-display.shake {
+    animation: none;
+  }
+}
+
+/* ─── Valid-word flash ───────────────────────────────────────────────────── */
+
+.word-display--flash {
+  color: var(--color-accent);
+  transition: color 150ms ease-out;
 }
