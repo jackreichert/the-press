@@ -1,0 +1,12 @@
+{
+  "epoch": "2026-01-01",
+  "seed": 1,
+  "count": 1,
+  "puzzles": [
+    {
+      "index": 0,
+      "letters": ["D","E","I","N","P","R","T"],
+      "centerLetter": "P"
+    }
+  ]
+}
