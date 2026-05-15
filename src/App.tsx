@@ -8,27 +8,71 @@
  *   3. fetch('/dictionary.json') starts in parallel after schedule resolves (no await).
  *   4. Submit disabled until DICT_LOADED dispatch.
  *
+ * Persistence (STOR-01, STOR-02):
+ *   - After DICT_LOADED: check localStorage. If today's state exists, dispatch RESTORE_STATE.
+ *     If previous day had words, save partial history entry then clear.
+ *   - save-on-submit: useEffect on [foundWords, score] writes to localStorage.
+ *   - save-on-gameOver: useEffect on [gameOver] appends history entry + clears state.
+ *
  * Layout (D-10): ScoreBar → WordDisplay → LetterGrid → ActionRow
  * Game-over (D-18): LetterGrid + ActionRow replaced by GameOverScreen
  */
 
-import { useEffect, useState, useCallback } from 'react';
+import React, { useEffect, useState, useCallback, useRef } from 'react';
 import { GameProvider, useGameState, useGameDispatch } from './context/GameContext';
-import { getTodayPuzzleIndex } from './utils/date';
+import { getTodayPuzzleIndex, getPuzzleDateStr } from './utils/date';
+import { getRank } from './utils/scoring';
+import { readState, saveState, clearState, appendHistory } from './storage';
+import type { HistoryEntry } from './storage';
 import { ScoreBar } from './components/ScoreBar';
 import { WordDisplay } from './components/WordDisplay';
 import { LetterGrid } from './components/LetterGrid';
 import { ActionRow } from './components/ActionRow';
 import { FoundWordsModal } from './components/FoundWordsModal';
 import { GameOverScreen } from './components/GameOverScreen';
+import { StatsModal } from './components/StatsModal';
 import type { Schedule } from './types';
 
 // ─── Game layout ─────────────────────────────────────────────────────────────
 
+interface GameLayoutProps {
+  epochRef: React.RefObject<string | null>;
+}
+
 /** Inner component: reads game state and composes the UI. Must be inside GameProvider. */
-function GameLayout(): React.JSX.Element {
+function GameLayout({ epochRef }: GameLayoutProps): React.JSX.Element {
   const state = useGameState();
   const [modalOpen, setModalOpen] = useState(false);
+  const [statsOpen, setStatsOpen] = useState(false);
+
+  // STOR-01: save state on every valid word submission
+  useEffect(() => {
+    if (!state.dictLoaded || !state.puzzle) return;
+    if (state.foundWords.length === 0) return;
+    saveState({
+      puzzleIndex: state.puzzle.index,
+      foundWords: state.foundWords,
+      score: state.score,
+    });
+  }, [state.foundWords, state.score, state.puzzle, state.dictLoaded]);
+
+  // STOR-02: append history entry when game is complete
+  useEffect(() => {
+    if (!state.gameOver || !state.puzzle || !epochRef.current) return;
+    const date = getPuzzleDateStr(epochRef.current, state.puzzle.index);
+    const rank = getRank(state.score, state.maxScore, state.foundWords.length, state.allWords.length);
+    const entry: HistoryEntry = {
+      date,
+      score: state.score,
+      rank: rank.name,
+      foundCount: state.foundWords.length,
+      totalCount: state.allWords.length,
+      completed: true,
+    };
+    appendHistory(entry);
+    clearState();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [state.gameOver]);
 
   // D-07: Show plain loading text while schedule is pending
   if (!state.puzzle && !state.scheduleError) {
@@ -53,15 +97,15 @@ function GameLayout(): React.JSX.Element {
 
   return (
     <div className="app">
-      {/* Score bar — tapping opens found-words modal (D-12) */}
-      <ScoreBar onOpenModal={() => setModalOpen(true)} />
+      {/* Score bar — tapping word count opens found-words modal; tapping streak opens stats */}
+      <ScoreBar onOpenModal={() => setModalOpen(true)} onOpenStats={() => setStatsOpen(true)} />
 
       {/* Word-in-progress display above grid (D-03) */}
       <WordDisplay />
 
       {/* D-18: game-over screen replaces grid + action row when all words found */}
       {state.gameOver ? (
-        <GameOverScreen />
+        <GameOverScreen epochRef={epochRef} />
       ) : (
         <>
           {/* 2-3-2 letter grid with hidden keyboard input (D-10) */}
@@ -74,6 +118,9 @@ function GameLayout(): React.JSX.Element {
 
       {/* Found words modal (D-11, D-12, D-13) */}
       {modalOpen && <FoundWordsModal onClose={() => setModalOpen(false)} />}
+
+      {/* Stats modal (STOR-03 — D-10) */}
+      {statsOpen && <StatsModal onClose={() => setStatsOpen(false)} />}
     </div>
   );
 }
@@ -83,6 +130,8 @@ function GameLayout(): React.JSX.Element {
 /** Wrapper component: owns data loading side-effects; renders GameLayout inside GameProvider. */
 function AppLoader(): React.JSX.Element {
   const dispatch = useGameDispatch();
+  // epochRef captures schedule.epoch — PuzzleEntry has no date field (Research finding)
+  const epochRef = useRef<string | null>(null);
 
   const loadData = useCallback((): (() => void) => {
     let cancelled = false;
@@ -105,6 +154,8 @@ function AppLoader(): React.JSX.Element {
 
         if (!cancelled) {
           dispatch({ type: 'PUZZLE_LOADED', puzzle });
+          // Capture epoch after schedule resolves — PuzzleEntry has no epoch field
+          epochRef.current = schedule.epoch;
         }
 
         // D-06: dictionary loads in parallel — do NOT await; grid renders before dict resolves
@@ -114,7 +165,28 @@ function AppLoader(): React.JSX.Element {
             return r.json() as Promise<string[]>;
           })
           .then((words: string[]) => {
-            if (!cancelled) dispatch({ type: 'DICT_LOADED', words });
+            if (!cancelled) {
+              dispatch({ type: 'DICT_LOADED', words });
+              // STOR-01: check storage AFTER DICT_LOADED so allWords is populated (Research Pitfall 2)
+              const stored = readState();
+              if (stored && stored.puzzleIndex === index) {
+                // Today's puzzle — restore found words and score
+                dispatch({ type: 'RESTORE_STATE', foundWords: stored.foundWords, score: stored.score });
+              } else if (stored && stored.foundWords.length > 0 && epochRef.current) {
+                // New day, previous day had words — save as partial history entry (D-06)
+                const date = getPuzzleDateStr(epochRef.current, stored.puzzleIndex);
+                const partialEntry: HistoryEntry = {
+                  date,
+                  score: stored.score,
+                  rank: getRank(stored.score, 0, stored.foundWords.length, 0).name,
+                  foundCount: stored.foundWords.length,
+                  totalCount: 0,
+                  completed: false,
+                };
+                appendHistory(partialEntry);
+                clearState();
+              }
+            }
           })
           .catch(() => {
             if (!cancelled) dispatch({ type: 'DICT_ERROR' });
@@ -135,7 +207,7 @@ function AppLoader(): React.JSX.Element {
     return cleanup;
   }, [loadData]);
 
-  return <GameLayout />;
+  return <GameLayout epochRef={epochRef} />;
 }
 
 // ─── Root component ───────────────────────────────────────────────────────────
