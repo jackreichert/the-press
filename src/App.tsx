@@ -164,7 +164,7 @@ function AppLoader(): React.JSX.Element {
 
     async function fetchPuzzle(): Promise<void> {
       try {
-        const schedRes = await fetch('/schedule.json');
+        const schedRes = await fetch(`${import.meta.env.BASE_URL}schedule.json`);
         if (!schedRes.ok) throw new Error(`schedule fetch failed: ${schedRes.status}`);
         const schedule: Schedule = await schedRes.json() as Schedule;
 
@@ -185,7 +185,7 @@ function AppLoader(): React.JSX.Element {
         }
 
         // D-06: dictionary loads in parallel — do NOT await; grid renders before dict resolves
-        fetch('/dictionary.json')
+        fetch(`${import.meta.env.BASE_URL}dictionary.json`)
           .then(r => {
             if (!r.ok) throw new Error(`dictionary fetch failed: ${r.status}`);
             return r.json() as Promise<string[]>;
