@@ -1,6 +1,5 @@
 import React from 'react';
-import { screen, act } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
+import { screen, act, fireEvent } from '@testing-library/react';
 import { renderWithGame } from '../test/helpers';
 import { WordDisplay } from './WordDisplay';
 import { ActionRow } from './ActionRow';
@@ -47,9 +46,8 @@ describe('WordDisplay rendering', () => {
 });
 
 describe('WordDisplay error animation', () => {
-  it('adds shake class after an invalid submission', async () => {
-    // D-05: fake timers needed — shake uses setTimeout
-    const user = userEvent.setup({ advanceTimers: vi.advanceTimersByTime.bind(vi) });
+  it('adds shake class after an invalid submission', () => {
+    // D-05: use fireEvent (synchronous) so fake timers don't block click resolution
     const LETTER_P = { type: 'LETTER_APPEND' as const, letter: 'p' };
     const LETTER_I = { type: 'LETTER_APPEND' as const, letter: 'i' };
     const LETTER_N = { type: 'LETTER_APPEND' as const, letter: 'n' };
@@ -61,19 +59,14 @@ describe('WordDisplay error animation', () => {
       { initialActions: [PUZZLE_LOADED, DICT_LOADED, LETTER_P, LETTER_I, LETTER_N] },
     );
 
-    const submitBtn = screen.getByRole('button', { name: /Submit word/i });
-    await user.click(submitBtn);
+    fireEvent.click(screen.getByRole('button', { name: /Submit word/i }));
 
-    // shake class appears immediately after error
     const wordDiv = document.querySelector('.word-display') as HTMLElement;
     expect(wordDiv).toHaveClass('shake');
-
-    // error message appears
     expect(screen.getByRole('alert')).toHaveTextContent('Too short');
   });
 
-  it('removes shake class after 400ms', async () => {
-    const user = userEvent.setup({ advanceTimers: vi.advanceTimersByTime.bind(vi) });
+  it('removes shake class after 400ms', () => {
     const LETTER_P = { type: 'LETTER_APPEND' as const, letter: 'p' };
     const LETTER_I = { type: 'LETTER_APPEND' as const, letter: 'i' };
     const LETTER_N = { type: 'LETTER_APPEND' as const, letter: 'n' };
@@ -84,15 +77,14 @@ describe('WordDisplay error animation', () => {
       </>,
       { initialActions: [PUZZLE_LOADED, DICT_LOADED, LETTER_P, LETTER_I, LETTER_N] },
     );
-    await user.click(screen.getByRole('button', { name: /Submit word/i }));
+    fireEvent.click(screen.getByRole('button', { name: /Submit word/i }));
 
     act(() => { vi.advanceTimersByTime(401); });
     const wordDiv = document.querySelector('.word-display') as HTMLElement;
     expect(wordDiv).not.toHaveClass('shake');
   });
 
-  it('clears the current word after 700ms following an error', async () => {
-    const user = userEvent.setup({ advanceTimers: vi.advanceTimersByTime.bind(vi) });
+  it('clears the current word after 700ms following an error', () => {
     const LETTER_P = { type: 'LETTER_APPEND' as const, letter: 'p' };
     const LETTER_I = { type: 'LETTER_APPEND' as const, letter: 'i' };
     const LETTER_N = { type: 'LETTER_APPEND' as const, letter: 'n' };
@@ -103,14 +95,12 @@ describe('WordDisplay error animation', () => {
       </>,
       { initialActions: [PUZZLE_LOADED, DICT_LOADED, LETTER_P, LETTER_I, LETTER_N] },
     );
-    await user.click(screen.getByRole('button', { name: /Submit word/i }));
+    fireEvent.click(screen.getByRole('button', { name: /Submit word/i }));
 
-    // Word still visible immediately after error
     expect(screen.getByText('PIN')).toBeInTheDocument();
 
     act(() => { vi.advanceTimersByTime(701); });
 
-    // Word cleared — placeholder shows
     expect(screen.getByText('—')).toBeInTheDocument();
   });
 });
