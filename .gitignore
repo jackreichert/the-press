@@ -28,9 +28,8 @@ Thumbs.db
 *.log
 npm-debug.log*
 
-# Generated data (large — rebuild via npm run pipeline)
-public/dictionary.json
-public/schedule.json
+# public/dictionary.json and public/schedule.json are committed — they are
+# static content (not build artifacts) and must be present for deployment.
 
 # Downloaded word list cache (rebuild via npm run dict:build)
 data/scowl-60-raw.txt
