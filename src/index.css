@@ -9,23 +9,23 @@
   --space-xl:  32px;
   --space-2xl: 48px;
 
-  /* Color palette — Gutenberg letterpress placeholder */
-  --color-bg:       #F5F0E8; /* Aged ivory page */
-  --color-surface:  #EAE4D6; /* Tile and bar backgrounds */
-  --color-hover:    #D9D1C0; /* Hover state for tiles and buttons */
-  --color-ink:      #1A1610; /* Near-black text */
-  --color-accent:   #8B2500; /* Center tile, pressed state, progress fill, error text */
-  --color-border:   #C4BAA8; /* Tile borders, modal border, progress track */
+  /* Color palette — Gutenberg letterpress */
+  --color-bg:          #F5F0E8; /* Aged ivory page */
+  --color-surface:     #EAE4D6; /* Tile and bar backgrounds */
+  --color-hover:       #D9D1C0; /* Hover state for tiles and buttons */
+  --color-ink:         #1A1610; /* Near-black text */
+  --color-accent:      #8B2500; /* Center tile, pressed state, progress fill, error text */
+  --color-border:      #C4BAA8; /* Tile borders, modal border, progress track */
+  --color-tile-border: #9E9282; /* Darkened tile border for woodblock shadow contrast */
+  --color-rule:        rgba(26, 22, 16, 0.18); /* Hairline decorative rule tint */
 
   /* Typography */
-  --font-serif: 'Crimson Pro', Georgia, 'Times New Roman', serif;
-
-  /* Phase 4 typography variables */
+  --font-serif:   'Crimson Pro', Georgia, 'Times New Roman', serif;
   --font-fraktur: 'UnifrakturMaguntia', 'Times New Roman', serif;
   --font-tile:    'IM Fell English', Georgia, serif;
   --font-body:    'Crimson Pro', Georgia, 'Times New Roman', serif;
 
-  /* Phase 4 pangram color */
+  /* Pangram illuminated color */
   --color-pangram: #C49A0A;
 }
 
@@ -43,8 +43,8 @@ body {
   line-height: 1.5;
   color: var(--color-ink);
   background-color: var(--color-bg);
-  /* Parchment grain — SVG feTurbulence noise filter, tiled, very low opacity */
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+  /* Parchment grain — asymmetric feTurbulence (0.75 x, 0.55 y) for paper-fiber directionality */
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75 0.55' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)' opacity='0.07'/%3E%3C/svg%3E");
   background-repeat: repeat;
   background-size: 200px 200px;
 }
@@ -54,22 +54,41 @@ body {
 .app {
   max-width: 480px;
   margin: 0 auto;
-  padding: var(--space-2xl) var(--space-md);
+  padding: var(--space-xl) var(--space-md) var(--space-2xl);
   min-height: 100dvh;
   display: flex;
   flex-direction: column;
   gap: var(--space-md);
 }
 
+/* ─── Masthead ───────────────────────────────────────────────────────────── */
+
+.masthead {
+  text-align: center;
+  /* Newspaper double-rule: 3px thick above, 1px hairline below */
+  border-top: 3px solid var(--color-ink);
+  border-bottom: 1px solid var(--color-ink);
+  padding: var(--space-sm) 0;
+}
+
 .app-title {
   font-family: var(--font-fraktur);
-  font-size: 28px;
+  font-size: 52px;
   font-weight: 400;
-  line-height: 1.1;
+  line-height: 0.95;
   color: var(--color-ink);
-  text-align: center;
-  letter-spacing: 0.02em;
-  margin-bottom: var(--space-xs);
+  letter-spacing: 0.03em;
+}
+
+.app-subtitle {
+  font-family: var(--font-serif);
+  font-size: 11px;
+  font-weight: 400;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--color-ink);
+  opacity: 0.6;
+  margin-top: var(--space-xs);
 }
 
 /* ─── Loading / error states ─────────────────────────────────────────────── */
@@ -97,36 +116,43 @@ body {
   padding: var(--space-sm) var(--space-md);
   background: var(--color-surface);
   border: 1px solid var(--color-border);
-  border-radius: 4px;
+  border-radius: 2px;
   cursor: pointer;
   color: var(--color-ink);
+  box-shadow: 0 2px 0 rgba(0, 0, 0, 0.12), inset 0 1px 0 rgba(255, 255, 255, 0.12);
 }
 
 .retry-btn:hover { background: var(--color-hover); border-color: var(--color-ink); }
-.retry-btn:active { background: var(--color-accent); border-color: var(--color-accent); color: var(--color-bg); }
+.retry-btn:active {
+  background: var(--color-accent);
+  border-color: var(--color-accent);
+  color: var(--color-bg);
+  box-shadow: 0 1px 0 rgba(0, 0, 0, 0.10), inset 0 1px 2px rgba(0, 0, 0, 0.15);
+}
 
 /* ─── Score bar ─────────────────────────────────────────────────────────── */
 
 .score-bar {
   background: var(--color-surface);
   padding: var(--space-sm) var(--space-md);
-  border-radius: 4px;
+  border: 1px solid var(--color-border);
+  border-radius: 2px;
   cursor: pointer;
   user-select: none;
 }
 
 .rank-name {
   font-family: var(--font-fraktur);
-  font-size: 20px;
+  font-size: 22px;
   font-weight: 400;
   line-height: 1.2;
   color: var(--color-ink);
 }
 
 .rank-progress {
-  height: 8px;
+  height: 6px;
   background: var(--color-border);
-  border-radius: 4px;
+  border-radius: 1px;
   margin: var(--space-xs) 0;
   overflow: hidden;
 }
@@ -134,53 +160,62 @@ body {
 .rank-progress__fill {
   height: 100%;
   background: var(--color-accent);
-  border-radius: 4px;
+  border-radius: 1px;
   transition: width 200ms ease-out;
 }
 
 .score-count {
-  font-size: 14px;
-  font-weight: 600;
+  font-size: 13px;
+  font-weight: 400;
+  letter-spacing: 0.02em;
   color: var(--color-ink);
+  opacity: 0.85;
 }
 
-/* ─── Word display ──────────────────────────────────────────────────────── */
+/* ─── Word display — composing stick ────────────────────────────────────── */
 
 .word-display-area {
-  margin-top: var(--space-xl);
   text-align: center;
-  min-height: 56px; /* prevent layout shift when empty */
+  min-height: 64px;
+  padding-bottom: var(--space-sm);
+  /* Composing tray baseline rail */
+  border-bottom: 1px solid var(--color-border);
 }
 
 .word-display {
-  font-size: 28px;
-  font-weight: 600;
+  font-family: var(--font-tile); /* IM Fell English — letters being set in type */
+  font-size: 32px;
+  font-weight: 400;             /* IM Fell English has weight 400 only */
   line-height: 1.1;
-  letter-spacing: 0.05em;
+  letter-spacing: 0.12em;       /* Wide typesetter tracking */
   color: var(--color-ink);
   min-height: 1.1em;
 }
 
 .word-display--placeholder {
-  opacity: 0.5;
+  opacity: 0.35;
 }
 
 .error-msg {
-  font-size: 16px;
+  font-size: 14px;
   font-weight: 400;
   color: var(--color-accent);
   margin-top: var(--space-xs);
   min-height: 1.5em;
+  letter-spacing: 0.04em;
 }
 
-/* ─── Letter grid ────────────────────────────────────────────────────────── */
+/* ─── Letter grid — composing frame ─────────────────────────────────────── */
 
 .letter-grid {
-  padding: var(--space-lg);
+  padding: var(--space-md) var(--space-lg);
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: var(--space-sm);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 2px;
 }
 
 .grid-row {
@@ -190,17 +225,17 @@ body {
   justify-content: center;
 }
 
-/* ─── Letter tile ────────────────────────────────────────────────────────── */
+/* ─── Letter tile — moveable type block ─────────────────────────────────── */
 
 .tile {
   font-family: var(--font-tile);
-  font-size: 20px;
+  font-size: 22px;
   font-weight: 600;
-  min-width: 48px;
-  min-height: 48px;
+  min-width: 52px;
+  min-height: 52px;
   padding: var(--space-sm);
   background: var(--color-surface);
-  border: 1px solid #9E9282;
+  border: 1px solid var(--color-tile-border);
   border-radius: 2px;
   cursor: pointer;
   color: var(--color-ink);
@@ -208,29 +243,30 @@ body {
   align-items: center;
   justify-content: center;
   text-transform: uppercase;
-  /* Raised letterpress woodblock effect */
+  /* Raised letterpress woodblock — physical depth + top-edge highlight */
   box-shadow:
-    0 2px 0 rgba(0, 0, 0, 0.30),
-    0 3px 0 rgba(0, 0, 0, 0.15),
-    inset 0 1px 0 rgba(255, 255, 255, 0.14);
+    0 3px 0 rgba(0, 0, 0, 0.32),
+    0 4px 0 rgba(0, 0, 0, 0.14),
+    inset 0 1px 0 rgba(255, 255, 255, 0.18);
 }
 
 .tile:hover {
   background: var(--color-hover);
   border-color: var(--color-accent);
   box-shadow:
-    0 2px 0 rgba(0, 0, 0, 0.30),
-    0 3px 0 rgba(0, 0, 0, 0.15),
-    inset 0 1px 0 rgba(255, 255, 255, 0.14);
+    0 3px 0 rgba(0, 0, 0, 0.32),
+    0 4px 0 rgba(0, 0, 0, 0.14),
+    inset 0 1px 0 rgba(255, 255, 255, 0.18);
 }
 
 .tile:active {
   background: var(--color-accent);
   border-color: var(--color-accent);
   color: var(--color-bg);
+  /* Shadow collapses — tile presses down into the stick */
   box-shadow:
-    0 1px 0 rgba(0, 0, 0, 0.20),
-    inset 0 1px 2px rgba(0, 0, 0, 0.20);
+    0 1px 0 rgba(0, 0, 0, 0.22),
+    inset 0 1px 3px rgba(0, 0, 0, 0.25);
 }
 
 .tile:focus-visible {
@@ -238,17 +274,17 @@ body {
   outline-offset: 2px;
 }
 
+/* Center tile — permanently locked in the composing stick (inset, not raised) */
 .tile--center {
-  min-width: 56px;
-  min-height: 56px;
+  min-width: 60px;
+  min-height: 60px;
   background: var(--color-accent);
   border: 1px solid var(--color-accent);
   border-radius: 2px;
   color: var(--color-bg);
-  /* Inset "pressed into the composing stick" — overrides raised shadow from .tile */
   box-shadow:
-    inset 0 2px 5px rgba(0, 0, 0, 0.40),
-    inset 0 1px 2px rgba(0, 0, 0, 0.25);
+    inset 0 2px 6px rgba(0, 0, 0, 0.45),
+    inset 0 1px 2px rgba(0, 0, 0, 0.28);
 }
 
 .tile--center:hover {
@@ -256,8 +292,8 @@ body {
   border-color: var(--color-accent);
   opacity: 0.9;
   box-shadow:
-    inset 0 2px 5px rgba(0, 0, 0, 0.40),
-    inset 0 1px 2px rgba(0, 0, 0, 0.25);
+    inset 0 2px 6px rgba(0, 0, 0, 0.45),
+    inset 0 1px 2px rgba(0, 0, 0, 0.28);
 }
 
 /* ─── Action row ─────────────────────────────────────────────────────────── */
@@ -266,22 +302,25 @@ body {
   display: flex;
   gap: var(--space-sm);
   justify-content: center;
-  margin-bottom: var(--space-2xl);
 }
 
 .action-btn {
   font-family: var(--font-serif);
   font-size: 14px;
   font-weight: 600;
+  letter-spacing: 0.04em;
   min-width: 80px;
   min-height: 48px;
   padding: var(--space-sm) var(--space-md);
   background: var(--color-surface);
   border: 1px solid var(--color-border);
-  border-radius: 4px;
+  border-radius: 2px;
   cursor: pointer;
   color: var(--color-ink);
   flex: 1;
+  box-shadow:
+    0 2px 0 rgba(0, 0, 0, 0.16),
+    inset 0 1px 0 rgba(255, 255, 255, 0.12);
 }
 
 .action-btn:hover {
@@ -293,6 +332,9 @@ body {
   background: var(--color-accent);
   border-color: var(--color-accent);
   color: var(--color-bg);
+  box-shadow:
+    0 1px 0 rgba(0, 0, 0, 0.10),
+    inset 0 1px 2px rgba(0, 0, 0, 0.15);
 }
 
 .action-btn:focus-visible {
@@ -305,6 +347,7 @@ body {
   border-color: var(--color-border);
   color: var(--color-border);
   cursor: not-allowed;
+  box-shadow: none;
 }
 
 /* ─── Modal ──────────────────────────────────────────────────────────────── */
@@ -312,7 +355,7 @@ body {
 .modal-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(26, 22, 16, 0.5);
+  background: rgba(26, 22, 16, 0.55);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -321,8 +364,12 @@ body {
 
 .modal-card {
   background: var(--color-bg);
-  border: 1px solid var(--color-border);
-  border-radius: 4px;
+  border: 1px solid var(--color-ink);
+  /* Double-border frame — ink line, parchment gap, outer border */
+  box-shadow:
+    0 0 0 3px var(--color-bg),
+    0 0 0 4px var(--color-border);
+  border-radius: 2px;
   max-width: 360px;
   width: 90%;
   padding: var(--space-lg);
@@ -335,13 +382,15 @@ body {
   font-family: var(--font-body);
   font-size: 20px;
   font-weight: 600;
-  margin-bottom: var(--space-md);
+  margin-bottom: var(--space-sm);
+  padding-bottom: var(--space-sm);
+  border-bottom: 1px solid var(--color-border);
 }
 
 .modal-close {
   font-family: var(--font-serif);
-  font-size: 20px;
-  font-weight: 600;
+  font-size: 18px;
+  font-weight: 400;
   position: absolute;
   top: var(--space-sm);
   right: var(--space-sm);
@@ -351,13 +400,14 @@ body {
   border: none;
   cursor: pointer;
   color: var(--color-ink);
+  opacity: 0.6;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  border-radius: 4px;
+  border-radius: 2px;
 }
 
-.modal-close:hover { background: var(--color-surface); }
+.modal-close:hover { background: var(--color-surface); opacity: 1; }
 .modal-close:focus-visible { outline: 2px solid var(--color-ink); outline-offset: 2px; }
 
 .found-words-list {
@@ -368,13 +418,11 @@ body {
 .found-word {
   font-size: 16px;
   font-weight: 400;
-  line-height: 1.5;
+  line-height: 1.6;
   color: var(--color-ink);
-  padding: 2px 0;
 }
 
 .found-word.pangram-word {
-  font-weight: 400;
   color: var(--color-pangram);
   font-style: italic;
 }
@@ -389,24 +437,32 @@ body {
 
 .game-over {
   text-align: center;
-  padding: var(--space-lg) 0;
+  padding: var(--space-xl) 0;
   display: flex;
   flex-direction: column;
+  align-items: center;
   gap: var(--space-md);
 }
 
 .game-over__rank {
   font-family: var(--font-fraktur);
-  font-size: 28px;
+  font-size: 44px;
   font-weight: 400;
   color: var(--color-accent);
-  line-height: 1.1;
+  line-height: 1.0;
+  padding: var(--space-sm) var(--space-xl);
+  /* Broadsheet headline rule treatment */
+  border-top: 1px solid var(--color-accent);
+  border-bottom: 1px solid var(--color-accent);
+  width: 100%;
 }
 
 .game-over__score {
-  font-size: 20px;
-  font-weight: 600;
+  font-size: 17px;
+  font-weight: 400;
+  letter-spacing: 0.06em;
   color: var(--color-ink);
+  opacity: 0.8;
 }
 
 /* ─── Shake animation ────────────────────────────────────────────────────── */
@@ -428,6 +484,9 @@ body {
   .word-display.shake {
     animation: none;
   }
+  .word-display--flash {
+    transition: none;
+  }
 }
 
 /* ─── Valid-word flash ───────────────────────────────────────────────────── */
@@ -437,7 +496,7 @@ body {
   transition: color 150ms ease-out;
 }
 
-/* ─── Score bar bottom row (Phase 3) ─────────────────────────────────────── */
+/* ─── Score bar bottom row ───────────────────────────────────────────────── */
 
 .score-bar__bottom {
   display: flex;
@@ -447,8 +506,9 @@ body {
 
 .streak-counter {
   font-family: var(--font-serif);
-  font-size: 14px;
-  font-weight: 600;
+  font-size: 13px;
+  font-weight: 400;
+  letter-spacing: 0.04em;
   background: none;
   border: none;
   cursor: pointer;
@@ -465,50 +525,62 @@ body {
   outline-offset: 2px;
 }
 
-/* ─── Stats modal content (Phase 3 — D-11) ───────────────────────────────── */
+/* ─── Stats modal content ────────────────────────────────────────────────── */
 
 .stats-list {
   display: flex;
   flex-direction: column;
   gap: var(--space-md);
-  margin-top: var(--space-md);
+  margin-top: var(--space-sm);
 }
 
 .stats-item {
   display: flex;
   flex-direction: column;
   gap: var(--space-xs);
+  padding-bottom: var(--space-sm);
+  border-bottom: 1px solid var(--color-rule);
+}
+
+.stats-item:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
 }
 
 .stat-label {
-  font-size: 16px;
+  font-size: 11px;
   font-weight: 400;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
   color: var(--color-ink);
-  line-height: 1.5;
+  opacity: 0.6;
 }
 
 .stat-value {
-  font-size: 28px;
-  font-weight: 600;
-  line-height: 1.1;
+  font-family: var(--font-fraktur);
+  font-size: 36px;
+  font-weight: 400;
+  line-height: 1.0;
   color: var(--color-ink);
 }
 
-/* ─── Share button (Phase 3 — D-13) ─────────────────────────────────────── */
+/* ─── Share button ───────────────────────────────────────────────────────── */
 
 .share-btn {
   font-family: var(--font-serif);
   font-size: 14px;
   font-weight: 600;
+  letter-spacing: 0.06em;
   padding: var(--space-sm) var(--space-md);
   background: var(--color-surface);
   border: 1px solid var(--color-border);
-  border-radius: 4px;
+  border-radius: 2px;
   cursor: pointer;
   color: var(--color-ink);
   width: 100%;
   min-height: 44px;
   margin-top: var(--space-sm);
+  box-shadow: 0 2px 0 rgba(0, 0, 0, 0.12), inset 0 1px 0 rgba(255, 255, 255, 0.10);
 }
 
 .share-btn:hover {
@@ -521,6 +593,7 @@ body {
   background: var(--color-accent);
   border-color: var(--color-accent);
   color: var(--color-bg);
+  box-shadow: 0 1px 0 rgba(0, 0, 0, 0.10);
 }
 
 .share-btn:focus-visible {
@@ -534,7 +607,7 @@ body {
   width: 100%;
   padding: var(--space-sm);
   border: 1px solid var(--color-border);
-  border-radius: 4px;
+  border-radius: 2px;
   background: var(--color-surface);
   color: var(--color-ink);
   resize: none;

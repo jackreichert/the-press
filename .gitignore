@@ -31,3 +31,14 @@ npm-debug.log*
 # Generated data (large — rebuild via npm run pipeline)
 public/dictionary.json
 public/schedule.json
+
+# Downloaded word list cache (rebuild via npm run dict:build)
+data/scowl-60-raw.txt
+
+# Test output
+coverage/
+test-results/
+playwright-report/
+
+# Claude Code internals (worktrees, local settings)
+.claude/

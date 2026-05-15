@@ -71,7 +71,8 @@ export function LetterGrid(): React.JSX.Element {
         onChange={handleHiddenInput}
         onKeyDown={handleHiddenKeyDown}
         style={{ position: 'absolute', opacity: 0, pointerEvents: 'none', width: 1, height: 1 }}
-        aria-hidden="true"
+        aria-label="game input"
+        tabIndex={-1}
         autoComplete="off"
         autoCorrect="off"
         autoCapitalize="off"

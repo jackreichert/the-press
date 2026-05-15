@@ -42,8 +42,30 @@ interface GameLayoutProps {
 /** Inner component: reads game state and composes the UI. Must be inside GameProvider. */
 function GameLayout({ epochRef }: GameLayoutProps): React.JSX.Element {
   const state = useGameState();
+  const dispatch = useGameDispatch();
   const [modalOpen, setModalOpen] = useState(false);
   const [statsOpen, setStatsOpen] = useState(false);
+
+  // Page-level keyboard capture — fires regardless of what element has focus.
+  useEffect(() => {
+    function handleKeydown(e: KeyboardEvent): void {
+      if (e.ctrlKey || e.metaKey || e.altKey) return;
+      if (modalOpen || statsOpen || state.gameOver) return;
+      const key = e.key.toLowerCase();
+      if (/^[a-z]$/.test(key)) {
+        e.preventDefault();
+        dispatch({ type: 'LETTER_APPEND', letter: key });
+      } else if (e.key === 'Backspace') {
+        e.preventDefault();
+        dispatch({ type: 'LETTER_DELETE' });
+      } else if (e.key === 'Enter') {
+        e.preventDefault();
+        dispatch({ type: 'WORD_SUBMIT' });
+      }
+    }
+    document.addEventListener('keydown', handleKeydown);
+    return () => document.removeEventListener('keydown', handleKeydown);
+  }, [modalOpen, statsOpen, state.gameOver, dispatch]);
 
   // STOR-01: save state on every valid word submission
   useEffect(() => {
@@ -97,7 +119,10 @@ function GameLayout({ epochRef }: GameLayoutProps): React.JSX.Element {
 
   return (
     <div className="app">
-      <h1 className="app-title">The Press</h1>
+      <header className="masthead">
+        <h1 className="app-title">The Press</h1>
+        <p className="app-subtitle">A Daily Word Puzzle</p>
+      </header>
       {/* Score bar — tapping word count opens found-words modal; tapping streak opens stats */}
       <ScoreBar onOpenModal={() => setModalOpen(true)} onOpenStats={() => setStatsOpen(true)} />
 

@@ -12,7 +12,7 @@
  * Decisions from CONTEXT.md respected:
  *   D-01: letters only in schedule.json — no embedded answers
  *   D-02: epoch hardcoded as 2026-05-12
- *   D-03: 730 puzzles (2 years)
+ *   D-03: 3650 puzzles (10 years)
  *   D-05: 25 words minimum per puzzle
  *   D-06: LDNOOBW + scripts/blocklist.txt offensive word filter
  */
@@ -27,7 +27,7 @@ const CHAR_A = 'a'.charCodeAt(0);
 const LDNOOBW_URL =
   'https://raw.githubusercontent.com/LDNOOBW/List-of-Dirty-Naughty-Obscene-and-Otherwise-Bad-Words/master/en';
 const EPOCH = '2026-05-12';
-const TARGET_PUZZLES = 730;
+const TARGET_PUZZLES = 3650;
 const MIN_WORDS = 25;
 const DEFAULT_SEED = 42;
 

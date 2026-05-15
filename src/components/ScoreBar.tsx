@@ -65,7 +65,7 @@ export function ScoreBar({ onOpenModal, onOpenStats }: ScoreBarProps): React.JSX
           type="button"
           aria-label={`Streak: ${streak} days. Tap to see stats.`}
         >
-          🔥 {streak}
+          ❧ {streak}
         </button>
       </div>
     </div>
