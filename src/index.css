@@ -18,7 +18,15 @@
   --color-border:   #C4BAA8; /* Tile borders, modal border, progress track */
 
   /* Typography */
-  --font-serif: Georgia, 'Times New Roman', serif;
+  --font-serif: 'Crimson Pro', Georgia, 'Times New Roman', serif;
+
+  /* Phase 4 typography variables */
+  --font-fraktur: 'UnifrakturMaguntia', 'Times New Roman', serif;
+  --font-tile:    'IM Fell English', Georgia, serif;
+  --font-body:    'Crimson Pro', Georgia, 'Times New Roman', serif;
+
+  /* Phase 4 pangram color */
+  --color-pangram: #C49A0A;
 }
 
 /* ─── Reset / base ──────────────────────────────────────────────────────── */
@@ -35,6 +43,10 @@ body {
   line-height: 1.5;
   color: var(--color-ink);
   background-color: var(--color-bg);
+  /* Parchment grain — SVG feTurbulence noise filter, tiled, very low opacity */
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+  background-repeat: repeat;
+  background-size: 200px 200px;
 }
 
 /* ─── App layout ────────────────────────────────────────────────────────── */
