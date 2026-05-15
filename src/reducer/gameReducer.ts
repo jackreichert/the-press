@@ -42,7 +42,8 @@ export type GameAction =
   | { type: 'WORD_SUBMIT' }
   | { type: 'SHUFFLE' }
   | { type: 'SCHEDULE_ERROR' }
-  | { type: 'DICT_ERROR' };
+  | { type: 'DICT_ERROR' }
+  | { type: 'RESTORE_STATE'; foundWords: string[]; score: number };
 
 // ─── Initial state ────────────────────────────────────────────────────────────
 
@@ -90,6 +91,18 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
         maxScore,
         dictLoaded: true,
         dictError: false,
+      };
+    }
+
+    case 'RESTORE_STATE': {
+      // Must not fire before DICT_LOADED — allWords empty means gameOver wrong (Pitfall 2)
+      if (!state.dictLoaded || !state.puzzle) return state;
+      const gameOver = action.foundWords.length === state.allWords.length;
+      return {
+        ...state,
+        foundWords: action.foundWords,
+        score: action.score,
+        gameOver,
       };
     }
 
