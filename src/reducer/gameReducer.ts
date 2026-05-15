@@ -162,7 +162,8 @@ function handleSubmit(state: GameState): GameState {
     return withError(state, 'Missing center letter');
   }
 
-  if (!state.dict.has(word)) {
+  // Check puzzle-valid word set (not full dict) — allWords are pre-filtered to use only puzzle letters
+  if (!state.allWords.includes(word)) {
     return withError(state, 'Not a word');
   }
 

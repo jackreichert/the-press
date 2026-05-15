@@ -138,6 +138,13 @@ describe('WORD_SUBMIT', () => {
     expect(s.errorMsg).toBe('Not a word');
   });
 
+  it('rejects real word that uses non-puzzle letters with "Not a word"', () => {
+    // 'sprint' is a real English word and contains center P, but uses S which is not in puzzle
+    // This guards against validating against the full dict instead of allWords
+    const s = gameReducer(typeWord(loadedState(), 'sprint'), { type: 'WORD_SUBMIT' });
+    expect(s.errorMsg).toBe('Not a word');
+  });
+
   it('accepts valid word, increments score, and clears currentWord', () => {
     const s = gameReducer(typeWord(loadedState(), 'drip'), { type: 'WORD_SUBMIT' });
     expect(s.foundWords).toContain('drip');
