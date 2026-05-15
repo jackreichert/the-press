@@ -6,20 +6,26 @@
  */
 
 import React, { useState, useEffect } from 'react';
-import { useGameState } from '../context/GameContext';
+import { useGameState, useGameDispatch } from '../context/GameContext';
 
 export function WordDisplay(): React.JSX.Element {
   const state = useGameState();
+  const dispatch = useGameDispatch();
   const [shaking, setShaking] = useState(false);
 
-  // Pitfall 3: depend on errorKey, not errorMsg — re-triggers for identical error strings
+  // Pitfall 3: depend on errorKey, not errorMsg — re-triggers for identical error strings.
+  // On error: shake for 400ms, then clear word after 700ms so player sees what they typed.
   useEffect(() => {
     if (state.errorKey > 0) {
       setShaking(true);
-      const t = setTimeout(() => setShaking(false), 400);
-      return () => clearTimeout(t);
+      const shakeTimer = setTimeout(() => setShaking(false), 400);
+      const clearTimer = setTimeout(() => dispatch({ type: 'WORD_CLEAR' }), 700);
+      return () => {
+        clearTimeout(shakeTimer);
+        clearTimeout(clearTimer);
+      };
     }
-  }, [state.errorKey]);
+  }, [state.errorKey, dispatch]);
 
   const isEmpty = state.currentWord.length === 0;
   const displayText = isEmpty ? '—' : state.currentWord.toUpperCase();

@@ -187,11 +187,10 @@ function handleSubmit(state: GameState): GameState {
   };
 }
 
-/** Return state with errorMsg set and errorKey incremented. */
+/** Return state with errorMsg set and errorKey incremented. Word clears after a UI-layer delay. */
 function withError(state: GameState, msg: string): GameState {
   return {
     ...state,
-    currentWord: state.currentWord, // preserve current word on error
     errorMsg: msg,
     errorKey: state.errorKey + 1,  // Pitfall 3: increment so shake re-triggers on same error
   };
