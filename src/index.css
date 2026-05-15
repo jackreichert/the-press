@@ -61,6 +61,17 @@ body {
   gap: var(--space-md);
 }
 
+.app-title {
+  font-family: var(--font-fraktur);
+  font-size: 28px;
+  font-weight: 400;
+  line-height: 1.1;
+  color: var(--color-ink);
+  text-align: center;
+  letter-spacing: 0.02em;
+  margin-bottom: var(--space-xs);
+}
+
 /* ─── Loading / error states ─────────────────────────────────────────────── */
 
 .loading-state {
@@ -105,8 +116,9 @@ body {
 }
 
 .rank-name {
+  font-family: var(--font-fraktur);
   font-size: 20px;
-  font-weight: 600;
+  font-weight: 400;
   line-height: 1.2;
   color: var(--color-ink);
 }
@@ -301,6 +313,7 @@ body {
 }
 
 .modal-title {
+  font-family: var(--font-body);
   font-size: 20px;
   font-weight: 600;
   margin-bottom: var(--space-md);
@@ -357,8 +370,9 @@ body {
 }
 
 .game-over__rank {
+  font-family: var(--font-fraktur);
   font-size: 28px;
-  font-weight: 600;
+  font-weight: 400;
   color: var(--color-accent);
   line-height: 1.1;
 }
