@@ -97,6 +97,7 @@ function GameLayout({ epochRef }: GameLayoutProps): React.JSX.Element {
 
   return (
     <div className="app">
+      <h1 className="app-title">The Press</h1>
       {/* Score bar — tapping word count opens found-words modal; tapping streak opens stats */}
       <ScoreBar onOpenModal={() => setModalOpen(true)} onOpenStats={() => setStatsOpen(true)} />
 
