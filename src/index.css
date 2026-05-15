@@ -496,6 +496,56 @@ body {
   transition: color 150ms ease-out;
 }
 
+/* ─── Word found recognition ─────────────────────────────────────────────── */
+
+@keyframes word-rise {
+  0%   { opacity: 1; transform: translateY(0)    scale(1);    }
+  40%  { opacity: 1; transform: translateY(-6px) scale(1.06); }
+  100% { opacity: 0; transform: translateY(-16px) scale(1);   }
+}
+
+@keyframes word-rise-pangram {
+  0%   { opacity: 1; transform: translateY(0)    scale(1);    }
+  30%  { opacity: 1; transform: translateY(-4px) scale(1.12); }
+  100% { opacity: 0; transform: translateY(-20px) scale(1);   }
+}
+
+@keyframes label-fade {
+  0%   { opacity: 0; transform: translateY(4px);  }
+  20%  { opacity: 1; transform: translateY(0);    }
+  70%  { opacity: 1; transform: translateY(0);    }
+  100% { opacity: 0; transform: translateY(-4px); }
+}
+
+.word-display--found {
+  color: var(--color-accent);
+  animation: word-rise 0.95s ease-out forwards;
+}
+
+.word-display--pangram {
+  color: var(--color-pangram, #b87a00);
+  animation: word-rise-pangram 0.95s ease-out forwards;
+}
+
+.found-label {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--color-accent);
+  min-height: 1.5em;
+  animation: label-fade 0.95s ease-out forwards;
+}
+
+.found-label--pangram {
+  color: var(--color-pangram, #b87a00);
+  font-size: 16px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .word-display--found,
+  .word-display--pangram { animation: none; opacity: 1; }
+  .found-label            { animation: none; opacity: 1; }
+}
+
 /* ─── Score bar bottom row ───────────────────────────────────────────────── */
 
 .score-bar__bottom {
