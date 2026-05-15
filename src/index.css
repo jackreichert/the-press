@@ -374,8 +374,15 @@ body {
 }
 
 .found-word.pangram-word {
-  font-weight: 600;
-  color: var(--color-accent);
+  font-weight: 400;
+  color: var(--color-pangram);
+  font-style: italic;
+}
+
+.found-word.pangram-word::before {
+  content: "✦ ";
+  color: var(--color-pangram);
+  font-style: normal;
 }
 
 /* ─── Game-over screen ───────────────────────────────────────────────────── */
