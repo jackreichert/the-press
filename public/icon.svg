@@ -7,15 +7,15 @@
       }
     </style>
   </defs>
-  <!-- Ink background fills the full squircle -->
-  <rect width="512" height="512" fill="#1A1610"/>
+  <!-- Ivory parchment background -->
+  <rect width="512" height="512" fill="#F5F0E8"/>
   <!-- Thin rule lines well inside the safe zone -->
   <rect x="48" y="48" width="416" height="416" fill="none" stroke="#8B2500" stroke-width="6"/>
   <rect x="56" y="56" width="400" height="400" fill="none" stroke="#8B2500" stroke-width="2"/>
-  <!-- UnifrakturMaguntia P in ivory -->
+  <!-- UnifrakturMaguntia P in ink -->
   <text x="256" y="374"
     font-family="UnifrakturMaguntia, serif"
     font-size="320"
     text-anchor="middle"
-    fill="#F5F0E8">P</text>
+    fill="#1A1610">P</text>
 </svg>

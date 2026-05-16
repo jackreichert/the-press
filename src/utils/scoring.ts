@@ -88,12 +88,7 @@ export function getRank(
  * making the bar jump to 50% after earning just 1% of total score.
  * The rank name already communicates tier; the bar shows raw completion progress.
  */
-export function getProgressPct(
-  score: number,
-  maxScore: number,
-  _foundCount: number,
-  _totalCount: number,
-): number {
+export function getProgressPct(score: number, maxScore: number): number {
   if (maxScore === 0) return 0;
   return Math.min(100, Math.max(0, Math.floor((score / maxScore) * 100)));
 }

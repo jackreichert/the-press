@@ -2,7 +2,7 @@
  * process-dict.ts — Dictionary processor for The Press.
  *
  * Builds public/dictionary.json from the intersection of:
- *   - SCOWL-60 (max_proper=0): explicitly excludes proper nouns
+ *   - SCOWL-70 (max_proper=0): explicitly excludes proper nouns
  *   - ENABLE2K: independently curated, no proper nouns by construction
  *
  * Using the intersection gives us SCOWL's explicit proper-noun gate AND
@@ -30,9 +30,9 @@ const ENABLE2K_URL =
 
 // max_proper=0 explicitly excludes proper nouns from the SCOWL word list
 const SCOWL_URL =
-  'https://app.aspell.net/create?max_size=60&spelling=US&max_variant=1&diacritic=strip&max_proper=0&download=wordlist&encoding=utf-8&format=inline';
+  'https://app.aspell.net/create?max_size=70&spelling=US&max_variant=1&diacritic=strip&max_proper=0&download=wordlist&encoding=utf-8&format=inline';
 
-const SCOWL_CACHE = join(process.cwd(), 'data', 'scowl-60-no-proper.txt');
+const SCOWL_CACHE = join(process.cwd(), 'data', 'scowl-70-no-proper.txt');
 
 async function fetchGzip(url: string): Promise<string[]> {
   const res = await fetch(url);

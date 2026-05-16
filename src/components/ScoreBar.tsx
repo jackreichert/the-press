@@ -10,7 +10,7 @@
  * D-17: Daily streak omitted entirely from Phase 2.
  */
 
-import React from 'react';
+import React, { useMemo } from 'react';
 import { getRank, getProgressPct } from '../utils/scoring';
 import { useGameState } from '../context/GameContext';
 import { computeStats } from '../utils/stats';
@@ -31,8 +31,8 @@ export function ScoreBar({ onOpenModal, onOpenStats }: ScoreBarProps): React.JSX
 
   // getRank returns { name: '—', current: 0, next: 0 } when maxScore === 0 (pre-dict guard)
   const rank = getRank(score, maxScore, foundWords.length, allWords.length);
-  const fillPct = getProgressPct(score, maxScore, foundWords.length, allWords.length);
-  const { streak } = computeStats(readHistory());
+  const fillPct = getProgressPct(score, maxScore);
+  const streak = useMemo(() => computeStats(readHistory()).streak, []);
 
   return (
     <div className="score-bar">
