@@ -128,7 +128,7 @@ export function ScoreBar({ onOpenModal, onOpenStats }: ScoreBarProps): React.JSX
           type="button"
           aria-label={`Score ${score}, ${foundWords.length} words found. Tap to see found words.`}
         >
-          Score: {score} · {foundWords.length}/{allWords.length} words ▾
+          Score: {score} · {foundWords.length} words ▾
         </button>
         <button
           className="streak-counter"
