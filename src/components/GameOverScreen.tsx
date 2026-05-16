@@ -85,7 +85,7 @@ export function GameOverScreen({ epochRef, onPlayToday }: GameOverScreenProps): 
     <div className="game-over">
       <div className="game-over__rank">{revealed ? 'Better luck next time' : rank.name}</div>
       <div className="game-over__score">
-        Score: {score} | {foundWords.length}/{allWords.length} words | {pangramCount} pangrams
+        Score: {score} · {foundWords.length}/{allWords.length} words · {pangramCount} pangram{pangramCount !== 1 ? 's' : ''}
       </div>
 
       {/* All words revealed — found ones highlighted, missed ones greyed */}

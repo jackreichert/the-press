@@ -100,7 +100,7 @@ export function ScoreBar({ onOpenModal, onOpenStats }: ScoreBarProps): React.JSX
       <div className="rank-progress" aria-label="Progress toward next rank">
         <div
           className="rank-progress__fill"
-          style={{ width: `${fillPct}%` }}
+          style={{ '--fill-pct': fillPct / 100 } as React.CSSProperties}
           role="progressbar"
           aria-valuenow={Math.round(fillPct)}
           aria-valuemin={0}
@@ -116,7 +116,6 @@ export function ScoreBar({ onOpenModal, onOpenStats }: ScoreBarProps): React.JSX
           onClick={onOpenModal}
           type="button"
           aria-label={`Score ${score}, ${foundWords.length} words found. Tap to see found words.`}
-          style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0, font: 'inherit' }}
         >
           Score: {score} · {foundWords.length}/{allWords.length} words ▾
         </button>

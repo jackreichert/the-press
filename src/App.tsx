@@ -102,7 +102,7 @@ function GameLayout({ epochRef, onPlayToday, newDayAvailable }: GameLayoutProps)
 
   // D-07: Show plain loading text while schedule is pending
   if (!state.puzzle && !state.scheduleError) {
-    return <p className="loading-state">Loading puzzle...</p>;
+    return <p className="loading-state">Setting type…</p>;
   }
 
   // D-08: Show error + Retry when schedule fetch failed

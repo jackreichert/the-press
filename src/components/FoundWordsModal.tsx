@@ -41,16 +41,20 @@ export function FoundWordsModal({ onClose }: FoundWordsModalProps): React.JSX.El
           type="button"
           aria-label="Close found words"
         >
-          ✕
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" aria-hidden="true">
+            <line x1="1" y1="1" x2="13" y2="13" />
+            <line x1="13" y1="1" x2="1" y2="13" />
+          </svg>
         </button>
         <h2 className="modal-title">Found Words ({foundWords.length})</h2>
         <ul className="found-words-list" aria-label="Found words list">
-          {sorted.map(word => {
+          {sorted.map((word, i) => {
             const pangram = puzzle ? isFoundWordPangram(word, puzzle) : false;
             return (
               <li
                 key={word}
                 className={pangram ? 'found-word pangram-word' : 'found-word'}
+                style={{ '--i': i } as React.CSSProperties}
               >
                 {word}
               </li>

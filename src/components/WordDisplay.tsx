@@ -42,7 +42,7 @@ export function WordDisplay(): React.JSX.Element {
         setFoundWord(newWord);
         setFoundPts(scoreWord(newWord, pangram));
         setFoundPangram(pangram);
-        const t = setTimeout(() => setFoundWord(null), 950);
+        const t = setTimeout(() => setFoundWord(null), 600);
         prevFoundRef.current = [...curr];
         return () => clearTimeout(t);
       }
@@ -66,7 +66,7 @@ export function WordDisplay(): React.JSX.Element {
       </div>
       {foundWord ? (
         <p className={`found-label${foundPangram ? ' found-label--pangram' : ''}`} role="status">
-          {foundPangram ? '✦ Pangram  ' : ''} +{foundPts}
+          {foundPangram ? '✦ Pangram' : ''} +{foundPts}
         </p>
       ) : (
         <p className="error-msg" role="alert">
