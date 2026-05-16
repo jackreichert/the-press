@@ -51,7 +51,7 @@ async function fetchPlain(url: string): Promise<string[]> {
  * Normalize and filter word lines to valid lowercase alphabetic words.
  * Removes proper nouns (capitals), possessives, out-of-range lengths, blanks.
  */
-function normalizeAndFilter(lines: string[], maxLen = 7): Set<string> {
+function normalizeAndFilter(lines: string[], maxLen = 15): Set<string> {
   return new Set(
     lines
       .map(w => w.trim().normalize('NFC').toLowerCase())
@@ -90,7 +90,7 @@ async function buildDictionary(): Promise<void> {
   console.log(`ENABLE2K: ${enable2kLines.length} raw lines`);
   console.log(`SCOWL-60: ${scowlLines.length} raw lines`);
 
-  // Step 2: filter each to clean 4-7 letter lowercase sets
+  // Step 2: filter each to clean 4-15 letter lowercase sets
   const enable2kSet = normalizeAndFilter(enable2kLines);
   const scowlSet    = normalizeAndFilter(scowlLines);
 
