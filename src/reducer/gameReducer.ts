@@ -26,6 +26,10 @@ export interface GameState {
   /** Increments on every error dispatch — shake useEffect depends on this, not errorMsg string. */
   errorKey: number;
   gameOver: boolean;
+  /** True when the player chose to reveal remaining words rather than finding them. */
+  revealed: boolean;
+  /** True when today's puzzle is waiting — the player is finishing a previous day first. */
+  hasPendingToday: boolean;
   dictLoaded: boolean;
   scheduleError: boolean;
   dictError: boolean;
@@ -43,7 +47,10 @@ export type GameAction =
   | { type: 'SHUFFLE' }
   | { type: 'SCHEDULE_ERROR' }
   | { type: 'DICT_ERROR' }
-  | { type: 'RESTORE_STATE'; foundWords: string[]; score: number };
+  | { type: 'RESTORE_STATE'; foundWords: string[]; score: number }
+  | { type: 'REVEAL_REMAINING' }
+  | { type: 'SET_PENDING_TODAY' }
+  | { type: 'SWITCH_PUZZLE'; puzzle: PuzzleEntry; allWords: string[]; maxScore: number; dict: Set<string> };
 
 // ─── Initial state ────────────────────────────────────────────────────────────
 
@@ -59,6 +66,8 @@ export const initialState: GameState = {
   errorMsg: null,
   errorKey: 0,
   gameOver: false,
+  revealed: false,
+  hasPendingToday: false,
   dictLoaded: false,
   scheduleError: false,
   dictError: false,
@@ -130,6 +139,27 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
       // Fisher-Yates equivalent via sort — statistically biased but acceptable for display
       const shuffled = [...state.surroundingOrder].sort(() => Math.random() - 0.5);
       return { ...state, surroundingOrder: shuffled };
+    }
+
+    case 'REVEAL_REMAINING':
+      return { ...state, gameOver: true, revealed: true };
+
+    case 'SET_PENDING_TODAY':
+      return { ...state, hasPendingToday: true };
+
+    case 'SWITCH_PUZZLE': {
+      const surrounding = action.puzzle.letters
+        .filter(l => l !== action.puzzle.centerLetter)
+        .map(l => l.toLowerCase());
+      return {
+        ...initialState,
+        puzzle: action.puzzle,
+        surroundingOrder: surrounding,
+        dict: action.dict,
+        allWords: action.allWords,
+        maxScore: action.maxScore,
+        dictLoaded: true,
+      };
     }
 
     case 'SCHEDULE_ERROR':

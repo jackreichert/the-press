@@ -105,7 +105,14 @@ export interface HistoryEntry {
 const STORAGE_KEYS = {
   state:   'thepress_state_v1',
   history: 'thepress_history_v1',
+  pending: 'thepress_pending_v1',
 } as const;
+
+/** Today's puzzle index, stored when the user is finishing a previous day's puzzle first. */
+export interface PendingPuzzle {
+  v: 1;
+  puzzleIndex: number;
+}
 
 // ─── Public helpers ───────────────────────────────────────────────────────────
 
@@ -159,6 +166,26 @@ export function readHistory(): HistoryEntry[] {
   } catch {
     return [];
   }
+}
+
+export function readPending(): PendingPuzzle | null {
+  const raw = storageGet(STORAGE_KEYS.pending);
+  if (!raw) return null;
+  try {
+    const parsed = JSON.parse(fromBase64(raw)) as PendingPuzzle;
+    return parsed.v === 1 ? parsed : null;
+  } catch { return null; }
+}
+
+export function savePending(data: Omit<PendingPuzzle, 'v'>): void {
+  storageSet(STORAGE_KEYS.pending, toBase64(JSON.stringify({ v: 1, ...data })));
+}
+
+export function clearPending(): void {
+  try {
+    if (lsAvailable) window.localStorage.removeItem(STORAGE_KEYS.pending);
+    else memStore.delete(STORAGE_KEYS.pending);
+  } catch { /* noop */ }
 }
 
 /**

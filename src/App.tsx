@@ -22,8 +22,10 @@ import React, { useEffect, useState, useCallback, useRef } from 'react';
 import { GameProvider, useGameState, useGameDispatch } from './context/GameContext';
 import { getTodayPuzzleIndex, getPuzzleDateStr } from './utils/date';
 import { getRank } from './utils/scoring';
-import { readState, saveState, clearState, appendHistory } from './storage';
+import { readState, saveState, clearState, appendHistory, readPending, savePending, clearPending } from './storage';
 import type { HistoryEntry } from './storage';
+import { deriveWordSet } from './utils/puzzle';
+import { computeMaxScore } from './utils/scoring';
 import { ScoreBar } from './components/ScoreBar';
 import { WordDisplay } from './components/WordDisplay';
 import { LetterGrid } from './components/LetterGrid';
@@ -31,16 +33,17 @@ import { ActionRow } from './components/ActionRow';
 import { FoundWordsModal } from './components/FoundWordsModal';
 import { GameOverScreen } from './components/GameOverScreen';
 import { StatsModal } from './components/StatsModal';
-import type { Schedule } from './types';
+import type { Schedule, PuzzleEntry } from './types';
 
 // ─── Game layout ─────────────────────────────────────────────────────────────
 
 interface GameLayoutProps {
   epochRef: React.RefObject<string | null>;
+  onPlayToday: () => void;
 }
 
 /** Inner component: reads game state and composes the UI. Must be inside GameProvider. */
-function GameLayout({ epochRef }: GameLayoutProps): React.JSX.Element {
+function GameLayout({ epochRef, onPlayToday }: GameLayoutProps): React.JSX.Element {
   const state = useGameState();
   const dispatch = useGameDispatch();
   const [modalOpen, setModalOpen] = useState(false);
@@ -89,7 +92,7 @@ function GameLayout({ epochRef }: GameLayoutProps): React.JSX.Element {
       rank: rank.name,
       foundCount: state.foundWords.length,
       totalCount: state.allWords.length,
-      completed: true,
+      completed: !state.revealed,
     };
     appendHistory(entry);
     clearState();
@@ -131,7 +134,7 @@ function GameLayout({ epochRef }: GameLayoutProps): React.JSX.Element {
 
       {/* D-18: game-over screen replaces grid + action row when all words found */}
       {state.gameOver ? (
-        <GameOverScreen epochRef={epochRef} />
+        <GameOverScreen epochRef={epochRef} onPlayToday={state.hasPendingToday ? onPlayToday : undefined} />
       ) : (
         <>
           {/* 2-3-2 letter grid with hidden keyboard input (D-10) */}
@@ -139,6 +142,17 @@ function GameLayout({ epochRef }: GameLayoutProps): React.JSX.Element {
 
           {/* Delete | Shuffle | Enter buttons (D-04, D-05) */}
           <ActionRow />
+
+          {/* Reveal remaining answers — only shown when finishing a previous day's puzzle */}
+          {state.hasPendingToday && (
+            <button
+              className="reveal-btn"
+              onClick={() => dispatch({ type: 'REVEAL_REMAINING' })}
+              type="button"
+            >
+              Reveal answers · play today's puzzle →
+            </button>
+          )}
         </>
       )}
 
@@ -156,8 +170,25 @@ function GameLayout({ epochRef }: GameLayoutProps): React.JSX.Element {
 /** Wrapper component: owns data loading side-effects; renders GameLayout inside GameProvider. */
 function AppLoader(): React.JSX.Element {
   const dispatch = useGameDispatch();
-  // epochRef captures schedule.epoch — PuzzleEntry has no date field (Research finding)
   const epochRef = useRef<string | null>(null);
+  // Holds today's puzzle data when the player is finishing a previous day's puzzle first
+  const todayDataRef = useRef<{ puzzle: PuzzleEntry; words: string[]; index: number } | null>(null);
+
+  const onPlayToday = useCallback(() => {
+    const data = todayDataRef.current;
+    if (!data) return;
+    clearPending();
+    clearState();
+    const { words } = deriveWordSet(data.puzzle, data.words);
+    const maxScore = computeMaxScore(words, data.puzzle);
+    dispatch({
+      type: 'SWITCH_PUZZLE',
+      puzzle: data.puzzle,
+      allWords: words,
+      maxScore,
+      dict: new Set(data.words),
+    });
+  }, [dispatch]);
 
   const loadData = useCallback((): (() => void) => {
     let cancelled = false;
@@ -168,23 +199,44 @@ function AppLoader(): React.JSX.Element {
         if (!schedRes.ok) throw new Error(`schedule fetch failed: ${schedRes.status}`);
         const schedule: Schedule = await schedRes.json() as Schedule;
 
-        // D-06: compute today's puzzle index using local midnight (not UTC)
-        const index = getTodayPuzzleIndex(schedule.epoch);
-        const puzzle = schedule.puzzles[index];
+        const todayIndex = getTodayPuzzleIndex(schedule.epoch);
+        const todayPuzzle = schedule.puzzles[todayIndex];
 
-        // T-02-17: guard against out-of-bounds index (> 730 days after epoch)
-        if (!puzzle) {
+        if (!todayPuzzle) {
           if (!cancelled) dispatch({ type: 'SCHEDULE_ERROR' });
           return;
         }
 
-        if (!cancelled) {
-          dispatch({ type: 'PUZZLE_LOADED', puzzle });
-          // Capture epoch after schedule resolves — PuzzleEntry has no epoch field
-          epochRef.current = schedule.epoch;
+        // Check for a carryover: stored state from a previous day still in progress
+        const stored = readState();
+        const pending = readPending();
+        const isCarryover = stored && stored.puzzleIndex !== todayIndex && stored.foundWords.length > 0;
+        const isResumingCarryover = pending && stored && stored.puzzleIndex !== todayIndex;
+
+        let activePuzzle = todayPuzzle;
+        let activeIndex = todayIndex;
+
+        if (isCarryover || isResumingCarryover) {
+          // Load the unfinished previous puzzle instead of today's
+          const prevPuzzle = schedule.puzzles[stored!.puzzleIndex];
+          if (prevPuzzle) {
+            activePuzzle = prevPuzzle;
+            activeIndex = stored!.puzzleIndex;
+            // Store today's puzzle for later
+            todayDataRef.current = { puzzle: todayPuzzle, words: [], index: todayIndex };
+            if (!pending) savePending({ puzzleIndex: todayIndex });
+          }
         }
 
-        // D-06: dictionary loads in parallel — do NOT await; grid renders before dict resolves
+        if (!cancelled) {
+          dispatch({ type: 'PUZZLE_LOADED', puzzle: activePuzzle });
+          epochRef.current = schedule.epoch;
+          // Pre-store today's puzzle reference so onPlayToday has it before dict loads
+          if (!todayDataRef.current) {
+            todayDataRef.current = { puzzle: todayPuzzle, words: [], index: todayIndex };
+          }
+        }
+
         fetch(`${import.meta.env.BASE_URL}dictionary.json`)
           .then(r => {
             if (!r.ok) throw new Error(`dictionary fetch failed: ${r.status}`);
@@ -192,25 +244,19 @@ function AppLoader(): React.JSX.Element {
           })
           .then((words: string[]) => {
             if (!cancelled) {
+              // Update todayDataRef with the loaded word list
+              if (todayDataRef.current) todayDataRef.current.words = words;
+
               dispatch({ type: 'DICT_LOADED', words });
-              // STOR-01: check storage AFTER DICT_LOADED so allWords is populated (Research Pitfall 2)
-              const stored = readState();
-              if (stored && stored.puzzleIndex === index) {
-                // Today's puzzle — restore found words and score
+
+              if (stored && stored.puzzleIndex === activeIndex) {
+                // Restore progress for the active puzzle
                 dispatch({ type: 'RESTORE_STATE', foundWords: stored.foundWords, score: stored.score });
-              } else if (stored && stored.foundWords.length > 0 && epochRef.current) {
-                // New day, previous day had words — save as partial history entry (D-06)
-                const date = getPuzzleDateStr(epochRef.current, stored.puzzleIndex);
-                const partialEntry: HistoryEntry = {
-                  date,
-                  score: stored.score,
-                  rank: getRank(stored.score, 0, stored.foundWords.length, 0).name,
-                  foundCount: stored.foundWords.length,
-                  totalCount: 0,
-                  completed: false,
-                };
-                appendHistory(partialEntry);
-                clearState();
+              }
+
+              if (isCarryover || isResumingCarryover) {
+                // Signal that today's puzzle is waiting
+                dispatch({ type: 'SET_PENDING_TODAY' });
               }
             }
           })
@@ -219,7 +265,6 @@ function AppLoader(): React.JSX.Element {
           });
 
       } catch {
-        // D-08: no silent failures — dispatch error action for UI to show retry
         if (!cancelled) dispatch({ type: 'SCHEDULE_ERROR' });
       }
     }
@@ -233,7 +278,7 @@ function AppLoader(): React.JSX.Element {
     return cleanup;
   }, [loadData]);
 
-  return <GameLayout epochRef={epochRef} />;
+  return <GameLayout epochRef={epochRef} onPlayToday={onPlayToday} />;
 }
 
 // ─── Root component ───────────────────────────────────────────────────────────
