@@ -26,24 +26,15 @@ export function FoundWordsModal({ onClose }: FoundWordsModalProps): React.JSX.El
   // D-13: Alphabetical sort — spread to avoid mutating state array
   const sorted = [...foundWords].sort();
 
-  function handleOverlayClick(): void {
-    onClose();
-  }
-
-  function handleCardClick(e: React.MouseEvent): void {
-    // Prevent click from reaching the overlay (D-12)
-    e.stopPropagation();
-  }
-
   return (
     <div
       className="modal-overlay"
-      onClick={handleOverlayClick}
+      onClick={onClose}
       role="dialog"
       aria-modal="true"
       aria-label="Found words"
     >
-      <div className="modal-card" onClick={handleCardClick}>
+      <div className="modal-card" onClick={e => e.stopPropagation()}>
         <button
           className="modal-close"
           onClick={onClose}
@@ -53,9 +44,8 @@ export function FoundWordsModal({ onClose }: FoundWordsModalProps): React.JSX.El
           ✕
         </button>
         <h2 className="modal-title">Found Words ({foundWords.length})</h2>
-        <ul className="found-words-list">
+        <ul className="found-words-list" aria-label="Found words list">
           {sorted.map(word => {
-            // GAME-05: classify pangrams using puzzle bitmask
             const pangram = puzzle ? isFoundWordPangram(word, puzzle) : false;
             return (
               <li

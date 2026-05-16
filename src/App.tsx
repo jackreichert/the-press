@@ -40,10 +40,11 @@ import type { Schedule, PuzzleEntry } from './types';
 interface GameLayoutProps {
   epochRef: React.RefObject<string | null>;
   onPlayToday: () => void;
+  newDayAvailable: boolean;
 }
 
 /** Inner component: reads game state and composes the UI. Must be inside GameProvider. */
-function GameLayout({ epochRef, onPlayToday }: GameLayoutProps): React.JSX.Element {
+function GameLayout({ epochRef, onPlayToday, newDayAvailable }: GameLayoutProps): React.JSX.Element {
   const state = useGameState();
   const dispatch = useGameDispatch();
   const [modalOpen, setModalOpen] = useState(false);
@@ -122,6 +123,15 @@ function GameLayout({ epochRef, onPlayToday }: GameLayoutProps): React.JSX.Eleme
 
   return (
     <div className="app">
+      {newDayAvailable && (
+        <button
+          className="new-day-banner"
+          onClick={() => window.location.reload()}
+          type="button"
+        >
+          New puzzle available — tap to reload
+        </button>
+      )}
       <header className="masthead">
         <h1 className="app-title">The Press</h1>
         <p className="app-subtitle">A Daily Word Puzzle</p>
@@ -173,6 +183,9 @@ function AppLoader(): React.JSX.Element {
   const epochRef = useRef<string | null>(null);
   // Holds today's puzzle data when the player is finishing a previous day's puzzle first
   const todayDataRef = useRef<{ puzzle: PuzzleEntry; words: string[]; index: number } | null>(null);
+  // Tracks the puzzle index that was "today" at load time — used for new-day detection
+  const loadedTodayIndexRef = useRef<number | null>(null);
+  const [newDayAvailable, setNewDayAvailable] = useState(false);
 
   const onPlayToday = useCallback(() => {
     const data = todayDataRef.current;
@@ -200,6 +213,7 @@ function AppLoader(): React.JSX.Element {
         const schedule: Schedule = await schedRes.json() as Schedule;
 
         const todayIndex = getTodayPuzzleIndex(schedule.epoch);
+        loadedTodayIndexRef.current = todayIndex;
         const todayPuzzle = schedule.puzzles[todayIndex];
 
         if (!todayPuzzle) {
@@ -278,7 +292,22 @@ function AppLoader(): React.JSX.Element {
     return cleanup;
   }, [loadData]);
 
-  return <GameLayout epochRef={epochRef} onPlayToday={onPlayToday} />;
+  // New-day detection: when the app is foregrounded, check if the date rolled over.
+  // Uses refs so the handler never goes stale and needs no deps.
+  useEffect(() => {
+    function handleVisibilityChange(): void {
+      if (document.visibilityState !== 'visible') return;
+      if (epochRef.current === null || loadedTodayIndexRef.current === null) return;
+      const currentTodayIndex = getTodayPuzzleIndex(epochRef.current);
+      if (currentTodayIndex !== loadedTodayIndexRef.current) {
+        setNewDayAvailable(true);
+      }
+    }
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    return () => document.removeEventListener('visibilitychange', handleVisibilityChange);
+  }, []);
+
+  return <GameLayout epochRef={epochRef} onPlayToday={onPlayToday} newDayAvailable={newDayAvailable} />;
 }
 
 // ─── Root component ───────────────────────────────────────────────────────────

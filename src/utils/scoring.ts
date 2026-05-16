@@ -51,8 +51,9 @@ export function computeMaxScore(allWords: string[], puzzle: PuzzleEntry): number
 
 export interface RankResult {
   name: string;
-  current: number;  // current tier threshold (%)
-  next: number;     // next tier threshold (%)
+  current: number;   // current tier threshold (%)
+  next: number;      // next tier threshold (%)
+  nextName: string;  // name of the next tier
 }
 
 /**
@@ -67,19 +68,19 @@ export function getRank(
   foundCount: number,
   totalCount: number,
 ): RankResult {
-  if (maxScore === 0) return { name: '—', current: 0, next: 0 };
+  if (maxScore === 0) return { name: '—', current: 0, next: 0, nextName: '' };
   if (score >= maxScore && foundCount === totalCount) {
-    return { name: 'Grand Colophon', current: 100, next: 100 };
+    return { name: 'Grand Colophon', current: 100, next: 100, nextName: '' };
   }
   const pct = Math.floor((score / maxScore) * 100);
   let tierIdx = -1;
   for (let i = 0; i < RANK_TIERS.length; i++) {
     if (pct >= RANK_TIERS[i].threshold) tierIdx = i;
   }
-  if (tierIdx === -1) return { name: 'Apprentice', current: 0, next: RANK_TIERS[0].threshold };
+  if (tierIdx === -1) return { name: 'Apprentice', current: 0, next: RANK_TIERS[0].threshold, nextName: RANK_TIERS[0].name };
   const tier = RANK_TIERS[tierIdx];
-  const next = RANK_TIERS[tierIdx + 1]?.threshold ?? 100;
-  return { name: tier.name, current: tier.threshold, next };
+  const nextTier = RANK_TIERS[tierIdx + 1];
+  return { name: tier.name, current: tier.threshold, next: nextTier?.threshold ?? 100, nextName: nextTier?.name ?? 'Grand Colophon' };
 }
 
 /**
@@ -91,4 +92,12 @@ export function getRank(
 export function getProgressPct(score: number, maxScore: number): number {
   if (maxScore === 0) return 0;
   return Math.min(100, Math.max(0, Math.floor((score / maxScore) * 100)));
+}
+
+/** Point threshold for each rank tier, computed from maxScore. */
+export function getRankLadder(maxScore: number): { name: string; pts: number }[] {
+  return RANK_TIERS.map(t => ({
+    name: t.name,
+    pts: Math.ceil((t.threshold / 100) * maxScore),
+  }));
 }

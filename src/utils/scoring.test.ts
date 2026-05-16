@@ -41,11 +41,11 @@ describe('computeMaxScore', () => {
 
 describe('getRank', () => {
   it('returns a dash rank when maxScore is 0 (dictionary not loaded yet)', () => {
-    expect(getRank(0, 0, 0, 0)).toEqual({ name: '—', current: 0, next: 0 });
+    expect(getRank(0, 0, 0, 0)).toEqual({ name: '—', current: 0, next: 0, nextName: '' });
   });
 
   it('returns Grand Colophon when all words found and score equals max', () => {
-    expect(getRank(30, 30, 9, 9)).toEqual({ name: 'Grand Colophon', current: 100, next: 100 });
+    expect(getRank(30, 30, 9, 9)).toEqual({ name: 'Grand Colophon', current: 100, next: 100, nextName: '' });
   });
 
   it('does NOT return Grand Colophon when score matches max but not all words are found', () => {

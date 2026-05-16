@@ -716,6 +716,124 @@ body {
 .play-today-btn:hover { opacity: 0.9; }
 .play-today-btn:focus-visible { outline: 2px solid var(--color-ink); outline-offset: 2px; }
 
+/* ─── New-day banner ─────────────────────────────────────────────────────── */
+
+.new-day-banner {
+  display: block;
+  width: 100%;
+  background: var(--color-accent);
+  color: var(--color-bg);
+  text-align: center;
+  padding: var(--space-sm) var(--space-md);
+  font-family: var(--font-serif);
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  border: none;
+  cursor: pointer;
+  border-radius: 2px;
+}
+
+.new-day-banner:hover { opacity: 0.9; }
+.new-day-banner:focus-visible { outline: 2px solid var(--color-ink); outline-offset: 2px; }
+
+/* ─── Rank name button + popover ─────────────────────────────────────────── */
+
+.rank-name-row {
+  position: relative;
+}
+
+.rank-name--btn {
+  background: none;
+  border: none;
+  padding: 0;
+  font-family: var(--font-fraktur);
+  font-size: 22px;
+  font-weight: 400;
+  line-height: 1.2;
+  color: var(--color-ink);
+  cursor: pointer;
+  text-align: left;
+}
+
+.rank-name--btn:disabled {
+  cursor: default;
+}
+
+.rank-name--btn:not(:disabled):hover { opacity: 0.75; }
+.rank-name--btn:focus-visible { outline: 2px solid var(--color-ink); outline-offset: 2px; border-radius: 1px; }
+
+.rank-name__caret {
+  font-family: var(--font-serif);
+  font-size: 11px;
+  opacity: 0.5;
+}
+
+.rank-popover {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  z-index: 50;
+  background: var(--color-bg);
+  border: 1px solid var(--color-ink);
+  border-radius: 2px;
+  box-shadow: 0 4px 12px rgba(26, 22, 16, 0.18);
+  padding: var(--space-sm) var(--space-md);
+  min-width: 200px;
+}
+
+.rank-popover__list {
+  list-style: none;
+}
+
+.rank-popover__item {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: var(--space-lg);
+  padding: 2px 0;
+  font-size: 13px;
+  color: var(--color-ink);
+  opacity: 0.4;
+}
+
+.rank-popover__item--current {
+  opacity: 1;
+  font-weight: 600;
+  color: var(--color-accent);
+}
+
+.rank-popover__item--current .rank-popover__name::before {
+  content: '▸ ';
+}
+
+.rank-popover__item--colophon {
+  margin-top: 4px;
+  padding-top: 4px;
+  border-top: 1px solid var(--color-border);
+  opacity: 0.35;
+}
+
+.rank-popover__item--colophon.rank-popover__item--current {
+  opacity: 1;
+}
+
+.rank-popover__pts {
+  font-size: 12px;
+  white-space: nowrap;
+}
+
+/* ─── Inline next-rank hint ──────────────────────────────────────────────── */
+
+.rank-next-hint {
+  font-size: 11px;
+  font-weight: 400;
+  letter-spacing: 0.04em;
+  color: var(--color-ink);
+  opacity: 0.45;
+  margin-top: 2px;
+}
+
 /* ─── Missed words (revealed) ────────────────────────────────────────────── */
 
 .game-over__missed {

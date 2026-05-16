@@ -1,5 +1,5 @@
 import React from 'react';
-import { screen, fireEvent } from '@testing-library/react';
+import { screen, within, fireEvent } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { renderWithGame } from '../test/helpers.tsx';
 import { FoundWordsModal } from './FoundWordsModal';
@@ -39,7 +39,8 @@ describe('FoundWordsModal content', () => {
       <FoundWordsModal onClose={vi.fn()} />,
       { initialActions: [PUZZLE_LOADED, DICT_LOADED, ...addWords] },
     );
-    const items = screen.getAllByRole('listitem');
+    const list = screen.getByRole('list', { name: /found words list/i });
+    const items = within(list).getAllByRole('listitem');
     expect(items[0]).toHaveTextContent('drip');
     expect(items[1]).toHaveTextContent('pine');
     expect(items[2]).toHaveTextContent('ripe');
