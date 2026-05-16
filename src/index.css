@@ -256,6 +256,13 @@ body {
   background: var(--color-surface);
   border: 1px solid var(--color-border);
   border-radius: 2px;
+  transition: opacity 400ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@starting-style {
+  .letter-grid {
+    opacity: 0;
+  }
 }
 
 .grid-row {
@@ -434,6 +441,13 @@ body {
   align-items: center;
   justify-content: center;
   z-index: 100;
+  transition: opacity 200ms ease-out;
+}
+
+@starting-style {
+  .modal-overlay {
+    opacity: 0;
+  }
 }
 
 .modal-card {
@@ -528,6 +542,11 @@ body {
 
 /* ─── Game-over screen ───────────────────────────────────────────────────── */
 
+@keyframes game-over-item-enter {
+  from { translate: 0 8px; }
+  to   { translate: 0 0; }
+}
+
 .game-over {
   text-align: center;
   padding: var(--space-xl) 0;
@@ -548,6 +567,7 @@ body {
   border-top: 1px solid var(--color-accent);
   border-bottom: 1px solid var(--color-accent);
   width: 100%;
+  animation: game-over-item-enter 350ms cubic-bezier(0.16, 1, 0.3, 1) both;
 }
 
 .game-over__score {
@@ -556,6 +576,7 @@ body {
   letter-spacing: 0.06em;
   color: var(--color-ink);
   opacity: 0.8;
+  animation: game-over-item-enter 350ms cubic-bezier(0.16, 1, 0.3, 1) 70ms both;
 }
 
 /* ─── Shake animation ────────────────────────────────────────────────────── */
@@ -657,6 +678,13 @@ body {
   .loading-state             { animation: none; }
   .word-display--placeholder { animation: none; opacity: 0.35; }
   .rank-progress__fill       { transition: none; }
+  .game-over__rank,
+  .game-over__score,
+  .game-over__missed,
+  .share-btn,
+  .play-today-btn            { animation: none; translate: 0 0; }
+  .letter-grid               { transition: none; opacity: 1; }
+  .modal-overlay             { transition: none; opacity: 1; }
 }
 
 /* ─── Score bar bottom row ───────────────────────────────────────────────── */
@@ -745,6 +773,7 @@ body {
   margin-top: var(--space-sm);
   transition: transform 100ms ease-out;
   box-shadow: 0 2px 0 rgba(0, 0, 0, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  animation: game-over-item-enter 350ms cubic-bezier(0.16, 1, 0.3, 1) 200ms both;
 }
 
 @media (hover: hover) and (pointer: fine) {
@@ -825,6 +854,7 @@ body {
   cursor: pointer;
   margin-top: var(--space-sm);
   transition: transform 100ms ease-out;
+  animation: game-over-item-enter 350ms cubic-bezier(0.16, 1, 0.3, 1) 200ms both;
 }
 
 @media (hover: hover) and (pointer: fine) {
@@ -977,6 +1007,7 @@ body {
   border-top: 1px solid var(--color-border);
   padding-top: var(--space-md);
   margin-top: var(--space-sm);
+  animation: game-over-item-enter 350ms cubic-bezier(0.16, 1, 0.3, 1) 140ms both;
 }
 
 .game-over__missed-label {
