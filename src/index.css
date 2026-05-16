@@ -531,6 +531,7 @@ body {
   font-size: 14px;
   font-weight: 600;
   color: var(--color-accent);
+  margin-top: var(--space-xs);
   min-height: 1.5em;
   animation: label-fade 0.95s ease-out forwards;
 }
