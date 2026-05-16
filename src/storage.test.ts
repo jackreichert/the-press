@@ -1,4 +1,4 @@
-import { readState, saveState, clearState, readHistory, appendHistory } from './storage';
+import { readState, saveState, clearState, readHistory, appendHistory, readPending, savePending, clearPending } from './storage';
 import type { HistoryEntry } from './storage';
 
 // Note: localStorage.clear() is called in beforeEach by src/test/setup.ts (D-08)
@@ -89,5 +89,32 @@ describe('appendHistory / readHistory', () => {
 describe('clearState', () => {
   it('is safe to call when nothing is saved (no error thrown)', () => {
     expect(() => clearState()).not.toThrow();
+  });
+});
+
+describe('savePending / readPending / clearPending', () => {
+  it('returns null when nothing saved', () => {
+    expect(readPending()).toBeNull();
+  });
+
+  it('persists and restores puzzle index', () => {
+    savePending({ puzzleIndex: 5 });
+    const p = readPending();
+    expect(p).toEqual({ v: 1, puzzleIndex: 5 });
+  });
+
+  it('returns null after clearPending', () => {
+    savePending({ puzzleIndex: 5 });
+    clearPending();
+    expect(readPending()).toBeNull();
+  });
+
+  it('clearPending is safe when nothing saved', () => {
+    expect(() => clearPending()).not.toThrow();
+  });
+
+  it('returns null for corrupt data', () => {
+    localStorage.setItem('thepress_pending_v1', 'CORRUPTED!!!');
+    expect(readPending()).toBeNull();
   });
 });

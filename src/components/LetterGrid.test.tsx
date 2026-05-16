@@ -1,5 +1,5 @@
 import React from 'react';
-import { screen } from '@testing-library/react';
+import { screen, act } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { renderWithGame } from '../test/helpers.tsx';
 import { LetterGrid } from './LetterGrid';
@@ -65,51 +65,53 @@ describe('LetterGrid tile click', () => {
   });
 });
 
-describe('LetterGrid keyboard input (hidden input)', () => {
-  it('hidden input exists with aria-hidden="true"', () => {
-    renderWithGame(<LetterGrid />, { initialActions: [PUZZLE_LOADED, DICT_LOADED] });
-    const hiddenInput = document.querySelector('input[aria-hidden="true"]');
-    expect(hiddenInput).not.toBeNull();
-  });
+// Keyboard input moved to a document-level listener in GameLayout (App.tsx).
+// KeyboardConnector replicates that listener so these tests work without rendering the full app.
+import { useEffect } from 'react';
+import { useGameDispatch, useGameState } from '../context/GameContext';
 
-  it('typing p in hidden input appends p to current word', async () => {
-    // pointer-events: none on hidden input — skip pointer events check so userEvent can type into it
-    const user = userEvent.setup({ pointerEventsCheck: 0 });
+function KeyboardConnector(): null {
+  const dispatch = useGameDispatch();
+  const { gameOver } = useGameState();
+  useEffect(() => {
+    function handle(e: KeyboardEvent): void {
+      if (e.ctrlKey || e.metaKey || e.altKey || gameOver) return;
+      const key = e.key.toLowerCase();
+      if (/^[a-z]$/.test(key)) { e.preventDefault(); dispatch({ type: 'LETTER_APPEND', letter: key }); }
+      else if (e.key === 'Backspace') { e.preventDefault(); dispatch({ type: 'LETTER_DELETE' }); }
+      else if (e.key === 'Enter') { e.preventDefault(); dispatch({ type: 'WORD_SUBMIT' }); }
+    }
+    document.addEventListener('keydown', handle);
+    return () => document.removeEventListener('keydown', handle);
+  }, [dispatch, gameOver]);
+  return null;
+}
+
+describe('LetterGrid keyboard input (document listener)', () => {
+  it('pressing p appends P to current word', () => {
     renderWithGame(
-      <>
-        <WordDisplay />
-        <LetterGrid />
-      </>,
+      <><KeyboardConnector /><WordDisplay /><LetterGrid /></>,
       { initialActions: [PUZZLE_LOADED, DICT_LOADED] },
     );
-    const hiddenInput = document.querySelector('input[aria-hidden="true"]') as HTMLInputElement;
-    await user.type(hiddenInput, 'p');
-    // The word-display div shows the uppercased current word
-    const wordDisplay = document.querySelector('.word-display') as HTMLElement;
-    expect(wordDisplay).toHaveTextContent('P');
+    act(() => {
+      document.dispatchEvent(new KeyboardEvent('keydown', { key: 'p', bubbles: true }));
+    });
+    expect(document.querySelector('.word-display')).toHaveTextContent('P');
   });
 
-  it('pressing Enter in hidden input dispatches WORD_SUBMIT', async () => {
-    // pointerEventsCheck: 0 allows keyboard interaction on aria-hidden="true" input
-    const user = userEvent.setup({ pointerEventsCheck: 0 });
-    // Seed 'pin' via initialActions so WORD_SUBMIT produces 'Too short' error
+  it('pressing Enter dispatches WORD_SUBMIT (too short error)', () => {
     renderWithGame(
-      <>
-        <WordDisplay />
-        <LetterGrid />
-      </>,
+      <><KeyboardConnector /><WordDisplay /><LetterGrid /></>,
       { initialActions: [
-          PUZZLE_LOADED,
-          DICT_LOADED,
+          PUZZLE_LOADED, DICT_LOADED,
           { type: 'LETTER_APPEND' as const, letter: 'p' },
           { type: 'LETTER_APPEND' as const, letter: 'i' },
           { type: 'LETTER_APPEND' as const, letter: 'n' },
       ]},
     );
-    const hiddenInput = document.querySelector('input[aria-hidden="true"]') as HTMLInputElement;
-    hiddenInput.focus();
-    await user.keyboard('{Enter}');
-    // The error message appears synchronously — errorMsg is set by WORD_SUBMIT handler
+    act(() => {
+      document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', bubbles: true }));
+    });
     expect(screen.getByRole('alert')).toHaveTextContent('Too short');
   });
 });

@@ -10,12 +10,14 @@ interface LetterTileProps {
   letter: string;
   onTap: (letter: string) => void;
   isCenter?: boolean;
+  extraClass?: string;
 }
 
-export function LetterTile({ letter, onTap, isCenter = false }: LetterTileProps): React.JSX.Element {
+export function LetterTile({ letter, onTap, isCenter = false, extraClass }: LetterTileProps): React.JSX.Element {
+  const cls = [isCenter ? 'tile tile--center' : 'tile', extraClass].filter(Boolean).join(' ');
   return (
     <button
-      className={isCenter ? 'tile tile--center' : 'tile'}
+      className={cls}
       onClick={() => onTap(letter)}
       aria-label={isCenter ? `Center letter ${letter.toUpperCase()}` : `Letter ${letter.toUpperCase()}`}
       type="button"

@@ -31,7 +31,7 @@ npm-debug.log*
 # public/dictionary.json and public/schedule.json are committed — they are
 # static content (not build artifacts) and must be present for deployment.
 
-# Downloaded word list cache (rebuild via npm run dict:build)
+# Old SCOWL cache (replaced by scowl-60-no-proper.txt)
 data/scowl-60-raw.txt
 
 # Test output

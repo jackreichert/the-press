@@ -206,3 +206,47 @@ describe('DICT_ERROR', () => {
     expect(s.dictError).toBe(true);
   });
 });
+
+describe('REVEAL_REMAINING', () => {
+  it('sets gameOver and revealed to true', () => {
+    const s = gameReducer(loadedState(), { type: 'REVEAL_REMAINING' });
+    expect(s.gameOver).toBe(true);
+    expect(s.revealed).toBe(true);
+  });
+});
+
+describe('SET_PENDING_TODAY', () => {
+  it('sets hasPendingToday to true', () => {
+    const s = gameReducer(loadedState(), { type: 'SET_PENDING_TODAY' });
+    expect(s.hasPendingToday).toBe(true);
+  });
+});
+
+describe('SWITCH_PUZZLE', () => {
+  const NEW_PUZZLE: PuzzleEntry = {
+    index: 1,
+    letters: ['A', 'C', 'E', 'L', 'P', 'R', 'S'],
+    centerLetter: 'P',
+  };
+  const NEW_WORDS = ['cape', 'caper', 'pale', 'pace', 'place', 'space'];
+
+  it('resets state and loads the new puzzle', () => {
+    let s = loadedState();
+    s = gameReducer(typeWord(s, 'drip'), { type: 'WORD_SUBMIT' });
+    s = gameReducer(s, {
+      type: 'SWITCH_PUZZLE',
+      puzzle: NEW_PUZZLE,
+      allWords: NEW_WORDS,
+      maxScore: 25,
+      dict: new Set(NEW_WORDS),
+    });
+    expect(s.puzzle).toEqual(NEW_PUZZLE);
+    expect(s.foundWords).toHaveLength(0);
+    expect(s.score).toBe(0);
+    expect(s.currentWord).toBe('');
+    expect(s.gameOver).toBe(false);
+    expect(s.hasPendingToday).toBe(false);
+    expect(s.dictLoaded).toBe(true);
+    expect(s.allWords).toEqual(NEW_WORDS);
+  });
+});

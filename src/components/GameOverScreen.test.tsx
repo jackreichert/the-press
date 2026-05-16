@@ -124,10 +124,13 @@ describe('GameOverScreen share button', () => {
     });
     // Verify writeText was called with the correct share text format
     expect(writeTextMock).toHaveBeenCalledWith(
-      expect.stringMatching(/^The Press — \d{4}-\d{2}-\d{2}\n/)
+      expect.stringMatching(/^The Press · \w+ \d+, \d{4}\n/)
     );
     expect(writeTextMock).toHaveBeenCalledWith(
-      expect.stringContaining('Score: 30')
+      expect.stringContaining('30 pts')
+    );
+    expect(writeTextMock).toHaveBeenCalledWith(
+      expect.stringContaining('thepress.app')
     );
   });
 
@@ -146,7 +149,7 @@ describe('GameOverScreen share button', () => {
     });
   });
 
-  it('reverts to "Share Result" after 2000ms', async () => {
+  it('reverts to "Share Result" after 2000ms (Copied! timeout)', async () => {
     vi.useFakeTimers();
     // stubClipboard here — no userEvent.setup() in this test so beforeEach stub is still active
     const epochRef = makeEpochRef('2026-01-01');
@@ -167,5 +170,68 @@ describe('GameOverScreen share button', () => {
     // Advance past the 2000ms revert timeout — async act lets React flush the setState
     await act(async () => { vi.advanceTimersByTime(2001); });
     expect(screen.getByRole('button', { name: /Share result/i })).toBeInTheDocument();
+  });
+});
+
+describe('GameOverScreen revealed mode', () => {
+  const REVEAL = { type: 'REVEAL_REMAINING' as const };
+  const PARTIAL = { type: 'RESTORE_STATE' as const, foundWords: ['drip', 'pine'], score: 3 };
+
+  it('shows "Better luck next time" when revealed', () => {
+    const epochRef = makeEpochRef('2026-01-01');
+    renderWithGame(
+      <GameOverScreen epochRef={epochRef} />,
+      { initialActions: [PUZZLE_LOADED, DICT_LOADED, PARTIAL, REVEAL] },
+    );
+    expect(screen.getByText('Better luck next time')).toBeInTheDocument();
+  });
+
+  it('shows "All words" section with all puzzle words', () => {
+    const epochRef = makeEpochRef('2026-01-01');
+    renderWithGame(
+      <GameOverScreen epochRef={epochRef} />,
+      { initialActions: [PUZZLE_LOADED, DICT_LOADED, PARTIAL, REVEAL] },
+    );
+    expect(screen.getByText('All words')).toBeInTheDocument();
+    // Found words appear
+    expect(screen.getByText('drip')).toBeInTheDocument();
+    // Missed words appear
+    expect(screen.getByText('printed')).toBeInTheDocument();
+  });
+
+  it('found words have word-display--found class, missed words do not', () => {
+    const epochRef = makeEpochRef('2026-01-01');
+    renderWithGame(
+      <GameOverScreen epochRef={epochRef} />,
+      { initialActions: [PUZZLE_LOADED, DICT_LOADED, PARTIAL, REVEAL] },
+    );
+    const dripEl = screen.getByText('drip');
+    expect(dripEl).toHaveClass('game-over__missed-word--found');
+    const printedEl = screen.getByText('printed');
+    expect(printedEl).not.toHaveClass('game-over__missed-word--found');
+  });
+});
+
+describe('GameOverScreen onPlayToday', () => {
+  it('shows "Play today\'s puzzle" button when onPlayToday prop provided', () => {
+    const epochRef = makeEpochRef('2026-01-01');
+    renderWithGame(
+      <GameOverScreen epochRef={epochRef} onPlayToday={vi.fn()} />,
+      { initialActions: [PUZZLE_LOADED, DICT_LOADED, RESTORE_ALL] },
+    );
+    expect(screen.getByRole('button', { name: /Play today/i })).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: /Share result/i })).toBeNull();
+  });
+
+  it('calls onPlayToday when the button is clicked', async () => {
+    const user = userEvent.setup();
+    const onPlayToday = vi.fn();
+    const epochRef = makeEpochRef('2026-01-01');
+    renderWithGame(
+      <GameOverScreen epochRef={epochRef} onPlayToday={onPlayToday} />,
+      { initialActions: [PUZZLE_LOADED, DICT_LOADED, RESTORE_ALL] },
+    );
+    await user.click(screen.getByRole('button', { name: /Play today/i }));
+    expect(onPlayToday).toHaveBeenCalledTimes(1);
   });
 });

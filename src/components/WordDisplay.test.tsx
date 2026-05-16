@@ -1,5 +1,5 @@
 import React from 'react';
-import { screen, act, fireEvent } from '@testing-library/react';
+import { screen, act, fireEvent, waitFor } from '@testing-library/react';
 import { renderWithGame } from '../test/helpers';
 import { WordDisplay } from './WordDisplay';
 import { ActionRow } from './ActionRow';
@@ -84,7 +84,7 @@ describe('WordDisplay error animation', () => {
     expect(wordDiv).not.toHaveClass('shake');
   });
 
-  it('clears the current word after 700ms following an error', () => {
+  it('clears the current word after 700ms following an error (WORD_CLEAR dispatched)', () => {
     const LETTER_P = { type: 'LETTER_APPEND' as const, letter: 'p' };
     const LETTER_I = { type: 'LETTER_APPEND' as const, letter: 'i' };
     const LETTER_N = { type: 'LETTER_APPEND' as const, letter: 'n' };
@@ -102,5 +102,45 @@ describe('WordDisplay error animation', () => {
     act(() => { vi.advanceTimersByTime(701); });
 
     expect(screen.getByText('—')).toBeInTheDocument();
+  });
+});
+
+describe('WordDisplay found-word flash', () => {
+  it('shows found word with word-display--found class after valid submit', async () => {
+    const DRIP = ['d','r','i','p'].map(l => ({ type: 'LETTER_APPEND' as const, letter: l }));
+    renderWithGame(
+      <><WordDisplay /><ActionRow /></>,
+      { initialActions: [PUZZLE_LOADED, DICT_LOADED, ...DRIP] },
+    );
+    fireEvent.click(screen.getByRole('button', { name: /Submit word/i }));
+    // Flush React effects — fake timers are active so we flush with act instead of waitFor
+    await act(async () => { await Promise.resolve(); });
+    const wordDiv = document.querySelector('.word-display') as HTMLElement;
+    expect(wordDiv).toHaveClass('word-display--found');
+    expect(wordDiv).toHaveTextContent('DRIP');
+  });
+
+  it('reverts to placeholder after 950ms', async () => {
+    const DRIP = ['d','r','i','p'].map(l => ({ type: 'LETTER_APPEND' as const, letter: l }));
+    renderWithGame(
+      <><WordDisplay /><ActionRow /></>,
+      { initialActions: [PUZZLE_LOADED, DICT_LOADED, ...DRIP] },
+    );
+    fireEvent.click(screen.getByRole('button', { name: /Submit word/i }));
+    await act(async () => { await Promise.resolve(); });
+    expect(document.querySelector('.word-display--found')).toBeTruthy();
+    act(() => { vi.advanceTimersByTime(951); });
+    expect(document.querySelector('.word-display--placeholder')).toBeTruthy();
+  });
+
+  it('shows +N pts label (role=status) when word is found', async () => {
+    const DRIP = ['d','r','i','p'].map(l => ({ type: 'LETTER_APPEND' as const, letter: l }));
+    renderWithGame(
+      <><WordDisplay /><ActionRow /></>,
+      { initialActions: [PUZZLE_LOADED, DICT_LOADED, ...DRIP] },
+    );
+    fireEvent.click(screen.getByRole('button', { name: /Submit word/i }));
+    await act(async () => { await Promise.resolve(); });
+    expect(screen.getByRole('status')).toHaveTextContent('+1');
   });
 });

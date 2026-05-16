@@ -73,16 +73,18 @@ test('share button copies correct text format to clipboard', async ({ page }) =>
     () => (window as unknown as Record<string, unknown>).__clipboardText as string
   );
 
-  // D-14 format: first line "The Press — YYYY-MM-DD"
-  expect(clipText).toMatch(/^The Press — \d{4}-\d{2}-\d{2}\n/);
-  // Rank is Grand Colophon for 30/30 points
-  expect(clipText).toContain('Grand Colophon');
+  // New format: "The Press · Mon DD, YYYY"
+  expect(clipText).toMatch(/^The Press · \w+ \d+, \d{4}\n/);
+  // Rank is Grand Colophon for 30/30 points (uppercased in share format)
+  expect(clipText).toContain('GRAND COLOPHON');
   // Full score achieved
-  expect(clipText).toContain('Score: 30');
+  expect(clipText).toContain('30 pts');
   // All 9 words found
   expect(clipText).toContain('9/9 words');
   // 'printed' is the only pangram
-  expect(clipText).toContain('1 pangrams');
+  expect(clipText).toContain('✦ 1 pangram');
+  // Footer URL
+  expect(clipText).toContain('thepress.app');
 });
 
 test('share button shows Copied! for 2 seconds then reverts to Share Result', async ({ page }) => {
