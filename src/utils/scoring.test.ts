@@ -53,18 +53,18 @@ describe('getRank', () => {
     expect(result.name).not.toBe('Grand Colophon');
   });
 
-  it('returns Apprentice with current=0 and next=2 when score is below the 2% threshold', () => {
-    // 0/30 = 0% — below the Apprentice threshold of 2%
+  it("returns Printer's Devil with current=0 and next=2 when score is below the 2% threshold", () => {
+    // 0/30 = 0% — below the Printer's Devil threshold of 2%
     const result = getRank(0, 30, 0, 9);
-    expect(result.name).toBe('Apprentice');
+    expect(result.name).toBe("Printer's Devil");
     expect(result.current).toBe(0);
     expect(result.next).toBe(2);
   });
 
-  it('returns Apprentice when score is at 3% (above the 2% entry threshold)', () => {
-    // 1/30 = 3% — Apprentice threshold is 2%, so the Apprentice tier is active
+  it("returns Printer's Devil when score is at 3% (above the 2% entry threshold)", () => {
+    // 1/30 = 3% — Printer's Devil threshold is 2%, so that tier is active
     const result = getRank(1, 30, 1, 9);
-    expect(result.name).toBe('Apprentice');
+    expect(result.name).toBe("Printer's Devil");
   });
 });
 

@@ -133,7 +133,9 @@ function GameLayout({ epochRef, onPlayToday, newDayAvailable }: GameLayoutProps)
         </button>
       )}
       <header className="masthead">
-        <h1 className="app-title">The Press</h1>
+        <h1 className="app-title">
+          <a href="/" className="app-title__link">The Press</a>
+        </h1>
         <p className="app-subtitle">A Daily Word Puzzle</p>
       </header>
       {/* Score bar — tapping word count opens found-words modal; tapping streak opens stats */}

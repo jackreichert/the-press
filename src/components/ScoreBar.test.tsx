@@ -31,12 +31,12 @@ describe('ScoreBar rank display', () => {
     expect(screen.getByText('—')).toBeInTheDocument();
   });
 
-  it('shows Apprentice rank at 0 score after dict loaded', () => {
+  it("shows Printer's Devil rank at 0 score after dict loaded", () => {
     renderWithGame(<ScoreBar onOpenModal={onOpenModal} onOpenStats={onOpenStats} />, {
       initialActions: [PUZZLE_LOADED, DICT_LOADED],
     });
-    // pct=0 → below first tier threshold → Apprentice
-    expect(screen.getByText('Apprentice')).toBeInTheDocument();
+    // pct=0 → below first tier threshold → Printer's Devil
+    expect(screen.getByText("Printer's Devil")).toBeInTheDocument();
   });
 
   it('renders a progressbar element', () => {

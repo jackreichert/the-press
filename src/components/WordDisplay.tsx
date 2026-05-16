@@ -35,7 +35,7 @@ export function WordDisplay(): React.JSX.Element {
   useEffect(() => {
     const prev = prevFoundRef.current;
     const curr = state.foundWords;
-    if (curr.length > prev.length && state.puzzle) {
+    if (curr.length === prev.length + 1 && state.puzzle) {
       const newWord = curr.find(w => !prev.includes(w));
       if (newWord) {
         const pangram = isFoundWordPangram(newWord, state.puzzle);

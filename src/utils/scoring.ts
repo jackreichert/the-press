@@ -13,15 +13,14 @@ import { puzzleMaskFromLetters, wordMask, isPangram } from './puzzle';
 // Use `as const` — enum is forbidden by erasableSyntaxOnly in tsconfig.app.json
 
 const RANK_TIERS = [
-  { name: 'Apprentice',   threshold: 2   },
-  { name: 'Journeyman',   threshold: 5   },
-  { name: 'Typesetter',   threshold: 8   },
-  { name: 'Compositor',   threshold: 15  },
-  { name: 'Pressman',     threshold: 25  },
-  { name: 'Pressmaster',  threshold: 40  },
-  { name: 'Editor',       threshold: 50  },
-  { name: 'Chief Editor', threshold: 70  },
-  { name: 'Publisher',    threshold: 100 },
+  { name: "Printer's Devil", threshold: 2  },
+  { name: 'Apprentice',      threshold: 5  },
+  { name: 'Journeyman',      threshold: 12 },
+  { name: 'Typesetter',      threshold: 22 },
+  { name: 'Compositor',      threshold: 35 },
+  { name: 'Proofer',         threshold: 50 },
+  { name: 'Editor',          threshold: 68 },
+  { name: 'Editor in Chief', threshold: 84 },
 ] as const;
 
 // ─── Scoring formulas ─────────────────────────────────────────────────────────
@@ -77,7 +76,7 @@ export function getRank(
   for (let i = 0; i < RANK_TIERS.length; i++) {
     if (pct >= RANK_TIERS[i].threshold) tierIdx = i;
   }
-  if (tierIdx === -1) return { name: 'Apprentice', current: 0, next: RANK_TIERS[0].threshold, nextName: RANK_TIERS[0].name };
+  if (tierIdx === -1) return { name: RANK_TIERS[0].name, current: 0, next: RANK_TIERS[0].threshold, nextName: RANK_TIERS[1].name };
   const tier = RANK_TIERS[tierIdx];
   const nextTier = RANK_TIERS[tierIdx + 1];
   return { name: tier.name, current: tier.threshold, next: nextTier?.threshold ?? 100, nextName: nextTier?.name ?? 'Grand Colophon' };

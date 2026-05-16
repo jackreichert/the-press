@@ -28,13 +28,13 @@ export default defineConfig({
             // Puzzle schedule: check network first so today's puzzle is always fresh
             urlPattern: /\/schedule\.json$/,
             handler: 'NetworkFirst',
-            options: { cacheName: 'puzzle-data', networkTimeoutSeconds: 5 },
+            options: { cacheName: 'puzzle-data', networkTimeoutSeconds: 2 },
           },
           {
             // Dictionary: use NetworkFirst so word list updates are picked up on next load
             urlPattern: /\/dictionary\.json$/,
             handler: 'NetworkFirst',
-            options: { cacheName: 'dictionary', networkTimeoutSeconds: 5 },
+            options: { cacheName: 'dictionary', networkTimeoutSeconds: 2 },
           },
           {
             // Google Fonts
