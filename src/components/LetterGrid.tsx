@@ -31,7 +31,7 @@ export function LetterGrid(): React.JSX.Element {
       return () => clearTimeout(t);
     }
     prevOrderRef.current = curr;
-  });
+  }, [surroundingOrder]);
   const centerLetter = state.puzzle.centerLetter.toLowerCase();
   const [a, b, c, d, e, f] = surroundingOrder;
 

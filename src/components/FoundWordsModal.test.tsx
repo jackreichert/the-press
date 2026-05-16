@@ -86,8 +86,8 @@ describe('FoundWordsModal close behavior', () => {
       <FoundWordsModal onClose={onClose} />,
       { initialActions: [PUZZLE_LOADED, DICT_LOADED] },
     );
-    // Click the overlay div (role=dialog) directly
-    const overlay = screen.getByRole('dialog', { name: /Found words/i });
+    // The dialog role is on the card; its parent is the backdrop overlay
+    const overlay = screen.getByRole('dialog').parentElement!;
     fireEvent.click(overlay);
     expect(onClose).toHaveBeenCalledTimes(1);
   });

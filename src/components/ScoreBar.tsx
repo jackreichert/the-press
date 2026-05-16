@@ -32,7 +32,7 @@ export function ScoreBar({ onOpenModal, onOpenStats }: ScoreBarProps): React.JSX
   const streak = useMemo(() => computeStats(readHistory()).streak, []);
   const ladder = useMemo(() => (maxScore > 0 ? getRankLadder(maxScore) : null), [maxScore]);
 
-  // Close popover on outside click
+  // Close popover on outside click or Escape
   useEffect(() => {
     if (!ladderOpen) return;
     function handleMouseDown(e: MouseEvent): void {
@@ -40,8 +40,19 @@ export function ScoreBar({ onOpenModal, onOpenStats }: ScoreBarProps): React.JSX
       if (rankBtnRef.current?.contains(e.target as Node)) return;
       setLadderOpen(false);
     }
+    function handleKeydown(e: KeyboardEvent): void {
+      if (e.key === 'Escape') {
+        e.preventDefault();
+        setLadderOpen(false);
+        rankBtnRef.current?.focus();
+      }
+    }
     document.addEventListener('mousedown', handleMouseDown);
-    return () => document.removeEventListener('mousedown', handleMouseDown);
+    document.addEventListener('keydown', handleKeydown);
+    return () => {
+      document.removeEventListener('mousedown', handleMouseDown);
+      document.removeEventListener('keydown', handleKeydown);
+    };
   }, [ladderOpen]);
 
   // Inline next-rank hint
@@ -74,7 +85,7 @@ export function ScoreBar({ onOpenModal, onOpenStats }: ScoreBarProps): React.JSX
         </button>
 
         {ladderOpen && ladder && (
-          <div ref={popoverRef} className="rank-popover" role="dialog" aria-label="Rank thresholds">
+          <div ref={popoverRef} className="rank-popover">
             <ul className="rank-popover__list">
               {ladder.map(({ name, pts }) => {
                 const isCurrent = rank.name === name;

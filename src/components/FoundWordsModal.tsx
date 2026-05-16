@@ -7,9 +7,10 @@
  * GAME-05: Pangram detection via isFoundWordPangram().
  */
 
-import React from 'react';
+import React, { useRef } from 'react';
 import { useGameState } from '../context/GameContext';
 import { isFoundWordPangram } from '../utils/puzzle';
+import { useFocusTrap } from '../hooks/useFocusTrap';
 
 // ─── Props ────────────────────────────────────────────────────────────────────
 
@@ -22,19 +23,23 @@ interface FoundWordsModalProps {
 export function FoundWordsModal({ onClose }: FoundWordsModalProps): React.JSX.Element {
   const state = useGameState();
   const { foundWords, puzzle } = state;
+  const cardRef = useRef<HTMLDivElement>(null);
+
+  useFocusTrap(cardRef, onClose);
 
   // D-13: Alphabetical sort — spread to avoid mutating state array
   const sorted = [...foundWords].sort();
 
   return (
-    <div
-      className="modal-overlay"
-      onClick={onClose}
-      role="dialog"
-      aria-modal="true"
-      aria-label="Found words"
-    >
-      <div className="modal-card" onClick={e => e.stopPropagation()}>
+    <div className="modal-overlay" onClick={onClose}>
+      <div
+        className="modal-card"
+        ref={cardRef}
+        onClick={e => e.stopPropagation()}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="found-words-title"
+      >
         <button
           className="modal-close"
           onClick={onClose}
@@ -46,7 +51,7 @@ export function FoundWordsModal({ onClose }: FoundWordsModalProps): React.JSX.El
             <line x1="13" y1="1" x2="1" y2="13" />
           </svg>
         </button>
-        <h2 className="modal-title">Found Words ({foundWords.length})</h2>
+        <h2 id="found-words-title" className="modal-title">Found Words ({foundWords.length})</h2>
         <ul className="found-words-list" aria-label="Found words list">
           {sorted.map((word, i) => {
             const pangram = puzzle ? isFoundWordPangram(word, puzzle) : false;
