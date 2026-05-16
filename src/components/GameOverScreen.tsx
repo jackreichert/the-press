@@ -35,9 +35,28 @@ export function GameOverScreen({ epochRef, onPlayToday }: GameOverScreenProps): 
 
   function buildShareText(): string {
     const date = (epochRef.current && puzzle)
-      ? getPuzzleDateStr(epochRef.current, puzzle.index)
+      ? formatShareDate(getPuzzleDateStr(epochRef.current, puzzle.index))
       : '—';
-    return `The Press — ${date}\n${rank.name} — Score: ${score} | ${foundWords.length}/${allWords.length} words | ${pangramCount} pangrams`;
+    const filled = maxScore > 0 ? Math.round((score / maxScore) * 10) : 0;
+    const bar = '▓'.repeat(filled) + '░'.repeat(10 - filled);
+    const rankLine = revealed ? '—' : rank.name.toUpperCase();
+    const pangramLine = pangramCount > 0 ? `  ✦ ${pangramCount} pangram${pangramCount !== 1 ? 's' : ''}` : '';
+    const rule = '━━━━━━━━━━━━━━━━━━━━━';
+    return [
+      `The Press · ${date}`,
+      rule,
+      `  ${rankLine}`,
+      `  ${bar} ${score} pts`,
+      `  ${foundWords.length}/${allWords.length} words${pangramLine}`,
+      rule,
+      `  thepress.app`,
+    ].join('\n');
+  }
+
+  function formatShareDate(iso: string): string {
+    const [year, month, day] = iso.split('-').map(Number);
+    const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+    return `${months[month - 1]} ${day}, ${year}`;
   }
 
   async function handleShare(): Promise<void> {
