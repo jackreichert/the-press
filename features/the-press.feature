@@ -53,6 +53,17 @@ Feature: The Press — Daily Word Puzzle
       When the player immediately types a letter on the physical keyboard
       Then that letter appears in the word display
 
+    Scenario: Keyboard works after clicking anywhere on the page
+      Given the puzzle is loaded
+      When the player clicks on the background margin (not a tile)
+      And then types a letter
+      Then that letter appears in the word display
+
+    Scenario: Browser shortcuts are not intercepted
+      Given the puzzle is active
+      When the player presses Ctrl+R or Cmd+R
+      Then the page reloads normally (modifier keys are not captured)
+
     Scenario: Backspace removes the last letter (keyboard)
       Given the word display shows "GAB"
       When the player presses Backspace
@@ -134,12 +145,20 @@ Feature: The Press — Daily Word Puzzle
 
   Feature: Valid words
 
-    Scenario: Valid word is accepted
+    Scenario: Valid word is accepted — brief found-word flash
       Given the word display shows a valid word
       When the player submits
-      Then the word appears in the found-words list
+      Then the found word briefly appears in the word display with an accent animation
+      And a score label showing "+N pts" fades in below it
+      And the word display clears to "—" after ~950ms
+      And the word appears in the found-words list
       And the score increases
-      And the word display clears
+
+    Scenario: Pangram found — distinct animation
+      Given the word display shows a valid pangram
+      When the player submits
+      Then the found word briefly appears in gold (pangram colour)
+      And a "✦ Pangram +N pts" label appears
 
     Scenario: 4-letter word scores 1 point
       When the player finds a 4-letter word
@@ -183,15 +202,20 @@ Feature: The Press — Daily Word Puzzle
       Then the six surrounding letters are in a different order
       And the center letter remains in the center position
 
+    Scenario: Shuffle triggers tile animation
+      When the player taps "Shuffle"
+      Then the six surrounding tiles briefly scale and rotate
+      And the center tile is not animated
+
   # ─── Found words modal ────────────────────────────────────────────────────────
 
   Feature: Found words modal
 
     Scenario: Modal opens when player taps score area
       Given the player has found some words
-      When the player taps "Score: N · N/N words ▾"
+      When the player taps "Score: N · N words ▾"
       Then the found-words modal opens
-      And the found words are listed in alphabetical order
+      And the found words are listed in alphabetical order in two columns
 
     Scenario: Pangrams are visually distinct in the modal
       Given the player has found a pangram
@@ -218,9 +242,9 @@ Feature: The Press — Daily Word Puzzle
       And the game-over screen appears showing rank, score, word count, and pangram count
 
     Scenario: Game-over screen format
-      Given the player finished with rank "Publisher", score 120, 48 words, 2 pangrams
+      Given the player finished with rank "Publisher", score 120, 48/96 words, 2 pangrams
       Then the game-over screen shows "Publisher"
-      And "Score: 120 | 48 words | 2 pangrams"
+      And "Score: 120 | 48/96 words | 2 pangrams"
 
   # ─── Share button ─────────────────────────────────────────────────────────────
 
@@ -239,19 +263,68 @@ Feature: The Press — Daily Word Puzzle
       Then the button text changes to "Copied!"
       And after 2 seconds the button reverts to "Share Result"
 
-    Scenario: Share text is spoiler-free
+    Scenario: Share text format — newspaper style
       Given the player finished on 2026-05-15 as "Publisher" with score 120, 48/96 words, 2 pangrams
       When the player copies the share text
       Then the clipboard contains:
         """
-        The Press — 2026-05-15
-        Publisher — Score: 120 | 48/96 words | 2 pangrams
+        The Press · May 15, 2026
+        ━━━━━━━━━━━━━━━━━━━━━
+          PUBLISHER
+          ▓▓▓▓▓▓▓▓▓▓ 120 pts
+          48/96 words  ✦ 2 pangrams
+        ━━━━━━━━━━━━━━━━━━━━━
+          thepress.app
         """
+
+    Scenario: Mobile share — native share sheet
+      Given the player is on a mobile device with navigator.share available
+      When the player taps "Share Result"
+      Then the native OS share sheet opens with the share text
 
     Scenario: Clipboard API unavailable — textarea fallback
       Given the clipboard API is blocked or unavailable
       When the player taps "Share Result"
       Then a read-only textarea appears pre-filled with the share text
+
+  # ─── Carry-over puzzle ────────────────────────────────────────────────────────
+
+  Feature: Carry-over unfinished puzzle
+
+    Scenario: New day loads previous unfinished puzzle first
+      Given the player started yesterday's puzzle and found some words
+      When the player opens the game today (a new day)
+      Then yesterday's puzzle is loaded with the player's progress restored
+      And a "Reveal answers · play today's puzzle →" link is visible below the grid
+
+    Scenario: Player finishes carry-over puzzle naturally
+      Given the player is finishing yesterday's puzzle
+      When the player finds all remaining words
+      Then the game-over screen appears for yesterday's puzzle
+      And a "Play today's puzzle →" button appears instead of the Share button
+
+    Scenario: Player reveals answers for carry-over puzzle
+      Given the player is on yesterday's unfinished puzzle
+      When the player taps "Reveal answers · play today's puzzle →"
+      Then all puzzle words are shown — found words highlighted, missed words greyed
+      And a "Play today's puzzle →" button appears
+
+    Scenario: Revealed words distinguish found from missed
+      Given the player revealed answers after finding some words
+      Then found words have an accent-coloured style
+      And words the player missed are greyed out
+      And pangrams that were found are shown in gold
+
+    Scenario: Play Today button loads today's puzzle
+      Given the carry-over game-over screen is showing
+      When the player taps "Play today's puzzle →"
+      Then today's puzzle loads fresh with score 0 and no found words
+
+    Scenario: Page reload during carry-over resumes the carry-over
+      Given the player is mid-carry-over (yesterday's puzzle in progress)
+      When the player reloads the page
+      Then yesterday's puzzle and progress are restored
+      And the Play Today option is still available
 
   # ─── Persistence ─────────────────────────────────────────────────────────────
 
@@ -263,16 +336,16 @@ Feature: The Press — Daily Word Puzzle
       Then the same 3 words are shown as found
       And the score shows 10
 
-    Scenario: In-progress state is not restored for a different day
-      Given the player played yesterday and stored some found words
+    Scenario: New day — previous unfinished puzzle is carried over
+      Given the player found some words yesterday but did not finish
       When the player opens the game today (a new day)
-      Then yesterday's found words are not restored
-      And the puzzle shows today's puzzle with no found words
+      Then yesterday's puzzle is loaded (not today's)
+      And the player can continue or reveal and move on
 
-    Scenario: Previous partial day is saved to history on new-day load
-      Given the player found 2 words yesterday but did not finish
-      When the player opens the game today
-      Then yesterday's partial result is saved to history (completed: false)
+    Scenario: Previous partial day is saved to history when carried over
+      Given the player completed or revealed the carry-over puzzle
+      Then yesterday's partial result is saved to history with completed: false (if revealed)
+      Or with completed: true (if the player found all words)
 
     Scenario: Safari private mode — game still works
       Given localStorage is unavailable (Safari private mode)
@@ -309,6 +382,31 @@ Feature: The Press — Daily Word Puzzle
       Given the player has a 5-day streak
       When the player skips a day
       Then the streak resets to 0
+
+  # ─── PWA / installability ────────────────────────────────────────────────────
+
+  Feature: Installable PWA
+
+    Scenario: App is installable on Android Chrome
+      Given the player visits thepress.app in Chrome on Android
+      Then Chrome shows an "Add to Home Screen" prompt
+      When the player installs it
+      Then the app opens in standalone mode with no browser chrome
+
+    Scenario: App is installable on iOS Safari
+      Given the player visits thepress.app in Safari on iOS
+      When the player taps Share → "Add to Home Screen"
+      Then the app installs with the UnifrakturMaguntia "P" letterpress icon
+
+    Scenario: Game works offline after first visit
+      Given the player has visited thepress.app at least once
+      When the device has no network connection
+      Then the game loads and plays normally using the service worker cache
+
+    Scenario: Puzzle data is always fresh
+      Given the player opens the app with a network connection
+      Then schedule.json and dictionary.json are fetched from the network first
+      And only fall back to cache if the network request fails within 5 seconds
 
   # ─── Scoring unit behaviours ─────────────────────────────────────────────────
 
