@@ -31,10 +31,10 @@ export default defineConfig({
             options: { cacheName: 'puzzle-data', networkTimeoutSeconds: 5 },
           },
           {
-            // Dictionary: large file, rarely changes — serve from cache, refresh in background
+            // Dictionary: use NetworkFirst so word list updates are picked up on next load
             urlPattern: /\/dictionary\.json$/,
-            handler: 'StaleWhileRevalidate',
-            options: { cacheName: 'dictionary' },
+            handler: 'NetworkFirst',
+            options: { cacheName: 'dictionary', networkTimeoutSeconds: 5 },
           },
           {
             // Google Fonts
