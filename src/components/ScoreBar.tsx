@@ -32,6 +32,18 @@ export function ScoreBar({ onOpenModal, onOpenStats }: ScoreBarProps): React.JSX
   const streak = useMemo(() => computeStats(readHistory()).streak, []);
   const ladder = useMemo(() => (maxScore > 0 ? getRankLadder(maxScore) : null), [maxScore]);
 
+  // Show Grand Colophon score the day after someone found all words
+  const yesterdayColophonScore = useMemo(() => {
+    const history = readHistory();
+    if (history.length === 0) return null;
+    const last = history[history.length - 1];
+    if (last.foundCount !== last.totalCount) return null;
+    const d = new Date();
+    d.setDate(d.getDate() - 1);
+    const ys = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+    return last.date === ys ? last.score : null;
+  }, []);
+
   // Close popover on outside click or Escape
   useEffect(() => {
     if (!ladderOpen) return;
@@ -58,9 +70,8 @@ export function ScoreBar({ onOpenModal, onOpenStats }: ScoreBarProps): React.JSX
   // Inline next-rank hint
   const ptsToNext = maxScore > 0 ? Math.ceil((rank.next / 100) * maxScore) - score : 0;
   const nextHint = (() => {
-    if (!maxScore || rank.name === 'Grand Colophon') return null;
-    if (rank.name === 'Publisher') return 'Find all words for Grand Colophon';
-    if (ptsToNext > 0) return `${ptsToNext} pt${ptsToNext === 1 ? '' : 's'} to ${rank.nextName}`;
+    if (!maxScore || rank.name === 'Editor in Chief') return null;
+    if (ptsToNext > 0 && rank.nextName) return `${ptsToNext} pt${ptsToNext === 1 ? '' : 's'} to ${rank.nextName}`;
     return null;
   })();
 
@@ -99,10 +110,6 @@ export function ScoreBar({ onOpenModal, onOpenStats }: ScoreBarProps): React.JSX
                   </li>
                 );
               })}
-              <li className={`rank-popover__item rank-popover__item--colophon${rank.name === 'Grand Colophon' ? ' rank-popover__item--current' : ''}`}>
-                <span className="rank-popover__name">Grand Colophon</span>
-                <span className="rank-popover__pts">all words</span>
-              </li>
             </ul>
           </div>
         )}
@@ -120,6 +127,9 @@ export function ScoreBar({ onOpenModal, onOpenStats }: ScoreBarProps): React.JSX
       </div>
 
       {nextHint && <p className="rank-next-hint">{nextHint}</p>}
+      {yesterdayColophonScore !== null && (
+        <p className="rank-next-hint rank-next-hint--colophon">Grand Colophon yesterday · {yesterdayColophonScore} pts</p>
+      )}
 
       <div className="score-bar__bottom">
         <button

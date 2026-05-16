@@ -101,3 +101,84 @@ describe('ScoreBar streak counter', () => {
     expect(onOpenStats).toHaveBeenCalledTimes(1);
   });
 });
+
+describe('ScoreBar rank popover', () => {
+  it('does not list Grand Colophon in the rank popover', async () => {
+    const user = userEvent.setup();
+    renderWithGame(<ScoreBar onOpenModal={onOpenModal} onOpenStats={onOpenStats} />, {
+      initialActions: [PUZZLE_LOADED, DICT_LOADED],
+    });
+    await user.click(screen.getByRole('button', { name: /Show rank thresholds/i }));
+    expect(screen.queryByText('Grand Colophon')).toBeNull();
+  });
+
+  it('lists Editor in Chief in the rank popover', async () => {
+    const user = userEvent.setup();
+    renderWithGame(<ScoreBar onOpenModal={onOpenModal} onOpenStats={onOpenStats} />, {
+      initialActions: [PUZZLE_LOADED, DICT_LOADED],
+    });
+    await user.click(screen.getByRole('button', { name: /Show rank thresholds/i }));
+    expect(screen.getByText('Editor in Chief')).toBeInTheDocument();
+  });
+});
+
+describe('ScoreBar Grand Colophon day-after hint', () => {
+  afterEach(() => {
+    vi.useRealTimers();
+  });
+
+  it('shows Grand Colophon hint the day after all words were found', () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date(2026, 4, 16, 12, 0, 0)); // today = 2026-05-16
+    const entry: HistoryEntry = {
+      date: '2026-05-15', // yesterday
+      score: 30,
+      rank: 'Editor in Chief',
+      foundCount: 9,
+      totalCount: 9, // all words found
+      completed: true,
+    };
+    appendHistory(entry);
+    renderWithGame(<ScoreBar onOpenModal={onOpenModal} onOpenStats={onOpenStats} />, {
+      initialActions: [PUZZLE_LOADED, DICT_LOADED],
+    });
+    expect(screen.getByText(/Grand Colophon yesterday/i)).toBeInTheDocument();
+    expect(screen.getByText(/30 pts/i)).toBeInTheDocument();
+  });
+
+  it('does not show hint when yesterday\'s game did not find all words', () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date(2026, 4, 16, 12, 0, 0)); // today = 2026-05-16
+    const entry: HistoryEntry = {
+      date: '2026-05-15',
+      score: 20,
+      rank: 'Editor',
+      foundCount: 7,
+      totalCount: 9, // not all found
+      completed: true,
+    };
+    appendHistory(entry);
+    renderWithGame(<ScoreBar onOpenModal={onOpenModal} onOpenStats={onOpenStats} />, {
+      initialActions: [PUZZLE_LOADED, DICT_LOADED],
+    });
+    expect(screen.queryByText(/Grand Colophon yesterday/i)).toBeNull();
+  });
+
+  it('does not show hint when all-words entry is 2 days ago (not yesterday)', () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date(2026, 4, 16, 12, 0, 0)); // today = 2026-05-16
+    const entry: HistoryEntry = {
+      date: '2026-05-14', // two days ago
+      score: 30,
+      rank: 'Editor in Chief',
+      foundCount: 9,
+      totalCount: 9,
+      completed: true,
+    };
+    appendHistory(entry);
+    renderWithGame(<ScoreBar onOpenModal={onOpenModal} onOpenStats={onOpenStats} />, {
+      initialActions: [PUZZLE_LOADED, DICT_LOADED],
+    });
+    expect(screen.queryByText(/Grand Colophon yesterday/i)).toBeNull();
+  });
+});

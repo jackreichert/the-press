@@ -72,13 +72,14 @@ afterEach(() => {
 });
 
 describe('GameOverScreen rendering', () => {
-  it('shows Grand Colophon rank when all words found', () => {
+  it('shows Editor in Chief rank when all words found (top visible rank)', () => {
     const epochRef = makeEpochRef('2026-01-01');
     renderWithGame(
       <GameOverScreen epochRef={epochRef} />,
       { initialActions: [PUZZLE_LOADED, DICT_LOADED, RESTORE_ALL] },
     );
-    expect(screen.getByText('Grand Colophon')).toBeInTheDocument();
+    expect(screen.getByText('Editor in Chief')).toBeInTheDocument();
+    expect(screen.queryByText('Grand Colophon')).toBeNull();
   });
 });
 

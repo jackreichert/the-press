@@ -44,13 +44,15 @@ describe('getRank', () => {
     expect(getRank(0, 0, 0, 0)).toEqual({ name: '—', current: 0, next: 0, nextName: '' });
   });
 
-  it('returns Grand Colophon when all words found and score equals max', () => {
-    expect(getRank(30, 30, 9, 9)).toEqual({ name: 'Grand Colophon', current: 100, next: 100, nextName: '' });
+  it('returns Editor in Chief when score equals max (100% — top visible rank)', () => {
+    const result = getRank(30, 30);
+    expect(result.name).toBe('Editor in Chief');
+    expect(result.current).toBe(84);
+    expect(result.nextName).toBe('');
   });
 
-  it('does NOT return Grand Colophon when score matches max but not all words are found', () => {
-    const result = getRank(30, 30, 8, 9);
-    expect(result.name).not.toBe('Grand Colophon');
+  it('returns Editor in Chief regardless of whether all words are found', () => {
+    expect(getRank(30, 30).name).toBe('Editor in Chief');
   });
 
   it("returns Printer's Devil with current=0 and next=2 when score is below the 2% threshold", () => {
@@ -70,18 +72,18 @@ describe('getRank', () => {
 
 describe('getProgressPct', () => {
   it('returns 0 when maxScore is 0 (dictionary not loaded yet)', () => {
-    expect(getProgressPct(0, 0, 0, 0)).toBe(0);
+    expect(getProgressPct(0, 0)).toBe(0);
   });
 
   it('returns 50 for half of the max score', () => {
-    expect(getProgressPct(15, 30, 5, 9)).toBe(50);
+    expect(getProgressPct(15, 30)).toBe(50);
   });
 
   it('returns 100 at max score', () => {
-    expect(getProgressPct(30, 30, 9, 9)).toBe(100);
+    expect(getProgressPct(30, 30)).toBe(100);
   });
 
   it('clamps to 100 if score somehow exceeds max', () => {
-    expect(getProgressPct(40, 30, 9, 9)).toBe(100);
+    expect(getProgressPct(40, 30)).toBe(100);
   });
 });

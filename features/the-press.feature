@@ -181,16 +181,23 @@ Feature: The Press — Daily Word Puzzle
       Then the rank name shows "—" (before dictionary loads) then "Apprentice"
 
     Scenario: Rank advances as score percentage increases
-      Given the player's score is 25% of max
-      Then the rank shows "Pressman"
+      Given the player's score is 35% of max
+      Then the rank shows "Compositor"
 
     Scenario: Progress bar reflects overall score percentage
       Given the player's score is 50% of max
       Then the progress bar fill is approximately 50%
 
-    Scenario: Grand Colophon requires all words found
-      Given the player has found all words
-      Then the rank shows "Grand Colophon"
+    Scenario: Editor in Chief is the highest visible rank
+      Given the player's score is at least 84% of max
+      Then the rank shows "Editor in Chief"
+      And Grand Colophon does not appear anywhere in the UI
+
+    Scenario: Day-after Grand Colophon hint
+      Given the player found all words in yesterday's puzzle
+      When the player opens today's puzzle
+      Then the score bar shows "Grand Colophon yesterday · N pts"
+      And the hint disappears the following day
 
   # ─── Shuffle ─────────────────────────────────────────────────────────────────
 
@@ -213,7 +220,7 @@ Feature: The Press — Daily Word Puzzle
 
     Scenario: Modal opens when player taps score area
       Given the player has found some words
-      When the player taps "Score: N · N words ▾"
+      When the player taps "Score: N · N words ▾" (showing found count only, not total)
       Then the found-words modal opens
       And the found words are listed in alphabetical order in two columns
 
@@ -242,8 +249,8 @@ Feature: The Press — Daily Word Puzzle
       And the game-over screen appears showing rank, score, word count, and pangram count
 
     Scenario: Game-over screen format
-      Given the player finished with rank "Publisher", score 120, 48/96 words, 2 pangrams
-      Then the game-over screen shows "Publisher"
+      Given the player finished with rank "Editor in Chief", score 120, 48/96 words, 2 pangrams
+      Then the game-over screen shows "Editor in Chief"
       And "Score: 120 | 48/96 words | 2 pangrams"
 
   # ─── Share button ─────────────────────────────────────────────────────────────
@@ -264,13 +271,13 @@ Feature: The Press — Daily Word Puzzle
       And after 2 seconds the button reverts to "Share Result"
 
     Scenario: Share text format — newspaper style
-      Given the player finished on 2026-05-15 as "Publisher" with score 120, 48/96 words, 2 pangrams
+      Given the player finished on 2026-05-15 as "Editor in Chief" with score 120, 48/96 words, 2 pangrams
       When the player copies the share text
       Then the clipboard contains:
         """
         The Press · May 15, 2026
         ━━━━━━━━━━━━━━━━━━━━━
-          PUBLISHER
+          EDITOR IN CHIEF
           ▓▓▓▓▓▓▓▓▓▓ 120 pts
           48/96 words  ✦ 2 pangrams
         ━━━━━━━━━━━━━━━━━━━━━

@@ -57,20 +57,17 @@ export interface RankResult {
 
 /**
  * Return the player's current rank name and tier thresholds for the progress bar.
- * Grand Colophon requires 100% score AND all words found.
+ * Editor in Chief is the top rank. Grand Colophon is not surfaced in the UI.
  * Returns name '—' with current=0,next=0 when maxScore is 0 (dict not loaded).
  * D-15 threshold formula: Math.floor(score / maxScore * 100).
  */
 export function getRank(
   score: number,
   maxScore: number,
-  foundCount: number,
-  totalCount: number,
+  _foundCount?: number,
+  _totalCount?: number,
 ): RankResult {
   if (maxScore === 0) return { name: '—', current: 0, next: 0, nextName: '' };
-  if (score >= maxScore && foundCount === totalCount) {
-    return { name: 'Grand Colophon', current: 100, next: 100, nextName: '' };
-  }
   const pct = Math.floor((score / maxScore) * 100);
   let tierIdx = -1;
   for (let i = 0; i < RANK_TIERS.length; i++) {
@@ -79,7 +76,7 @@ export function getRank(
   if (tierIdx === -1) return { name: RANK_TIERS[0].name, current: 0, next: RANK_TIERS[0].threshold, nextName: RANK_TIERS[1].name };
   const tier = RANK_TIERS[tierIdx];
   const nextTier = RANK_TIERS[tierIdx + 1];
-  return { name: tier.name, current: tier.threshold, next: nextTier?.threshold ?? 100, nextName: nextTier?.name ?? 'Grand Colophon' };
+  return { name: tier.name, current: tier.threshold, next: nextTier?.threshold ?? 100, nextName: nextTier?.name ?? '' };
 }
 
 /**
