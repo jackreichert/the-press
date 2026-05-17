@@ -19,6 +19,7 @@
 
 import { readFile, writeFile } from 'fs/promises';
 import { join } from 'path';
+import { existsSync } from 'fs';
 import type { PuzzleEntry, Schedule, PuzzleCandidate } from './types';
 
 // ─── Constants ───────────────────────────────────────────────────────────────
@@ -29,6 +30,7 @@ const LDNOOBW_URL =
 const EPOCH = '2026-05-12';
 const TARGET_PUZZLES = 3650;
 const MIN_WORDS = 25;
+const MAX_WORDS = 100;
 const DEFAULT_SEED = 42;
 
 // ─── Seeded PRNG (mulberry32) ─────────────────────────────────────────────────
@@ -107,14 +109,33 @@ async function loadPuzzleWords(): Promise<string[]> {
     .filter((w) => /^[a-z]+$/.test(w) && w.length >= 4 && w.length <= 7)
     .filter((w) => !w.includes('s')); // S exclusion — puzzle letter sets only
 
-  // Compute SCOWL-60 ∩ ENABLE2K: ensures every puzzle answer is submittable
+  // Compute SCOWL-60 ∩ dictionary.json: ensures every puzzle answer is submittable
   const dictRaw = await readFile(
     join(process.cwd(), 'public', 'dictionary.json'),
     'utf8'
   );
   const dictSet = new Set<string>(JSON.parse(dictRaw) as string[]);
 
-  return scowlWords.filter((w) => dictSet.has(w));
+  const base = scowlWords.filter((w) => dictSet.has(w));
+
+  // Allowlist words: add any that are in dictionary.json but not SCOWL-60-raw,
+  // provided they meet puzzle criteria (4–7 letters, no S).
+  const allowlistPath = join(process.cwd(), 'data', 'allowlist.txt');
+  if (existsSync(allowlistPath)) {
+    const baseSet = new Set(base);
+    const allowlistWords = (await readFile(allowlistPath, 'utf8'))
+      .split('\n')
+      .map((w) => w.trim().toLowerCase())
+      .filter((w) => w && !w.startsWith('#') && /^[a-z]+$/.test(w))
+      .filter((w) => w.length >= 4 && w.length <= 7 && !w.includes('s'))
+      .filter((w) => dictSet.has(w) && !baseSet.has(w));
+    if (allowlistWords.length > 0) {
+      console.log(`Allowlist added to puzzle pool: ${allowlistWords.join(', ')}`);
+    }
+    return [...base, ...allowlistWords];
+  }
+
+  return base;
 }
 
 // ─── Blocklist loading ────────────────────────────────────────────────────────
@@ -192,7 +213,7 @@ function findValidPuzzles(words: string[]): PuzzleCandidate[] {
         }
       }
 
-      if (validCount < MIN_WORDS) continue; // D-05: reject if fewer than 25 words
+      if (validCount < MIN_WORDS || validCount > MAX_WORDS) continue;
 
       const letters = letterMaskToArray(puzzleMask);
       const centerLetter = String.fromCharCode(CHAR_A + bit).toUpperCase();

@@ -1,0 +1,366 @@
+#005  2026-05-17  [CEGNRUY]  R   39 words  urgency
+#006  2026-05-18  [ALMNOPW]  O   48 words  plowman
+#007  2026-05-19  [ADEFGRT]  T  133 words  grafted
+#008  2026-05-20  [BCEHLRU]  H   32 words  blucher
+#009  2026-05-21  [BEILMOR]  L   69 words  embroil
+#010  2026-05-22  [ACEHLMY]  E   53 words  alchemy
+#011  2026-05-23  [AILOPTV]  L   65 words  pivotal
+#012  2026-05-24  [AEGLOTV]  V   35 words  voltage
+#013  2026-05-25  [ADEGHLU]  L   92 words  laughed
+#014  2026-05-26  [ADENRTU]  R  216 words  denature, denatured, natured, redundant, underrate, underrated, unrated, untreated
+#015  2026-05-27  [CEHORTU]  E   99 words  retouch
+#016  2026-05-28  [EIKLMNR]  L   42 words  kremlin
+#017  2026-05-29  [ACELOTY]  E   66 words  acolyte
+#018  2026-05-30  [ABEFILR]  E  154 words  fireball, friable, refillable
+#019  2026-05-31  [AEGORTU]  U   52 words  outrage
+#020  2026-06-01  [CDEORTU]  O  137 words  courted
+#021  2026-06-02  [ACEGINO]  G   61 words  angiogenic, canoeing, coinage, oceangoing
+#022  2026-06-03  [DEILOPT]  E  155 words  piloted
+#023  2026-06-04  [ACEHMRT]  T  157 words  matcher, rematch
+#024  2026-06-05  [ADEGILT]  L  137 words  ligated, litigated, tailgated
+#025  2026-06-06  [DEILPRT]  I  151 words  tripled
+#026  2026-06-07  [ABGHMRU]  A   41 words  hamburg
+#027  2026-06-08  [ABDGLUY]  D   28 words  ladybug
+#028  2026-06-09  [EILORTU]  T  118 words  outlier, ulterior
+#029  2026-06-10  [AEFKLNR]  R   69 words  flanker
+#030  2026-06-11  [GHORTUW]  R   37 words  outgrowth, wrought
+#031  2026-06-12  [ACDEHRT]  H  144 words  charted, chartered, chattered, ratcheted, reattached
+#032  2026-06-13  [CEIPRTU]  U   46 words  picture
+#033  2026-06-14  [ACDENRU]  C   92 words  durance, endurance
+#034  2026-06-15  [ACDEHKW]  C   37 words  whacked
+#035  2026-06-16  [AGHILRT]  L   59 words  alright, arthralgia
+#036  2026-06-17  [DEHIMOT]  T   67 words  ethmoid
+#037  2026-06-18  [DEILRVY]  I  110 words  delivery, devilry
+#038  2026-06-19  [ABCEINR]  E   97 words  carabiner, carbine
+#039  2026-06-20  [ACDEGHR]  G   70 words  charged, recharged
+#040  2026-06-21  [DELNRTU]  L   59 words  trundle, trundled, unlettered
+#041  2026-06-22  [ADEGORW]  D  148 words  dowager
+#042  2026-06-23  [ABDEORT]  R  243 words  aborted
+#043  2026-06-24  [ADEHLNR]  D  129 words  handler
+#044  2026-06-25  [AEFLNRU]  E   95 words  funeral, funereal
+#045  2026-06-26  [ACGHINR]  R   71 words  arching, chagrin, chairing, charging, charing, charring, ranching
+#046  2026-06-27  [ABLNOTY]  T   59 words  notably
+#047  2026-06-28  [DEILQTU]  U   40 words  quilted
+#048  2026-06-29  [ACDELMP]  P   71 words  clamped, emplaced
+#049  2026-06-30  [ADEHLOT]  A   96 words  loathed
+#050  2026-07-01  [ACEOPTU]  A   46 words  outpace
+#051  2026-07-02  [ACEKLRT]  L  103 words  tackler
+#052  2026-07-03  [ADEGHPR]  H   46 words  graphed
+#053  2026-07-04  [CDELRUY]  U   72 words  crudely
+#054  2026-07-05  [BEFILRY]  L   63 words  briefly
+#055  2026-07-06  [EFGIORV]  V   33 words  forgive
+#056  2026-07-07  [ADELPTY]  E  144 words  adeptly, playdate
+#057  2026-07-08  [ABDEKNU]  K   32 words  unbaked
+#058  2026-07-09  [AEGIMNT]  G  121 words  emanating, geminate, magnetite, mintage, teaming
+#059  2026-07-10  [ACELOPT]  A  120 words  polecat
+#060  2026-07-11  [BGIMNPU]  G   36 words  bumping
+#061  2026-07-12  [DEINPRT]  T  161 words  interdependent, interpreted, intrepid, printed, reinterpreted, reprinted
+#062  2026-07-13  [ACGILMN]  G   92 words  calming, claiming, clamming
+#063  2026-07-14  [ACEIMNR]  E  132 words  carmine
+#064  2026-07-15  [ABGHINT]  H   35 words  bathing, inhabiting
+#065  2026-07-16  [ADMNORT]  A  113 words  dormant, mordant
+#066  2026-07-17  [ABDGINR]  I  120 words  abridging, braiding, branding, brigand
+#067  2026-07-18  [EGNORUY]  U   31 words  younger
+#068  2026-07-19  [CEIPRTU]  R  106 words  picture
+#069  2026-07-20  [EGNORUY]  N   40 words  younger
+#070  2026-07-21  [ABCDEOR]  E  181 words  brocade
+#071  2026-07-22  [ABELMRT]  T  135 words  lambert
+#072  2026-07-23  [AGHILRT]  H   41 words  alright, arthralgia
+#073  2026-07-24  [ACEIPTV]  A   52 words  capacitive, captivate, captive
+#074  2026-07-25  [BCEIMOR]  I   44 words  microbe
+#075  2026-07-26  [ACHIORT]  O   79 words  chariot, haricot, thoracic, trochaic
+#076  2026-07-27  [ABEGIMT]  E   63 words  megabit
+#077  2026-07-28  [ADEIPRT]  T  203 words  partied, pirated, repatriated
+#078  2026-07-29  [DEILRTY]  R  106 words  tiredly
+#079  2026-07-30  [DEGILNU]  G  110 words  deluding, dueling, eluding, guideline, indulge, indulged
+#080  2026-07-31  [ADEILRY]  A  149 words  drearily, readily
+#081  2026-08-01  [CEHNPRU]  R   41 words  puncher
+#082  2026-08-02  [ABEOQRU]  A   34 words  baroque
+#083  2026-08-03  [ADEGNOR]  D  188 words  androgen, groaned
+#084  2026-08-04  [ABDGILN]  I  105 words  balding, dabbling
+#085  2026-08-05  [BDEILNR]  L   92 words  blinder, brindle
+#086  2026-08-06  [AFGILNR]  I  122 words  flaring, raffling
+#087  2026-08-07  [ACDHLOR]  H   43 words  chordal
+#088  2026-08-08  [ACDEHTW]  H   66 words  deathwatch, watched
+#089  2026-08-09  [EFGIORV]  E   66 words  forgive
+#090  2026-08-10  [EIMRTUX]  M   42 words  mixture
+#091  2026-08-11  [DEIOPTV]  V   32 words  pivoted
+#092  2026-08-12  [ACDFIOT]  A   42 words  factoid
+#093  2026-08-13  [CDOPRTU]  O   62 words  product
+#094  2026-08-14  [FGIMNOR]  O   64 words  forming, informing
+#095  2026-08-15  [EFINRUY]  E   46 words  reunify
+#096  2026-08-16  [CEFIKLR]  R   64 words  flicker
+#097  2026-08-17  [ACDEHKW]  E   62 words  whacked
+#098  2026-08-18  [ABENORT]  A  160 words  baronet
+#099  2026-08-19  [ACDEGHN]  G   35 words  changed
+#100  2026-08-20  [ADEHILP]  A   95 words  helipad
+#101  2026-08-21  [ADEHILP]  H   36 words  helipad
+#102  2026-08-22  [AEGMNOT]  G   66 words  magneto, magneton, megaton, montage
+#103  2026-08-23  [ACDEGHR]  D  126 words  charged, recharged
+#104  2026-08-24  [GINOPTU]  I   90 words  gunpoint, outputting, pouting
+#105  2026-08-25  [GLNORWY]  L   29 words  wrongly
+#106  2026-08-26  [DEIKLNT]  T   84 words  tinkled
+#107  2026-08-27  [ADEORTU]  E  180 words  readout
+#108  2026-08-28  [AEIMNTY]  E   93 words  amenity, anytime
+#109  2026-08-29  [EGLMNOR]  M   48 words  mongrel
+#110  2026-08-30  [BELMPRU]  P   49 words  plumber
+#111  2026-08-31  [DEHMPTU]  D   41 words  thumped
+#112  2026-09-01  [AEOQRTU]  U   44 words  equator
+#113  2026-09-02  [CDEHLOT]  L   79 words  clothed
+#114  2026-09-03  [ADEGLOT]  L  123 words  gloated
+#115  2026-09-04  [ACEILMX]  C   43 words  exclaim
+#116  2026-09-05  [ABCDIRT]  R   69 words  catbird
+#117  2026-09-06  [DEFNORU]  O   84 words  founder, foundered, refound, unroofed
+#118  2026-09-07  [DEILMOP]  P   84 words  implode, imploded
+#119  2026-09-08  [ACHIRTY]  A   70 words  charity
+#120  2026-09-09  [ACEIMNR]  M  102 words  carmine
+#121  2026-09-10  [CEGILNR]  C   43 words  clinger, encircling, reclining
+#122  2026-09-11  [ADELTWZ]  D   58 words  waltzed
+#123  2026-09-12  [CEHIKRT]  H   56 words  hitchhiker, thicker
+#124  2026-09-13  [ABILOTU]  A   57 words  bailout
+#125  2026-09-14  [ADGINOR]  R  113 words  adoring, adorning, ordaining, radioing
+#126  2026-09-15  [AEHPRTY]  Y   56 words  therapy
+#127  2026-09-16  [ADEHLTY]  D   65 words  deathly, heatedly
+#128  2026-09-17  [CGIKNRU]  G   32 words  rucking
+#129  2026-09-18  [ILMORTU]  U   27 words  turmoil
+#130  2026-09-19  [ACDEFIN]  A   81 words  defiance, fancied, financed
+#131  2026-09-20  [CDELRUY]  L   68 words  crudely
+#132  2026-09-21  [ACEGHRU]  A   70 words  gaucher
+#133  2026-09-22  [AHMNORY]  M   50 words  harmony
+#134  2026-09-23  [DELNOUV]  L   59 words  unloved
+#135  2026-09-24  [AHOPRTY]  A   76 words  atrophy
+#136  2026-09-25  [GILNPRU]  P   42 words  purling
+#137  2026-09-26  [EFILOPR]  E  106 words  profile, profiler
+#138  2026-09-27  [ACEHMRT]  E  187 words  matcher, rematch
+#139  2026-09-28  [CENPRTY]  R   59 words  encrypt
+#140  2026-09-29  [DEGILRU]  R  106 words  guilder
+#141  2026-09-30  [ADEKLNP]  K   38 words  planked
+#142  2026-10-01  [AEIMRTW]  R  127 words  wartime
+#143  2026-10-02  [BCDEILM]  B   37 words  climbed
+#144  2026-10-03  [DEINPRT]  N  141 words  interdependent, interpreted, intrepid, printed, reinterpreted, reprinted
+#145  2026-10-04  [DEIOPRV]  R  135 words  provide, provided, provider
+#146  2026-10-05  [AGIKLNW]  K   31 words  walking
+#147  2026-10-06  [ACEGNOT]  A   97 words  cognate, cotangent
+#148  2026-10-07  [ABELRVY]  L   94 words  bravely, verbally
+#149  2026-10-08  [ABEFILR]  R  136 words  fireball, friable, refillable
+#150  2026-10-09  [BDEINRY]  D   87 words  bindery
+#151  2026-10-10  [ACILRYZ]  Y   33 words  crazily
+#152  2026-10-11  [BCEHRTU]  R   61 words  butcher, trebuchet
+#153  2026-10-12  [ACEILRU]  U   51 words  auricle
+#154  2026-10-13  [AEGIMRT]  T  141 words  emigrate, immigrate, migrate, ragtime
+#155  2026-10-14  [AFLMORW]  M   39 words  wolfram
+#156  2026-10-15  [ACDKLOP]  P   36 words  padlock
+#157  2026-10-16  [AINRTUY]  U   29 words  unitary
+#158  2026-10-17  [AINPRTU]  U   30 words  puritan
+#159  2026-10-18  [DGIKMNO]  G   43 words  kingdom
+#160  2026-10-19  [AGINRVY]  R   56 words  varying
+#161  2026-10-20  [ABEITUX]  A   33 words  bauxite
+#162  2026-10-21  [BEIRTVY]  B   33 words  brevity
+#163  2026-10-22  [ABCEKLR]  B   81 words  blacker
+#164  2026-10-23  [ABCGINR]  I  104 words  bracing, crabbing
+#165  2026-10-24  [GILNPRU]  R   34 words  purling
+#166  2026-10-25  [CEFHILY]  C   29 words  chiefly
+#167  2026-10-26  [ACELNRT]  T  194 words  accelerant, central
+#168  2026-10-27  [CEHIOTV]  C   35 words  cheviot
+#169  2026-10-28  [DEHMPTU]  U   31 words  thumped
+#170  2026-10-29  [DEGILMN]  N   94 words  meddling, melding, mingled
+#171  2026-10-30  [EGIMNOT]  M   72 words  emoting, mentioning, mignonette
+#172  2026-10-31  [AGIMNPV]  P   38 words  vamping
+#173  2026-11-01  [ACDEINY]  C   62 words  cyanide
+#174  2026-11-01  [ACDEKLU]  A   67 words  caulked
+#175  2026-11-02  [BEHIOTW]  H   26 words  bobwhite, howbeit
+#176  2026-11-03  [GHILNOW]  W   32 words  hollowing, howling
+#177  2026-11-04  [ADEGORW]  A  109 words  dowager
+#178  2026-11-05  [CGINOPY]  G   38 words  copying
+#179  2026-11-06  [FGLNORU]  O   35 words  furlong
+#180  2026-11-07  [ADEHIRY]  A   91 words  hayride
+#181  2026-11-08  [ACENRTU]  E  186 words  centaur, truncate, utterance
+#182  2026-11-09  [CDEILOP]  E  127 words  policed
+#183  2026-11-10  [ABDEFLT]  F   59 words  flatbed
+#184  2026-11-11  [ACGHINR]  C   62 words  arching, chagrin, chairing, charging, charing, charring, ranching
+#185  2026-11-12  [ABCDEKL]  B   67 words  blackballed, blacked
+#186  2026-11-13  [DHIORTY]  D   33 words  thyroid
+#187  2026-11-14  [ACEGILP]  I   48 words  pelagic
+#188  2026-11-15  [ABCELRU]  B   92 words  curable
+#189  2026-11-16  [BDEORTU]  D  116 words  doubter, redoubt
+#190  2026-11-17  [ACDELNR]  R  151 words  calendar, calender, candler
+#191  2026-11-18  [CDEINOT]  E  184 words  coincident, conceited, conditioned, decoction, detection, endodontic, noticed, occident
+#192  2026-11-19  [ADGNORU]  N   55 words  aground
+#193  2026-11-20  [EMNORTU]  E  132 words  remount
+#194  2026-11-21  [AEHMNOR]  R   82 words  amenorrhea, menorah
+#195  2026-11-22  [EGIMNOT]  N  115 words  emoting, mentioning, mignonette
+#196  2026-11-23  [CDEHIPR]  H   42 words  chirped, decipher, deciphered
+#197  2026-11-24  [AFHLOTY]  A   60 words  hayloft
+#198  2026-11-25  [EGORTUW]  O   68 words  outgrew
+#199  2026-11-26  [ACDEORT]  R  271 words  cordate, decorate, decorated, decorator, detractor, doctorate, redactor, redcoat, redecorate, redecorated
+#200  2026-11-27  [ACELTUY]  U   30 words  acutely
+#201  2026-11-28  [ACIMPRY]  A   55 words  primacy
+#202  2026-11-29  [ADEINTV]  D  119 words  deviant
+#203  2026-11-30  [AHOPRTY]  P   55 words  atrophy
+#204  2026-12-01  [AEIKNRT]  A  153 words  keratin
+#205  2026-12-02  [ADILPRY]  R   52 words  lapidary, rapidly
+#206  2026-12-03  [DEFINUX]  I   35 words  unfixed
+#207  2026-12-04  [ADEINPT]  I  116 words  painted
+#208  2026-12-05  [ABDGINR]  D   72 words  abridging, braiding, branding, brigand
+#209  2026-12-06  [ABELNOY]  E   64 words  baloney
+#210  2026-12-07  [AGHIKNR]  N   67 words  harking
+#211  2026-12-08  [AEFINRT]  T  185 words  fainter
+#212  2026-12-09  [ACEHMRT]  R  169 words  matcher, rematch
+#213  2026-12-10  [GILMNPU]  N   62 words  lumping, plumping
+#214  2026-12-11  [AFGHRTU]  T   33 words  fraught
+#215  2026-12-12  [ACEMNRW]  A   96 words  crewman
+#216  2026-12-13  [AFGIMNO]  O   47 words  foaming
+#217  2026-12-14  [ACDIOPR]  C   49 words  parodic, picador
+#218  2026-12-15  [ACELNOR]  R  121 words  concealer, corneal, olecranon
+#219  2026-12-16  [DEIMNOR]  N   98 words  minored
+#220  2026-12-17  [BGHINOR]  N   74 words  bighorn, highborn
+#221  2026-12-18  [BELMOPR]  L   60 words  problem
+#222  2026-12-19  [EFNORTU]  O   92 words  fortune, fourteen, frontrunner
+#223  2026-12-20  [DEGILUV]  L   70 words  divulge, divulged
+#224  2026-12-21  [DEGORTU]  T  106 words  grouted
+#225  2026-12-22  [ADEFINT]  I  101 words  defiant, fainted
+#226  2026-12-23  [ADEINRV]  V   97 words  invader
+#227  2026-12-24  [CDEGIKN]  N   69 words  decking
+#228  2026-12-25  [CDEHIOW]  E   54 words  cowhide
+#229  2026-12-26  [BCHLOTY]  T   31 words  blotchy
+#230  2026-12-27  [ACELNVY]  Y   30 words  valency
+#231  2026-12-28  [AILMNPT]  I   99 words  implant
+#232  2026-12-29  [EIMRTUX]  T   57 words  mixture
+#233  2026-12-30  [EGIMNOW]  M   33 words  meowing
+#234  2026-12-31  [CEHILNO]  I   67 words  choline, colchicine, helicon
+#235  2027-01-01  [ADNORTU]  R   80 words  rotunda, turnaround
+#236  2027-01-02  [ACDEHOP]  E   84 words  poached
+#237  2027-01-03  [AEHLMOR]  H   48 words  armhole
+#238  2027-01-04  [FGILNTU]  I   75 words  fluting
+#239  2027-01-05  [AEORTUW]  R  114 words  outerwear, outwear
+#240  2027-01-06  [CEMOPTU]  T   51 words  compute, outcompete
+#241  2027-01-07  [ACDHLOR]  R   58 words  chordal
+#242  2027-01-08  [ACEIKLT]  A   92 words  catlike
+#243  2027-01-09  [DEHILRW]  E  121 words  whirled
+#244  2027-01-10  [CEFIMOR]  E   77 words  comfier
+#245  2027-01-11  [ADEIMRT]  A  214 words  diameter, dreamtime, readmit, readmitted, remediate, remediated
+#246  2027-01-12  [ACEFILM]  I   59 words  malefic
+#247  2027-01-13  [AEILMNR]  M  123 words  manlier, millenarian, mineral
+#248  2027-01-14  [ABCDEHT]  D   70 words  batched
+#249  2027-01-15  [BCEHIOR]  R   64 words  brioche
+#250  2027-01-16  [EGLMNOR]  E   77 words  mongrel
+#251  2027-01-17  [AEHMNOR]  H   37 words  amenorrhea, menorah
+#252  2027-01-18  [BDELRTU]  R   93 words  blurted
+#253  2027-01-19  [CDEIKLP]  P   46 words  pickled
+#254  2027-01-20  [DEGILMN]  I  117 words  meddling, melding, mingled
+#255  2027-01-21  [ACFINOT]  T   92 words  faction, notification, officiant
+#256  2027-01-22  [ACEMNRW]  W   26 words  crewman
+#257  2027-01-23  [BDEIMOR]  I   76 words  bromide, embroider, embroidered, embroiderer
+#258  2027-01-24  [BDEGLRU]  L   86 words  bludger, burgled
+#259  2027-01-25  [CDEGINR]  D  140 words  cringed, decreeing, receding
+#260  2027-01-26  [ADGINRT]  T   87 words  darting, irradiating, radiating, trading
+#261  2027-01-27  [ACEGHNR]  H   45 words  changer
+#262  2027-01-28  [ACDEHMR]  C   91 words  charmed, marched
+#263  2027-01-29  [CEHIKNT]  H   50 words  kitchen, kitchenette, thicken
+#264  2027-01-30  [ADEIPRT]  D  196 words  partied, pirated, repatriated
+#265  2027-01-31  [BEILNOW]  L   65 words  bowline
+#266  2027-02-01  [CDEIMOT]  M   74 words  committed, demotic
+#267  2027-02-02  [ABCEILR]  R  132 words  caliber
+#268  2027-02-03  [EFLORWY]  R   58 words  flowery
+#269  2027-02-04  [ACFILRY]  R   55 words  clarify
+#270  2027-02-05  [ABEMNOT]  E  105 words  boatmen
+#271  2027-02-06  [CEFIRTY]  R   72 words  certify, rectify
+#272  2027-02-07  [BCLMRUY]  U   38 words  crumbly
+#273  2027-02-08  [EIMNOPT]  P   72 words  impotent, omnipotent, pimento, pimiento
+#274  2027-02-09  [CDEIMPR]  P   76 words  crimped
+#275  2027-02-10  [ACDEHOT]  C   78 words  cathode
+#276  2027-02-11  [DEGOPRU]  U   57 words  grouped, prorogued, regrouped
+#277  2027-02-12  [DGHOTUY]  O   36 words  doughty
+#278  2027-02-13  [ACDEHLT]  C   89 words  chelated, decathlete, latched
+#279  2027-02-14  [AKMNORW]  N   43 words  workman
+#280  2027-02-15  [ADEGHLU]  U   49 words  laughed
+#281  2027-02-16  [CENORTV]  R  110 words  convert, converter, convertor
+#282  2027-02-17  [EILORTU]  E  105 words  outlier, ulterior
+#283  2027-02-18  [ABDGINT]  I   92 words  dingbat
+#284  2027-02-19  [ACDEHPT]  D   67 words  patched
+#285  2027-02-20  [ACEINRT]  N  195 words  anticancer, centenarian, certain, creatine, creatinine, incarcerate, incarnate, incinerate, interact, intricate, nectarine, reincarnate
+#286  2027-02-21  [ACDEHOP]  D   70 words  poached
+#287  2027-02-22  [AEGLPRU]  U   66 words  earplug
+#288  2027-02-23  [CELMPRU]  R   56 words  crumple
+#289  2027-02-24  [AEILMNT]  E  186 words  ailment, aliment, eliminate, entailment, laminate, lineament, militiamen
+#290  2027-02-25  [BDEILTZ]  D   55 words  blitzed
+#291  2027-02-26  [AFHLMRU]  U   31 words  harmful
+#292  2027-02-27  [BGINRUY]  R   41 words  burying
+#293  2027-02-28  [EGHLNOR]  O   62 words  leghorn
+#294  2027-03-01  [ABDELRU]  L  152 words  bluebeard, durable
+#295  2027-03-02  [EKMNORW]  K   31 words  workmen
+#296  2027-03-03  [ADEILRV]  V  124 words  daredevil, rivaled
+#297  2027-03-04  [AIMNRTV]  A   90 words  varmint
+#298  2027-03-05  [ADEGHIN]  A   68 words  deadheading, heading
+#299  2027-03-06  [EFGILNT]  I  121 words  felting, filleting, fleeting
+#300  2027-03-07  [DEGLNOU]  G   77 words  lounged
+#301  2027-03-08  [BEHLORT]  R   91 words  brothel
+#302  2027-03-09  [BDENORZ]  D   87 words  bronzed
+#303  2027-03-10  [DEFLOTU]  O   67 words  flouted
+#304  2027-03-11  [ABENOTY]  Y   31 words  bayonet
+#305  2027-03-12  [ACELTXY]  T   44 words  exactly
+#306  2027-03-13  [ADGIMNP]  A   86 words  damping
+#307  2027-03-15  [EILNOTU]  I   69 words  elution, outline
+#308  2027-03-16  [ABGHINT]  N   88 words  bathing, inhabiting
+#309  2027-03-17  [CEHIOTV]  T   34 words  cheviot
+#310  2027-03-18  [ABELMTU]  L  116 words  mutable
+#311  2027-03-19  [ADGIMNP]  D   34 words  damping
+#312  2027-03-20  [DEGHIOT]  O   47 words  hogtied
+#313  2027-03-21  [GIKLNRU]  G   51 words  knurling, lurking
+#314  2027-03-22  [DEINPRT]  R  168 words  interdependent, interpreted, intrepid, printed, reinterpreted, reprinted
+#315  2027-03-23  [DEGILNW]  D  108 words  dwelling, indwelling, welding, wielding
+#316  2027-03-24  [AELORVY]  Y   48 words  layover, overlay
+#317  2027-03-25  [BCDEIKR]  R   83 words  bickered, bricked, redbrick
+#318  2027-03-26  [DEGIJLN]  I   87 words  jingled
+#319  2027-03-27  [ACIMNRU]  A   59 words  cranium
+#320  2027-03-28  [ACGINRZ]  I   72 words  crazing
+#321  2027-03-29  [CDEIORV]  O   94 words  divorce, divorced, divorcee
+#322  2027-03-30  [DEIJNOT]  E   91 words  jointed
+#323  2027-03-31  [ADEGORW]  W   65 words  dowager
+#324  2027-04-01  [ACDEHKW]  W   26 words  whacked
+#325  2027-04-02  [DEGNOTU]  O   71 words  outgunned, tongued
+#326  2027-04-03  [DELNOTW]  O   97 words  letdown
+#327  2027-04-04  [ADEILMP]  I  101 words  impaled
+#328  2027-04-05  [DEGHOTU]  T   42 words  toughed
+#329  2027-04-06  [ADEIMTY]  A   72 words  daytime
+#330  2027-04-07  [AGILMNP]  M   82 words  impaling, palming
+#331  2027-04-08  [ABCHIOT]  A   57 words  cohabit
+#332  2027-04-09  [AGILNPY]  P   67 words  appallingly, applying, playing
+#333  2027-04-10  [ADEIMRY]  E  142 words  midyear
+#334  2027-04-11  [DEFGITY]  D   44 words  fidgety
+#335  2027-04-12  [AGHILNW]  W   32 words  whaling
+#336  2027-04-13  [ACEILRU]  R  114 words  auricle
+#337  2027-04-14  [ACGINRT]  C   72 words  attracting, carting, crating, granitic, incarnating, tracing
+#338  2027-04-15  [ABEGORX]  R   69 words  gearbox
+#339  2027-04-16  [EINORTU]  R  140 words  neutrino, routine
+#340  2027-04-17  [CDEKRTU]  R   76 words  trucked, tuckered
+#341  2027-04-18  [EHNOPUY]  E   26 words  euphony
+#342  2027-04-19  [BDEIORV]  D  112 words  overbid
+#343  2027-04-20  [CDGINOR]  G   72 words  cording, corroding
+#344  2027-04-21  [AEILRWY]  R   78 words  wearily
+#345  2027-04-22  [ACELTUY]  C   50 words  acutely
+#346  2027-04-23  [ABDENRT]  B  116 words  bantered, bartend, bartender
+#347  2027-04-24  [ACILRTY]  A  106 words  alacrity, clarity, criticality, critically
+#348  2027-04-25  [ACEHLOR]  A  112 words  chlorella, cholera, chorale, cochlear
+#349  2027-04-26  [CDEIRTV]  E  173 words  directive, verdict
+#350  2027-04-27  [ABDEGLM]  A  143 words  gambled
+#351  2027-04-28  [ADNORTU]  N   59 words  rotunda, turnaround
+#352  2027-04-29  [CDOPRTU]  R   52 words  product
+#353  2027-04-30  [BCELMRU]  M   36 words  cerebellum, crumble
+#354  2027-05-01  [AEPQRTU]  U   43 words  parquet
+#355  2027-05-02  [AEOPRVY]  O   38 words  overpay
+#356  2027-05-03  [ABNOTUY]  N   42 words  buoyant
+#357  2027-05-04  [AFILMPY]  A   62 words  amplify
+#358  2027-05-05  [AEINRTU]  T  192 words  intrauterine, taurine, urinate
+#359  2027-05-06  [ADGINOR]  D   92 words  adoring, adorning, ordaining, radioing
+#360  2027-05-07  [DFNORUY]  O   27 words  foundry
+#361  2027-05-08  [AEGLRVY]  R  103 words  averagely, gravelly, gravely
+#362  2027-05-09  [ADEHINP]  E   86 words  pinhead
+#363  2027-05-10  [CDGIKNO]  G   49 words  docking
+#364  2027-05-11  [AEGLTUV]  T   41 words  vulgate
+#365  2027-05-12  [DFLMOUW]  O   26 words  mudflow
+#366  2027-05-13  [CEFHILY]  E   31 words  chiefly
+#367  2027-05-14  [ABDEGLR]  B  134 words  bedraggled, degradable, gallbladder, garbled
+#368  2027-05-15  [ADEINRT]  R  284 words  attainder, detainer, entertained, entrained, retained, retrained, trained
+#369  2027-05-16  [ADEFGOR]  O   89 words  foraged
+#370  2027-05-17  [ACEIQRU]  A   38 words  acquire, acquirer, reacquire

@@ -1,0 +1,59 @@
+============================================================
+Puzzle #370  —  2027-05-17
+Letters: [A, C, E, I, Q, R, U]  Center: A
+38 words  |  3 pangram(s): acquire, acquirer, reacquire
+
+  4-letter: acre, aqua, area, aria, aura, care, carr, ceca, quai, race, rare, rear, urea
+  5-letter: acari, aerie, areca, auric, carer, ceria, circa, curia, erica, racer, rarer
+  6-letter: acacia, accrue, arrear, career, curare, curiae, racier
+  7-letter: acquire, cacique, carrier
+  8-letter: acquirer, caracara
+  9-letter: araucaria, reacquire
+
+============================================================
+Puzzle #371  —  2027-05-18
+Letters: [A, D, E, L, M, N, T]  Center: T
+121 words  |  2 pangram(s): lamented, mantled
+
+  4-letter: anta, ante, data, date, deet, dent, etna, late, leet, lent, malt, mate, matt, meat, meet, melt, meta, mete, neat, tael, tala, tale, tall, tame, tate, teal, team, teat, teed, teem, teen, tele, tell, tend, tent
+  5-letter: ament, anent, anted, atman, dated, dealt, delta, eaten, emmet, lated, latte, manta, mated, matte, meant, metal, meted, natal, tamed, tenet
+  6-letter: adnate, ataman, attend, delete, dement, dental, dented, detent, elated, lament, lateen, latent, lenten, mallet, malted, mantel, mantle, matted, melted, mental, mettle, netted, nettle, talent, tamale, tandem, tanned, tatted, tattle, teamed, teemed, telnet, tenant, tended, tented
+  7-letter: adamant, andante, antenna, deleted, dentate, detente, element, emanate, entente, lantana, maleate, manatee, mandate, mantled
+  8-letter: antennae, attended, attendee, demented, emanated, lamented, mandated, talented, teammate, telltale, tenanted, tenement
+  9-letter: amendment, antenatal, attendant, elemental
+  10-letter: tattletale
+
+============================================================
+Puzzle #372  —  2027-05-19
+Letters: [A, E, H, M, N, O, R]  Center: A
+79 words  |  2 pangram(s): amenorrhea, menorah
+
+  4-letter: aeon, aero, ahem, amah, amen, ammo, anna, anon, area, earn, haar, hame, hare, harm, hear, hoar, hora, mama, mana, mane, mare, mean, moan, mora, naan, name, nana, near, noma, nona, rare, ream, rear, rhea, roam, roan, roar
+  5-letter: arena, armor, aroma, enema, harem, henna, honan, mamma, manna, manor, namer, ramen, ranee, rarer, rearm, reran, roman
+  6-letter: arrear, earner, hammer, hearer, mammon, manana, manner, maroon, marron, meaner, merman, moaner, nearer, rammer, reamer, rehear, remora, rename, roamer, romano
+  7-letter: anemone, armorer, maremma, menorah
+  10-letter: amenorrhea
+
+============================================================
+Puzzle #373  —  2027-05-20
+Letters: [A, D, E, G, N, O, R]  Center: R
+201 words  |  2 pangram(s): androgen, groaned
+
+  4-letter: aero, agar, area, dare, darn, dear, deer, doer, door, dore, drag, dree, earn, ergo, erne, gear, goer, gore, grad, gran, gree, grog, nard, near, nerd, odor, ogre, ordo, raga, rage, rand, rang, rare, read, rear, redd, rede, redo, reed, rend, road, roan, roar, rode, rood
+  5-letter: adder, adore, adorn, agger, aggro, agora, agree, anger, ardor, arena, argon, dared, donor, dread, drone, eager, eared, edger, egger, erode, erred, error, genre, goner, gored, gorge, grade, grand, greed, green, groan, oared, odder, orang, order, organ, radar, radon, raged, ranee, range, rarer, redan, reran, rodeo, roger, rondo
+  6-letter: adored, agreed, angora, arrear, dagger, dander, danger, darned, deader, dearer, degree, deodar, dodder, dodger, dogger, dorado, dragon, dredge, droned, drongo, earned, earner, endear, enrage, eroded, errand, gander, ganger, garage, garden, garner, geared, gender, genera, gorged, gorgon, graded, grader, grange, neared, nearer, orange, organa, ragged, ranged, ranger, reader, reared, redden, redder, redone, regard, reggae, render, renege, reread, roared
+  7-letter: adorned, angered, arrange, degrade, dragged, dragger, dragoon, dreaded, dredged, dredger, enraged, garaged, grandad, grandee, grander, granger, greened, greener, grenade, groaned, ordered, oregano, organon, reneged, reorder
+  8-letter: androgen, arranged, arranger, degraded, deranged, endanger, endeared, engender, engorged, gangrene, gardened, gardener, garnered, gendered, granddad, reddened, reengage, regarded, regraded, rendered, renderer, renegade
+  9-letter: rearrange, reordered
+  10-letter: endangered, engendered, rearranged
+
+============================================================
+Puzzle #374  —  2027-05-21
+Letters: [C, D, E, M, O, R, U]  Center: U
+55 words  |  1 pangram(s): decorum
+
+  4-letter: crud, cued, curd, cure, dour, drum, duce, dude, duro, ecru, euro, mure, roue, rudd, rude, rued
+  5-letter: cecum, crude, cured, demur, deuce, douce, duomo, duroc, durum, occur, recur, ruder, rumor, udder
+  6-letter: cruder, deduce, demure, deuced, dumdum, murder, murmur, reduce, rudder
+  7-letter: decorum, deduced, drummed, drummer, mudroom, reduced, reducer, reoccur, rumored
+  8-letter: demurred, demurrer, murdered, murderer, murmured, occurred, recurred

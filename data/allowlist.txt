@@ -1,0 +1,12 @@
+# Words that always pass the frequency filter regardless of wordfreq score.
+# Add culturally common words that are missing from ENABLE2K / SCOWL or score
+# below the threshold but are clearly fair game in a word puzzle.
+# One word per line. Lines starting with # are ignored.
+
+# Food / modern culture
+babka
+boba
+tahini
+sriracha
+emoji
+mochi

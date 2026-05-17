@@ -11,7 +11,8 @@
     "test:watch": "vitest",
     "coverage": "vitest run --coverage",
     "test:e2e": "playwright test",
-    "dict:build": "tsx scripts/process-dict.ts",
+    "dict:build": "tsx scripts/process-dict.ts && python3 scripts/freq_filter.py",
+    "dict:freq": "python3 scripts/freq_filter.py",
     "puzzle:generate": "tsx scripts/generate-puzzles.ts",
     "puzzle:check": "tsx scripts/check-puzzles.ts",
     "pipeline": "npm run dict:build && npm run puzzle:generate"

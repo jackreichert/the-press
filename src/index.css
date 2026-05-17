@@ -59,6 +59,12 @@ body {
   display: flex;
   flex-direction: column;
   gap: var(--space-md);
+  user-select: none;
+}
+
+/* Re-enable selection inside modals so players can copy share text etc. */
+.modal-card {
+  user-select: text;
 }
 
 /* ─── Masthead ───────────────────────────────────────────────────────────── */
