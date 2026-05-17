@@ -118,10 +118,10 @@ describe('WORD_CLEAR', () => {
 });
 
 describe('errorPending input block', () => {
-  it('LETTER_APPEND is ignored while errorPending is true', () => {
+  it('LETTER_APPEND goes through while errorPending (triggers early-clear in WordDisplay)', () => {
     const withError = { ...loadedState(), currentWord: 'pin', errorPending: true };
     const s = gameReducer(withError, { type: 'LETTER_APPEND', letter: 'd' });
-    expect(s.currentWord).toBe('pin');
+    expect(s.currentWord).toBe('pind');
   });
 
   it('LETTER_DELETE is ignored while errorPending is true', () => {

@@ -18,25 +18,42 @@ export function WordDisplay(): React.JSX.Element {
   const [foundPts, setFoundPts] = useState(0);
   const [foundPangram, setFoundPangram] = useState(false);
   const prevFoundRef = useRef<string[]>([]);
-  // Snapshot the errored word length so STRIP_PREFIX only removes those characters,
-  // leaving any letters the player typed during the shake window.
   const errorLengthRef = useRef(0);
+  const shakeTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const clearTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
     if (state.errorKey > 0) {
       errorLengthRef.current = state.currentWord.length;
       setShaking(true);
-      const shakeTimer = setTimeout(() => setShaking(false), 400);
-      const clearTimer = setTimeout(
-        () => dispatch({ type: 'STRIP_PREFIX', length: errorLengthRef.current }),
-        700,
-      );
+
+      shakeTimerRef.current = setTimeout(() => {
+        shakeTimerRef.current = null;
+        setShaking(false);
+      }, 400);
+
+      clearTimerRef.current = setTimeout(() => {
+        clearTimerRef.current = null;
+        dispatch({ type: 'STRIP_PREFIX', length: errorLengthRef.current });
+      }, 700);
+
       return () => {
-        clearTimeout(shakeTimer);
-        clearTimeout(clearTimer);
+        if (shakeTimerRef.current) clearTimeout(shakeTimerRef.current);
+        if (clearTimerRef.current) clearTimeout(clearTimerRef.current);
       };
     }
   }, [state.errorKey, dispatch]);
+
+  // Early clear: a new letter typed during the shake window cuts the animation short.
+  useEffect(() => {
+    if (clearTimerRef.current === null) return;
+    if (state.currentWord.length <= errorLengthRef.current) return;
+    if (shakeTimerRef.current) { clearTimeout(shakeTimerRef.current); shakeTimerRef.current = null; }
+    clearTimeout(clearTimerRef.current);
+    clearTimerRef.current = null;
+    setShaking(false);
+    dispatch({ type: 'STRIP_PREFIX', length: errorLengthRef.current });
+  }, [state.currentWord, dispatch]);
 
   // When foundWords grows, show the new word briefly before display resets
   useEffect(() => {

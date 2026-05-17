@@ -120,7 +120,6 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
     }
 
     case 'LETTER_APPEND':
-      if (state.errorPending) return state;
       return {
         ...state,
         currentWord: state.currentWord + action.letter.toLowerCase(),

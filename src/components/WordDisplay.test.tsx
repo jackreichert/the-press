@@ -123,7 +123,7 @@ describe('WordDisplay error animation', () => {
     expect(screen.getByText('—')).toBeInTheDocument();
   });
 
-  it('blocks letters typed during the 700ms shake window', () => {
+  it('typing during the shake window immediately clears old word and shows new letter', async () => {
     const LETTER_P = { type: 'LETTER_APPEND' as const, letter: 'p' };
     const LETTER_I = { type: 'LETTER_APPEND' as const, letter: 'i' };
     const LETTER_N = { type: 'LETTER_APPEND' as const, letter: 'n' };
@@ -135,25 +135,18 @@ describe('WordDisplay error animation', () => {
       </>,
       { initialActions: [PUZZLE_LOADED, DICT_LOADED, LETTER_P, LETTER_I, LETTER_N] },
     );
-    // Submit "PIN" → too short error
     fireEvent.click(screen.getByRole('button', { name: /Submit word/i }));
     expect(screen.getByRole('alert')).toHaveTextContent('Too short');
 
-    // Player tries to type new letters during the shake window — should be blocked
+    // Typing a letter during the shake should cut it short and show only the new letter
     act(() => {
       document.dispatchEvent(new KeyboardEvent('keydown', { key: 'd', bubbles: true }));
-      document.dispatchEvent(new KeyboardEvent('keydown', { key: 'r', bubbles: true }));
     });
 
-    // The word display should still show the original errored word, not "PINDR"
-    expect(screen.getByText('PIN')).toBeInTheDocument();
-
-    // After 700ms the errored word clears to a clean slate
-    act(() => { vi.advanceTimersByTime(701); });
-    expect(screen.getByText('—')).toBeInTheDocument();
+    expect(screen.getByText('D')).toBeInTheDocument();
   });
 
-  it('accepts letters again immediately after the shake window ends', () => {
+  it('accepts letters normally after the shake window ends naturally', () => {
     const LETTER_P = { type: 'LETTER_APPEND' as const, letter: 'p' };
     const LETTER_I = { type: 'LETTER_APPEND' as const, letter: 'i' };
     const LETTER_N = { type: 'LETTER_APPEND' as const, letter: 'n' };
@@ -167,11 +160,9 @@ describe('WordDisplay error animation', () => {
     );
     fireEvent.click(screen.getByRole('button', { name: /Submit word/i }));
 
-    // Advance past the clear
     act(() => { vi.advanceTimersByTime(701); });
     expect(screen.getByText('—')).toBeInTheDocument();
 
-    // Typing should work again
     act(() => {
       document.dispatchEvent(new KeyboardEvent('keydown', { key: 'd', bubbles: true }));
     });
