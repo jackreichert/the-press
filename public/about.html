@@ -1,0 +1,160 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>About — The Press</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Crimson+Pro:ital,wght@0,400;0,600;1,400&family=UnifrakturMaguntia&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --ink:    #1A1610;
+      --bg:     #F5F0E8;
+      --accent: #8B2500;
+      --border: #C4BAA8;
+      --serif:  'Crimson Pro', Georgia, serif;
+      --fraktur:'UnifrakturMaguntia', serif;
+    }
+
+    body {
+      font-family: var(--serif);
+      font-size: 18px;
+      line-height: 1.65;
+      color: var(--ink);
+      background: var(--bg);
+      padding: 2rem 1rem 4rem;
+    }
+
+    .page { max-width: 600px; margin: 0 auto; }
+
+    header {
+      text-align: center;
+      border-top: 3px solid var(--ink);
+      border-bottom: 1px solid var(--ink);
+      padding: 0.5rem 0;
+      margin-bottom: 2.5rem;
+    }
+
+    header h1 {
+      font-family: var(--fraktur);
+      font-size: 2.5rem;
+      font-weight: 400;
+      color: var(--ink);
+    }
+
+    header p {
+      font-size: 0.85rem;
+      letter-spacing: 0.08em;
+      opacity: 0.6;
+      margin-top: 0.2rem;
+    }
+
+    h2 {
+      font-family: var(--serif);
+      font-size: 0.75rem;
+      font-weight: 600;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin: 2rem 0 0.6rem;
+    }
+
+    h2:first-of-type { margin-top: 0; }
+
+    p { margin-bottom: 0.75rem; }
+    p:last-child { margin-bottom: 0; }
+
+    ul {
+      list-style: none;
+      padding: 0;
+      margin-bottom: 0.75rem;
+    }
+
+    ul li {
+      padding: 0.3rem 0;
+      border-bottom: 1px solid var(--border);
+      font-size: 0.95rem;
+    }
+
+    ul li:last-child { border-bottom: none; }
+
+    .credit-name { font-weight: 600; }
+    .credit-note { opacity: 0.6; font-style: italic; font-size: 0.85rem; }
+
+    hr {
+      border: none;
+      border-top: 1px solid var(--border);
+      margin: 2rem 0;
+    }
+
+    footer {
+      margin-top: 3rem;
+      font-size: 0.8rem;
+      opacity: 0.5;
+      text-align: center;
+      border-top: 1px solid var(--border);
+      padding-top: 1rem;
+    }
+
+    a { color: var(--accent); }
+    a:visited { color: var(--accent); }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <header>
+      <h1>The Press</h1>
+      <p>A Daily Word Puzzle</p>
+    </header>
+
+    <h2>Privacy</h2>
+    <p>The Press does not collect, store, or transmit any personal data. There are no accounts, no analytics, no cookies, and no third-party tracking of any kind.</p>
+    <p>Your game progress (found words, score) is saved only in your browser's <code>localStorage</code> — it never leaves your device. Clearing your browser data removes it.</p>
+    <p>The only network requests this game makes are to fetch the puzzle schedule and dictionary when you open it.</p>
+    <p>This site is served via Cloudflare. Cloudflare may collect standard request metadata (IP address, country, timestamp) for network security purposes. See <a href="https://www.cloudflare.com/privacypolicy/" target="_blank" rel="noopener">Cloudflare's privacy policy</a>.</p>
+
+    <hr />
+
+    <h2>Attribution</h2>
+    <p>The Press is built on the shoulders of several open resources:</p>
+
+    <ul>
+      <li>
+        <span class="credit-name">SCOWL (Spell Checker Oriented Word Lists)</span><br />
+        <span class="credit-note">© Kevin Atkinson — used under a BSD-style licence. <a href="http://wordlist.aspell.net/" target="_blank" rel="noopener">wordlist.aspell.net</a></span>
+      </li>
+      <li>
+        <span class="credit-name">ENABLE2K word list</span><br />
+        <span class="credit-note">Public domain. Derived from the ENABLE project by Mendel Cooper &amp; Brian Kelk.</span>
+      </li>
+      <li>
+        <span class="credit-name">wordfreq</span><br />
+        <span class="credit-note">© Robyn Speer / LuminosoInsight — MIT licence. <a href="https://github.com/rspeer/wordfreq" target="_blank" rel="noopener">github.com/rspeer/wordfreq</a></span>
+      </li>
+      <li>
+        <span class="credit-name">React &amp; Vite</span><br />
+        <span class="credit-note">MIT licence. <a href="https://react.dev" target="_blank" rel="noopener">react.dev</a></span>
+      </li>
+      <li>
+        <span class="credit-name">UnifrakturMaguntia typeface</span><br />
+        <span class="credit-note">© j. 'mach' wust &amp; contributors — OFL licence. Via Google Fonts.</span>
+      </li>
+      <li>
+        <span class="credit-name">Crimson Pro typeface</span><br />
+        <span class="credit-note">© Jacques Le Bailly — OFL licence. Via Google Fonts.</span>
+      </li>
+    </ul>
+
+    <hr />
+
+    <h2>About</h2>
+    <p>The Press is an independent daily word puzzle. A new puzzle is available every day at midnight, local time.</p>
+    <p><a href="/">Play today's puzzle →</a></p>
+
+    <footer>© 2026 The Press · <a href="/">thepress.app</a></footer>
+  </div>
+</body>
+</html>

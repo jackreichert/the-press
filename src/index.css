@@ -67,6 +67,22 @@ body {
   user-select: text;
 }
 
+.app-footer {
+  margin-top: auto;
+  padding-top: var(--space-xl);
+  text-align: center;
+  font-size: 12px;
+  opacity: 0.4;
+}
+
+.app-footer a {
+  color: var(--color-ink);
+  text-decoration: none;
+  letter-spacing: 0.06em;
+}
+
+.app-footer a:hover { opacity: 0.8; text-decoration: underline; }
+
 /* ─── Masthead ───────────────────────────────────────────────────────────── */
 
 .masthead {

@@ -207,6 +207,10 @@ function GameLayout({ epochRef, onPlayToday, newDayAvailable }: GameLayoutProps)
       {editorWinOpen && (
         <EditorWinModal epochRef={epochRef} onKeepPlaying={() => setEditorWinOpen(false)} />
       )}
+
+      <footer className="app-footer">
+        <a href="/about.html">Privacy &amp; About</a>
+      </footer>
     </div>
   );
 }
