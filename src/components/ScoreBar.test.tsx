@@ -112,13 +112,13 @@ describe('ScoreBar rank popover', () => {
     expect(screen.queryByText('Grand Colophon')).toBeNull();
   });
 
-  it('lists Editor in Chief in the rank popover', async () => {
+  it('lists Laureate in the rank popover', async () => {
     const user = userEvent.setup();
     renderWithGame(<ScoreBar onOpenModal={onOpenModal} onOpenStats={onOpenStats} />, {
       initialActions: [PUZZLE_LOADED, DICT_LOADED],
     });
     await user.click(screen.getByRole('button', { name: /Show rank thresholds/i }));
-    expect(screen.getByText('Editor in Chief')).toBeInTheDocument();
+    expect(screen.getByText('Laureate')).toBeInTheDocument();
   });
 });
 
@@ -133,7 +133,7 @@ describe('ScoreBar Grand Colophon day-after hint', () => {
     const entry: HistoryEntry = {
       date: '2026-05-15', // yesterday
       score: 30,
-      rank: 'Editor in Chief',
+      rank: 'Laureate',
       foundCount: 9,
       totalCount: 9, // all words found
       completed: true,
@@ -170,7 +170,7 @@ describe('ScoreBar Grand Colophon day-after hint', () => {
     const entry: HistoryEntry = {
       date: '2026-05-14', // two days ago
       score: 30,
-      rank: 'Editor in Chief',
+      rank: 'Laureate',
       foundCount: 9,
       totalCount: 9,
       completed: true,

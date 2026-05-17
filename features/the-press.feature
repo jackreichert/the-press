@@ -176,21 +176,21 @@ Feature: The Press — Daily Word Puzzle
 
   Feature: Rank and progress bar
 
-    Scenario: Rank starts at Apprentice
+    Scenario: Rank starts at Printer's Devil
       Given no words have been found
-      Then the rank name shows "—" (before dictionary loads) then "Apprentice"
+      Then the rank name shows "—" (before dictionary loads) then "Printer's Devil"
 
     Scenario: Rank advances as score percentage increases
       Given the player's score is 35% of max
-      Then the rank shows "Compositor"
+      Then the rank shows "Editor"
 
     Scenario: Progress bar reflects overall score percentage
       Given the player's score is 50% of max
       Then the progress bar fill is approximately 50%
 
-    Scenario: Editor in Chief is the highest visible rank
+    Scenario: Laureate is the highest visible rank
       Given the player's score is at least 84% of max
-      Then the rank shows "Editor in Chief"
+      Then the rank shows "Laureate"
       And Grand Colophon does not appear anywhere in the UI
 
     Scenario: Day-after Grand Colophon hint
@@ -241,45 +241,76 @@ Feature: The Press — Daily Word Puzzle
 
   # ─── Game over ────────────────────────────────────────────────────────────────
 
-  Feature: Game over
+  Feature: Laureate winning screen
 
-    Scenario: Game-over screen replaces grid when all words are found
+    Scenario: Laureate win modal appears on rank transition
+      Given the player's score crosses 84% of max during a session
+      Then the Laureate win modal appears as an overlay
+      And it shows "Laureate" in the headline
+      And it shows the player's current score and word count
+      And it hints how many words remain for Grand Colophon
+
+    Scenario: Player dismisses win modal to keep playing
+      Given the Laureate win modal is showing
+      When the player taps "Keep Playing →"
+      Then the modal closes and the game grid is accessible again
+
+    Scenario: Win modal does not appear on restored Laureate state
+      Given a saved game already at Laureate score
+      When the player reopens the game
+      Then the win modal does NOT appear (no double-celebration on restore)
+
+    Scenario: Win modal closes automatically when Grand Colophon is reached
+      Given the Laureate win modal is showing and 1 word remains
+      When the player finds the last word
+      Then the win modal disappears and the Grand Colophon screen appears
+
+    Scenario: Keyboard input is blocked while win modal is showing
+      Given the Laureate win modal is open
+      When the player presses a letter key on the physical keyboard
+      Then no letter is appended to the word display
+
+  Feature: Grand Colophon game-over screen
+
+    Scenario: Grand Colophon screen replaces grid when all words are found
       Given the player finds the last remaining word
       Then the letter grid and action row disappear
-      And the game-over screen appears showing rank, score, word count, and pangram count
+      And the Grand Colophon screen appears showing "Grand Colophon" and "✦ All words found"
 
-    Scenario: Game-over screen format
-      Given the player finished with rank "Editor in Chief", score 120, 48/96 words, 2 pangrams
-      Then the game-over screen shows "Editor in Chief"
-      And "Score: 120 | 48/96 words | 2 pangrams"
+    Scenario: Grand Colophon share text
+      Given the player finished on 2026-05-15 with all words found, score 30, 1 pangram
+      When the player copies the share text
+      Then the clipboard contains "✦ GRAND COLOPHON" and "All X words"
 
   # ─── Share button ─────────────────────────────────────────────────────────────
 
   Feature: Share button
 
-    Scenario: Share button appears only on game-over screen
-      Given the game is in progress
-      Then no share button is visible
-      When the player finds all words
-      Then the "Share Result" button appears
+    Scenario: Share Result appears in Laureate win modal
+      Given the player has just reached Laureate rank
+      Then the Laureate win modal shows a "Share Result" button
+
+    Scenario: Share Result appears on Grand Colophon game-over screen
+      Given the player has found all words
+      Then the Grand Colophon screen shows a "Share Result" button
 
     Scenario: Successful clipboard copy
-      Given the game-over screen is showing
+      Given the Laureate win modal or Grand Colophon screen is showing
       When the player taps "Share Result"
       And the clipboard API succeeds
       Then the button text changes to "Copied!"
       And after 2 seconds the button reverts to "Share Result"
 
-    Scenario: Share text format — newspaper style
-      Given the player finished on 2026-05-15 as "Editor in Chief" with score 120, 48/96 words, 2 pangrams
-      When the player copies the share text
+    Scenario: Share text format — Laureate modal (mid-game win)
+      Given the player reached Laureate with score 25, 7 words found, 1 pangram on 2026-05-15
+      When the player copies from the Laureate win modal
       Then the clipboard contains:
         """
         The Press · May 15, 2026
         ━━━━━━━━━━━━━━━━━━━━━
           EDITOR IN CHIEF
-          ▓▓▓▓▓▓▓▓▓▓ 120 pts
-          48/96 words  ✦ 2 pangrams
+          ▓▓▓▓▓▓▓▓░░ 25 pts
+          7 words found  · ✦ 1
         ━━━━━━━━━━━━━━━━━━━━━
           thepress.app
         """
@@ -307,7 +338,7 @@ Feature: The Press — Daily Word Puzzle
     Scenario: Player finishes carry-over puzzle naturally
       Given the player is finishing yesterday's puzzle
       When the player finds all remaining words
-      Then the game-over screen appears for yesterday's puzzle
+      Then the Grand Colophon screen or revealed screen appears for yesterday's puzzle
       And a "Play today's puzzle →" button appears instead of the Share button
 
     Scenario: Player reveals answers for carry-over puzzle
@@ -365,7 +396,7 @@ Feature: The Press — Daily Word Puzzle
   Feature: Stats modal
 
     Scenario: Stats modal opens from streak counter
-      Given the streak counter shows "🔥 N"
+      Given the streak counter shows "❧ N"
       When the player taps the streak counter
       Then the stats modal opens
       And it shows "Your Stats"
@@ -378,7 +409,7 @@ Feature: The Press — Daily Word Puzzle
 
     Scenario: Streak shows 0 for a new player
       Given no history exists
-      Then the streak counter shows "🔥 0"
+      Then the streak counter shows "❧ 0"
       And the stats modal shows "0 days"
 
     Scenario: Streak increments when any word is found today

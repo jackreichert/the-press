@@ -72,14 +72,23 @@ afterEach(() => {
 });
 
 describe('GameOverScreen rendering', () => {
-  it('shows Editor in Chief rank when all words found (top visible rank)', () => {
+  it('shows Grand Colophon when all words found', () => {
     const epochRef = makeEpochRef('2026-01-01');
     renderWithGame(
       <GameOverScreen epochRef={epochRef} />,
       { initialActions: [PUZZLE_LOADED, DICT_LOADED, RESTORE_ALL] },
     );
-    expect(screen.getByText('Editor in Chief')).toBeInTheDocument();
-    expect(screen.queryByText('Grand Colophon')).toBeNull();
+    expect(screen.getByText('Grand Colophon')).toBeInTheDocument();
+    expect(screen.getByText(/All words found/i)).toBeInTheDocument();
+  });
+
+  it('does not show Laureate in the Grand Colophon game-over screen', () => {
+    const epochRef = makeEpochRef('2026-01-01');
+    renderWithGame(
+      <GameOverScreen epochRef={epochRef} />,
+      { initialActions: [PUZZLE_LOADED, DICT_LOADED, RESTORE_ALL] },
+    );
+    expect(screen.queryByText('Laureate')).toBeNull();
   });
 });
 
@@ -126,6 +135,9 @@ describe('GameOverScreen share button', () => {
     // Verify writeText was called with the correct share text format
     expect(writeTextMock).toHaveBeenCalledWith(
       expect.stringMatching(/^The Press · \w+ \d+, \d{4}\n/)
+    );
+    expect(writeTextMock).toHaveBeenCalledWith(
+      expect.stringContaining('GRAND COLOPHON')
     );
     expect(writeTextMock).toHaveBeenCalledWith(
       expect.stringContaining('30 pts')

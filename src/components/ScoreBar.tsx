@@ -70,7 +70,7 @@ export function ScoreBar({ onOpenModal, onOpenStats }: ScoreBarProps): React.JSX
   // Inline next-rank hint
   const ptsToNext = maxScore > 0 ? Math.ceil((rank.next / 100) * maxScore) - score : 0;
   const nextHint = (() => {
-    if (!maxScore || rank.name === 'Editor in Chief') return null;
+    if (!maxScore || rank.name === 'Laureate') return null;
     if (ptsToNext > 0 && rank.nextName) return `${ptsToNext} pt${ptsToNext === 1 ? '' : 's'} to ${rank.nextName}`;
     return null;
   })();

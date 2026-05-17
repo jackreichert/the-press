@@ -32,6 +32,7 @@ import { LetterGrid } from './components/LetterGrid';
 import { ActionRow } from './components/ActionRow';
 import { FoundWordsModal } from './components/FoundWordsModal';
 import { GameOverScreen } from './components/GameOverScreen';
+import { EditorWinModal } from './components/EditorWinModal';
 import { StatsModal } from './components/StatsModal';
 import type { Schedule, PuzzleEntry } from './types';
 
@@ -49,12 +50,38 @@ function GameLayout({ epochRef, onPlayToday, newDayAvailable }: GameLayoutProps)
   const dispatch = useGameDispatch();
   const [modalOpen, setModalOpen] = useState(false);
   const [statsOpen, setStatsOpen] = useState(false);
+  const [editorWinOpen, setEditorWinOpen] = useState(false);
+
+  const rank = getRank(state.score, state.maxScore);
+  // Tracks the first stable rank seen after dict load + restore.
+  // Only transitions that happen AFTER the initial rank is established trigger the win modal.
+  const initialRankSeenRef = useRef(false);
+  const prevRankRef = useRef(rank.name);
+
+  // Show Laureate win modal on rank transition — not on initial state restore.
+  useEffect(() => {
+    if (rank.name === '—') return;
+    if (!initialRankSeenRef.current) {
+      initialRankSeenRef.current = true;
+      prevRankRef.current = rank.name;
+      return;
+    }
+    if (prevRankRef.current !== 'Laureate' && rank.name === 'Laureate') {
+      setEditorWinOpen(true);
+    }
+    prevRankRef.current = rank.name;
+  }, [rank.name]);
+
+  // Close editor win overlay when Grand Colophon screen takes over.
+  useEffect(() => {
+    if (state.gameOver) setEditorWinOpen(false);
+  }, [state.gameOver]);
 
   // Page-level keyboard capture — fires regardless of what element has focus.
   useEffect(() => {
     function handleKeydown(e: KeyboardEvent): void {
       if (e.ctrlKey || e.metaKey || e.altKey) return;
-      if (modalOpen || statsOpen || state.gameOver) return;
+      if (modalOpen || statsOpen || state.gameOver || editorWinOpen) return;
       const key = e.key.toLowerCase();
       if (/^[a-z]$/.test(key)) {
         e.preventDefault();
@@ -69,7 +96,7 @@ function GameLayout({ epochRef, onPlayToday, newDayAvailable }: GameLayoutProps)
     }
     document.addEventListener('keydown', handleKeydown);
     return () => document.removeEventListener('keydown', handleKeydown);
-  }, [modalOpen, statsOpen, state.gameOver, dispatch]);
+  }, [modalOpen, statsOpen, state.gameOver, editorWinOpen, dispatch]);
 
   // STOR-01: save state on every valid word submission
   useEffect(() => {
@@ -86,11 +113,13 @@ function GameLayout({ epochRef, onPlayToday, newDayAvailable }: GameLayoutProps)
   useEffect(() => {
     if (!state.gameOver || !state.puzzle || !epochRef.current) return;
     const date = getPuzzleDateStr(epochRef.current, state.puzzle.index);
-    const rank = getRank(state.score, state.maxScore, state.foundWords.length, state.allWords.length);
+    const rankName = (!state.revealed && state.foundWords.length === state.allWords.length)
+      ? 'Grand Colophon'
+      : getRank(state.score, state.maxScore).name;
     const entry: HistoryEntry = {
       date,
       score: state.score,
-      rank: rank.name,
+      rank: rankName,
       foundCount: state.foundWords.length,
       totalCount: state.allWords.length,
       completed: !state.revealed,
@@ -173,6 +202,11 @@ function GameLayout({ epochRef, onPlayToday, newDayAvailable }: GameLayoutProps)
 
       {/* Stats modal (STOR-03 — D-10) */}
       {statsOpen && <StatsModal onClose={() => setStatsOpen(false)} />}
+
+      {/* Laureate win modal — dismissible, upgrades to Grand Colophon screen on game over */}
+      {editorWinOpen && (
+        <EditorWinModal epochRef={epochRef} onKeepPlaying={() => setEditorWinOpen(false)} />
+      )}
     </div>
   );
 }

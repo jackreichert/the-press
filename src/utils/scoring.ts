@@ -17,10 +17,10 @@ const RANK_TIERS = [
   { name: 'Apprentice',      threshold: 5  },
   { name: 'Journeyman',      threshold: 12 },
   { name: 'Typesetter',      threshold: 22 },
-  { name: 'Compositor',      threshold: 35 },
-  { name: 'Proofer',         threshold: 50 },
-  { name: 'Editor',          threshold: 68 },
-  { name: 'Editor in Chief', threshold: 84 },
+  { name: 'Editor',          threshold: 35 },
+  { name: 'Wordsmith',       threshold: 50 },
+  { name: 'Novelist',        threshold: 68 },
+  { name: 'Laureate',        threshold: 84 },
 ] as const;
 
 // ─── Scoring formulas ─────────────────────────────────────────────────────────

@@ -7,7 +7,7 @@
 
 import React, { useState } from 'react';
 import { useGameState } from '../context/GameContext';
-import { getRank } from '../utils/scoring';
+import { getProgressPct } from '../utils/scoring';
 import { isFoundWordPangram } from '../utils/puzzle';
 import { getPuzzleDateStr } from '../utils/date';
 
@@ -19,8 +19,6 @@ interface GameOverScreenProps {
 export function GameOverScreen({ epochRef, onPlayToday }: GameOverScreenProps): React.JSX.Element {
   const state = useGameState();
   const { score, maxScore, foundWords, allWords, puzzle, revealed } = state;
-
-  const rank = getRank(score, maxScore, foundWords.length, allWords.length);
 
   const pangramCount = puzzle
     ? foundWords.filter(w => isFoundWordPangram(w, puzzle)).length
@@ -37,9 +35,10 @@ export function GameOverScreen({ epochRef, onPlayToday }: GameOverScreenProps): 
     const date = (epochRef.current && puzzle)
       ? formatShareDate(getPuzzleDateStr(epochRef.current, puzzle.index))
       : '—';
-    const filled = maxScore > 0 ? Math.round((score / maxScore) * 10) : 0;
+    const fillPct = getProgressPct(score, maxScore);
+    const filled = Math.round(fillPct / 10);
     const bar = '▓'.repeat(filled) + '░'.repeat(10 - filled);
-    const rankLine = revealed ? '—' : rank.name.toUpperCase();
+    const rankLine = revealed ? '—' : '✦ GRAND COLOPHON';
     const pangramLine = pangramCount > 0 ? `  ✦ ${pangramCount} pangram${pangramCount !== 1 ? 's' : ''}` : '';
     const rule = '━━━━━━━━━━━━━━━━━━━━━';
     return [
@@ -47,7 +46,7 @@ export function GameOverScreen({ epochRef, onPlayToday }: GameOverScreenProps): 
       rule,
       `  ${rankLine}`,
       `  ${bar} ${score} pts`,
-      `  ${foundWords.length}/${allWords.length} words${pangramLine}`,
+      `  All ${foundWords.length} words${pangramLine}`,
       rule,
       `  thepress.app`,
     ].join('\n');
@@ -83,7 +82,10 @@ export function GameOverScreen({ epochRef, onPlayToday }: GameOverScreenProps): 
 
   return (
     <div className="game-over">
-      <div className="game-over__rank">{revealed ? 'Better luck next time' : rank.name}</div>
+      <div className={`game-over__rank${revealed ? '' : ' game-over__rank--colophon'}`}>
+        {revealed ? 'Better luck next time' : 'Grand Colophon'}
+      </div>
+      {!revealed && <p className="game-over__colophon-badge">✦ All words found</p>}
       <div className="game-over__score">
         Score: {score} · {foundWords.length}/{allWords.length} words · {pangramCount} pangram{pangramCount !== 1 ? 's' : ''}
       </div>
