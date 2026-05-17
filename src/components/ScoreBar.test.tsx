@@ -136,6 +136,43 @@ describe('ScoreBar rank popover', () => {
   });
 });
 
+describe('ScoreBar Grand Colophon rank', () => {
+  const ALL_WORDS_ACTIONS = [
+    PUZZLE_LOADED,
+    DICT_LOADED,
+    { type: 'RESTORE_STATE' as const, foundWords: TEST_WORDS, score: 30 },
+  ];
+
+  it('shows "Grand Colophon" as rank name when all words are found', () => {
+    renderWithGame(<ScoreBar onOpenModal={onOpenModal} onOpenStats={onOpenStats} epochRef={epochRef} />, {
+      initialActions: ALL_WORDS_ACTIONS,
+    });
+    expect(screen.getByText('Grand Colophon')).toBeInTheDocument();
+  });
+
+  it('shows full score without a denominator when Grand Colophon', () => {
+    renderWithGame(<ScoreBar onOpenModal={onOpenModal} onOpenStats={onOpenStats} epochRef={epochRef} />, {
+      initialActions: ALL_WORDS_ACTIONS,
+    });
+    expect(screen.getByText(/9 words · 30 pts ▾/)).toBeInTheDocument();
+    expect(screen.queryByText(/\/\d+ pts/)).toBeNull();
+  });
+
+  it('does not show a next-rank hint when Grand Colophon', () => {
+    renderWithGame(<ScoreBar onOpenModal={onOpenModal} onOpenStats={onOpenStats} epochRef={epochRef} />, {
+      initialActions: ALL_WORDS_ACTIONS,
+    });
+    expect(screen.queryByText(/pts to/i)).toBeNull();
+  });
+
+  it('does not show "Grand Colophon" rank before all words are found', () => {
+    renderWithGame(<ScoreBar onOpenModal={onOpenModal} onOpenStats={onOpenStats} epochRef={epochRef} />, {
+      initialActions: [PUZZLE_LOADED, DICT_LOADED],
+    });
+    expect(screen.queryByText('Grand Colophon')).toBeNull();
+  });
+});
+
 describe('ScoreBar Grand Colophon day-after hint', () => {
   afterEach(() => {
     vi.useRealTimers();

@@ -62,11 +62,12 @@ test('share button copies correct text format to clipboard', async ({ page }) =>
   }
   await page.locator('div.game-over').waitFor({ timeout: 5_000 });
 
-  // Click share — button uses aria-label="Share result" before copy
-  await page.click('[aria-label="Share result"]');
+  // Click the GameOverScreen share button specifically — ScoreBar also has aria-label="Share result"
+  // and appears earlier in the DOM, so we scope to .game-over to avoid hitting the wrong button.
+  await page.click('.game-over [aria-label="Share result"]');
 
   // Button transitions to aria-label="Copied to clipboard" after successful writeText
-  await expect(page.locator('[aria-label="Copied to clipboard"]')).toBeVisible({ timeout: 3_000 });
+  await expect(page.locator('.game-over [aria-label="Copied to clipboard"]')).toBeVisible({ timeout: 3_000 });
 
   // Read the intercepted clipboard text via window.__clipboardText
   const clipText = await page.evaluate(
@@ -75,12 +76,12 @@ test('share button copies correct text format to clipboard', async ({ page }) =>
 
   // New format: "The Press · Mon DD, YYYY"
   expect(clipText).toMatch(/^The Press · \w+ \d+, \d{4}\n/);
-  // Rank is Grand Colophon for 30/30 points (uppercased in share format)
+  // Rank is Grand Colophon for 30/30 points (uppercased in share format, prefixed with ✦)
   expect(clipText).toContain('GRAND COLOPHON');
   // Full score achieved
   expect(clipText).toContain('30 pts');
-  // All 9 words found
-  expect(clipText).toContain('9/9 words');
+  // All 9 words found — GameOverScreen format uses "All N words"
+  expect(clipText).toContain('All 9 words');
   // 'printed' is the only pangram
   expect(clipText).toContain('✦ 1 pangram');
   // Footer URL
@@ -95,12 +96,12 @@ test('share button shows Copied! for 2 seconds then reverts to Share Result', as
   }
   await page.locator('div.game-over').waitFor({ timeout: 5_000 });
 
-  await page.click('[aria-label="Share result"]');
+  await page.click('.game-over [aria-label="Share result"]');
 
   // Immediately after click — button shows "Copied!" state
-  await expect(page.locator('[aria-label="Copied to clipboard"]')).toBeVisible({ timeout: 3_000 });
+  await expect(page.locator('.game-over [aria-label="Copied to clipboard"]')).toBeVisible({ timeout: 3_000 });
 
   // After 2100ms (real timers in E2E — no fake timers here) the button reverts
   await page.waitForTimeout(2100);
-  await expect(page.locator('[aria-label="Share result"]')).toBeVisible();
+  await expect(page.locator('.game-over [aria-label="Share result"]')).toBeVisible();
 });

@@ -199,6 +199,13 @@ Feature: The Press — Daily Word Puzzle
       Then the score bar shows "Grand Colophon yesterday · N pts"
       And the hint disappears the following day
 
+    Scenario: Score bar shows Grand Colophon rank when all words are found
+      Given the player finds all words in the puzzle
+      Then the rank name in the score bar updates to "Grand Colophon"
+      And the progress bar is full (100%)
+      And no next-rank hint is shown
+      And the score button shows pts without a denominator
+
     Scenario: Score button shows pts out of laureate target, not total max
       Given the puzzle has a max score of 30 (laureate target = 26)
       And the player has scored 15 points

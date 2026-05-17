@@ -25,13 +25,15 @@ interface ScoreBarProps {
 
 export function ScoreBar({ onOpenModal, onOpenStats, epochRef }: ScoreBarProps): React.JSX.Element {
   const state = useGameState();
-  const { score, maxScore, foundWords, allWords, puzzle } = state;
+  const { score, maxScore, foundWords, allWords, puzzle, gameOver, revealed } = state;
   const [ladderOpen, setLadderOpen] = useState(false);
   const rankBtnRef = useRef<HTMLButtonElement>(null);
   const popoverRef = useRef<HTMLDivElement>(null);
 
   const rank = getRank(score, maxScore, foundWords.length, allWords.length);
-  const fillPct = getProgressPct(score, maxScore);
+  const isGrandColophon = gameOver && !revealed;
+  const displayRankName = isGrandColophon ? 'Grand Colophon' : rank.name;
+  const fillPct = isGrandColophon ? 100 : getProgressPct(score, maxScore);
   const streak = useMemo(() => computeStats(readHistory()).streak, []);
   const ladder = useMemo(() => (maxScore > 0 ? getRankLadder(maxScore) : null), [maxScore]);
 
@@ -73,7 +75,7 @@ export function ScoreBar({ onOpenModal, onOpenStats, epochRef }: ScoreBarProps):
   // Inline next-rank hint
   const ptsToNext = maxScore > 0 ? Math.ceil((rank.next / 100) * maxScore) - score : 0;
   const nextHint = (() => {
-    if (!maxScore || rank.name === 'Laureate') return null;
+    if (!maxScore || gameOver || rank.name === 'Laureate') return null;
     if (ptsToNext > 0 && rank.nextName) return `${ptsToNext} pt${ptsToNext === 1 ? '' : 's'} to ${rank.nextName}`;
     return null;
   })();
@@ -99,9 +101,9 @@ export function ScoreBar({ onOpenModal, onOpenStats, epochRef }: ScoreBarProps):
     return [
       `The Press · ${date}`,
       rule,
-      `  ${rank.name.toUpperCase()}`,
+      `  ${displayRankName.toUpperCase()}`,
       `  ${bar}`,
-      `  ${foundWords.length} words · ${score}/${laureateTarget} pts${pangramLine}`,
+      `  ${foundWords.length} words · ${isGrandColophon ? `${score}` : `${score}/${laureateTarget}`} pts${pangramLine}`,
       rule,
       `  thepress.app`,
     ].join('\n');
@@ -129,10 +131,10 @@ export function ScoreBar({ onOpenModal, onOpenStats, epochRef }: ScoreBarProps):
           type="button"
           aria-label="Show rank thresholds"
           aria-expanded={ladderOpen}
-          disabled={!maxScore}
+          disabled={!maxScore || isGrandColophon}
         >
-          {rank.name}
-          {maxScore > 0 && (
+          {displayRankName}
+          {maxScore > 0 && !isGrandColophon && (
             <span className="rank-name__caret" aria-hidden="true">
               {ladderOpen ? ' ▴' : ' ▾'}
             </span>
@@ -180,9 +182,9 @@ export function ScoreBar({ onOpenModal, onOpenStats, epochRef }: ScoreBarProps):
           className="score-count"
           onClick={onOpenModal}
           type="button"
-          aria-label={`${foundWords.length} words found, score ${score} of ${laureateTarget}. Tap to see found words.`}
+          aria-label={`${foundWords.length} words found, score ${score}${isGrandColophon ? '' : ` of ${laureateTarget}`}. Tap to see found words.`}
         >
-          {foundWords.length} words · {score}/{laureateTarget} pts ▾
+          {foundWords.length} words · {isGrandColophon ? `${score}` : `${score}/${laureateTarget}`} pts ▾
         </button>
         <div className="score-bar__right">
           {foundWords.length > 0 && (
