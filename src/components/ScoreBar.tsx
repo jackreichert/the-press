@@ -10,19 +10,22 @@ import { getRank, getProgressPct, getRankLadder } from '../utils/scoring';
 import { useGameState } from '../context/GameContext';
 import { computeStats } from '../utils/stats';
 import { readHistory } from '../storage';
+import { isFoundWordPangram } from '../utils/puzzle';
+import { getPuzzleDateStr } from '../utils/date';
 
 // ─── Props ────────────────────────────────────────────────────────────────────
 
 interface ScoreBarProps {
   onOpenModal: () => void;
   onOpenStats: () => void;
+  epochRef: React.RefObject<string | null>;
 }
 
 // ─── Component ────────────────────────────────────────────────────────────────
 
-export function ScoreBar({ onOpenModal, onOpenStats }: ScoreBarProps): React.JSX.Element {
+export function ScoreBar({ onOpenModal, onOpenStats, epochRef }: ScoreBarProps): React.JSX.Element {
   const state = useGameState();
-  const { score, maxScore, foundWords, allWords } = state;
+  const { score, maxScore, foundWords, allWords, puzzle } = state;
   const [ladderOpen, setLadderOpen] = useState(false);
   const rankBtnRef = useRef<HTMLButtonElement>(null);
   const popoverRef = useRef<HTMLDivElement>(null);
@@ -74,6 +77,46 @@ export function ScoreBar({ onOpenModal, onOpenStats }: ScoreBarProps): React.JSX
     if (ptsToNext > 0 && rank.nextName) return `${ptsToNext} pt${ptsToNext === 1 ? '' : 's'} to ${rank.nextName}`;
     return null;
   })();
+
+  const [shareCopied, setShareCopied] = useState(false);
+
+  function buildShareText(): string {
+    const date = epochRef.current && puzzle
+      ? (() => {
+          const iso = getPuzzleDateStr(epochRef.current, puzzle.index);
+          const [y, m, d] = iso.split('-').map(Number);
+          const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+          return `${months[m - 1]} ${d}, ${y}`;
+        })()
+      : '—';
+    const filled = maxScore > 0 ? Math.round((score / maxScore) * 10) : 0;
+    const bar = '▓'.repeat(filled) + '░'.repeat(10 - filled);
+    const laureateTarget = Math.ceil(0.84 * maxScore);
+    const pangramCount = puzzle ? foundWords.filter(w => isFoundWordPangram(w, puzzle)).length : 0;
+    const pangramLine = pangramCount > 0 ? ` · ✦ ${pangramCount}` : '';
+    const rule = '━━━━━━━━━━━━━━━━━━━━━';
+    return [
+      `The Press · ${date}`,
+      rule,
+      `  ${rank.name.toUpperCase()}`,
+      `  ${bar}`,
+      `  ${foundWords.length} words · ${score}/${laureateTarget} pts${pangramLine}`,
+      rule,
+      `  thepress.app`,
+    ].join('\n');
+  }
+
+  async function handleShare(): Promise<void> {
+    const text = buildShareText();
+    if (navigator.share) {
+      try { await navigator.share({ text }); return; } catch { /* fall through */ }
+    }
+    try {
+      await navigator.clipboard.writeText(text);
+      setShareCopied(true);
+      setTimeout(() => setShareCopied(false), 2000);
+    } catch { /* silent fail */ }
+  }
 
   return (
     <div className="score-bar">
@@ -136,18 +179,34 @@ export function ScoreBar({ onOpenModal, onOpenStats }: ScoreBarProps): React.JSX
           className="score-count"
           onClick={onOpenModal}
           type="button"
-          aria-label={`Score ${score}, ${foundWords.length} words found. Tap to see found words.`}
+          aria-label={`${foundWords.length} words found, score ${score} of ${maxScore}. Tap to see found words.`}
         >
-          Score: {score} · {foundWords.length} words ▾
+          {foundWords.length} words · {score}/{maxScore} pts ▾
         </button>
-        <button
-          className="streak-counter"
-          onClick={onOpenStats}
-          type="button"
-          aria-label={`Streak: ${streak} days. Tap to see stats.`}
-        >
-          ❧ {streak}
-        </button>
+        <div className="score-bar__right">
+          {foundWords.length > 0 && (
+            <button
+              className={`share-inline${shareCopied ? ' share-inline--copied' : ''}`}
+              onClick={() => void handleShare()}
+              type="button"
+              aria-label={shareCopied ? 'Copied to clipboard' : 'Share result'}
+            >
+              {shareCopied ? '✓' : (
+                <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                  <path d="M7 1v8M4 4l3-3 3 3M2 10v2a1 1 0 001 1h8a1 1 0 001-1v-2" />
+                </svg>
+              )}
+            </button>
+          )}
+          <button
+            className="streak-counter"
+            onClick={onOpenStats}
+            type="button"
+            aria-label={`Streak: ${streak} days. Tap to see stats.`}
+          >
+            ❧ {streak}
+          </button>
+        </div>
       </div>
     </div>
   );

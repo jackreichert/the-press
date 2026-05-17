@@ -168,7 +168,7 @@ function GameLayout({ epochRef, onPlayToday, newDayAvailable }: GameLayoutProps)
         <p className="app-subtitle">A Daily Word Puzzle</p>
       </header>
       {/* Score bar — tapping word count opens found-words modal; tapping streak opens stats */}
-      <ScoreBar onOpenModal={() => setModalOpen(true)} onOpenStats={() => setStatsOpen(true)} />
+      <ScoreBar onOpenModal={() => setModalOpen(true)} onOpenStats={() => setStatsOpen(true)} epochRef={epochRef} />
 
       {/* Word-in-progress display above grid (D-03) */}
       <WordDisplay />

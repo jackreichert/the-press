@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { createRef } from 'react';
 import { screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { renderWithGame } from '../test/helpers';
@@ -18,6 +18,11 @@ const DICT_LOADED = { type: 'DICT_LOADED' as const, words: TEST_WORDS };
 
 const onOpenModal = vi.fn();
 const onOpenStats = vi.fn();
+const epochRef = (() => {
+  const ref = createRef<string | null>();
+  (ref as React.MutableRefObject<string | null>).current = '2026-01-01';
+  return ref;
+})();
 
 afterEach(() => {
   vi.clearAllMocks();
@@ -25,14 +30,14 @@ afterEach(() => {
 
 describe('ScoreBar rank display', () => {
   it('shows dash rank before dict is loaded (maxScore=0)', () => {
-    renderWithGame(<ScoreBar onOpenModal={onOpenModal} onOpenStats={onOpenStats} />, {
+    renderWithGame(<ScoreBar onOpenModal={onOpenModal} onOpenStats={onOpenStats} epochRef={epochRef} />, {
       initialActions: [PUZZLE_LOADED],
     });
     expect(screen.getByText('—')).toBeInTheDocument();
   });
 
   it("shows Printer's Devil rank at 0 score after dict loaded", () => {
-    renderWithGame(<ScoreBar onOpenModal={onOpenModal} onOpenStats={onOpenStats} />, {
+    renderWithGame(<ScoreBar onOpenModal={onOpenModal} onOpenStats={onOpenStats} epochRef={epochRef} />, {
       initialActions: [PUZZLE_LOADED, DICT_LOADED],
     });
     // pct=0 → below first tier threshold → Printer's Devil
@@ -40,7 +45,7 @@ describe('ScoreBar rank display', () => {
   });
 
   it('renders a progressbar element', () => {
-    renderWithGame(<ScoreBar onOpenModal={onOpenModal} onOpenStats={onOpenStats} />, {
+    renderWithGame(<ScoreBar onOpenModal={onOpenModal} onOpenStats={onOpenStats} epochRef={epochRef} />, {
       initialActions: [PUZZLE_LOADED, DICT_LOADED],
     });
     expect(screen.getByRole('progressbar')).toBeInTheDocument();
@@ -49,25 +54,25 @@ describe('ScoreBar rank display', () => {
 
 describe('ScoreBar score-count button', () => {
   it('shows score and word count', () => {
-    renderWithGame(<ScoreBar onOpenModal={onOpenModal} onOpenStats={onOpenStats} />, {
+    renderWithGame(<ScoreBar onOpenModal={onOpenModal} onOpenStats={onOpenStats} epochRef={epochRef} />, {
       initialActions: [PUZZLE_LOADED, DICT_LOADED],
     });
-    expect(screen.getByText(/Score: 0/)).toBeInTheDocument();
+    expect(screen.getByText(/0 words · 0\/\d+ pts/)).toBeInTheDocument();
   });
 
   it('calls onOpenModal when score button is clicked', async () => {
     const user = userEvent.setup();
-    renderWithGame(<ScoreBar onOpenModal={onOpenModal} onOpenStats={onOpenStats} />, {
+    renderWithGame(<ScoreBar onOpenModal={onOpenModal} onOpenStats={onOpenStats} epochRef={epochRef} />, {
       initialActions: [PUZZLE_LOADED, DICT_LOADED],
     });
-    await user.click(screen.getByRole('button', { name: /Score.*words found/i }));
+    await user.click(screen.getByRole('button', { name: /words found.*score/i }));
     expect(onOpenModal).toHaveBeenCalledTimes(1);
   });
 });
 
 describe('ScoreBar streak counter', () => {
   it('shows streak 0 with empty history', () => {
-    renderWithGame(<ScoreBar onOpenModal={onOpenModal} onOpenStats={onOpenStats} />, {
+    renderWithGame(<ScoreBar onOpenModal={onOpenModal} onOpenStats={onOpenStats} epochRef={epochRef} />, {
       initialActions: [PUZZLE_LOADED, DICT_LOADED],
     });
     expect(screen.getByRole('button', { name: /Streak: 0 days/i })).toBeInTheDocument();
@@ -85,7 +90,7 @@ describe('ScoreBar streak counter', () => {
       completed: true,
     };
     appendHistory(entry);
-    renderWithGame(<ScoreBar onOpenModal={onOpenModal} onOpenStats={onOpenStats} />, {
+    renderWithGame(<ScoreBar onOpenModal={onOpenModal} onOpenStats={onOpenStats} epochRef={epochRef} />, {
       initialActions: [PUZZLE_LOADED, DICT_LOADED],
     });
     expect(screen.getByRole('button', { name: /Streak: 1 days/i })).toBeInTheDocument();
@@ -94,7 +99,7 @@ describe('ScoreBar streak counter', () => {
 
   it('calls onOpenStats when streak button is clicked', async () => {
     const user = userEvent.setup();
-    renderWithGame(<ScoreBar onOpenModal={onOpenModal} onOpenStats={onOpenStats} />, {
+    renderWithGame(<ScoreBar onOpenModal={onOpenModal} onOpenStats={onOpenStats} epochRef={epochRef} />, {
       initialActions: [PUZZLE_LOADED, DICT_LOADED],
     });
     await user.click(screen.getByRole('button', { name: /Streak:.*days/i }));
@@ -105,7 +110,7 @@ describe('ScoreBar streak counter', () => {
 describe('ScoreBar rank popover', () => {
   it('does not list Grand Colophon in the rank popover', async () => {
     const user = userEvent.setup();
-    renderWithGame(<ScoreBar onOpenModal={onOpenModal} onOpenStats={onOpenStats} />, {
+    renderWithGame(<ScoreBar onOpenModal={onOpenModal} onOpenStats={onOpenStats} epochRef={epochRef} />, {
       initialActions: [PUZZLE_LOADED, DICT_LOADED],
     });
     await user.click(screen.getByRole('button', { name: /Show rank thresholds/i }));
@@ -114,7 +119,7 @@ describe('ScoreBar rank popover', () => {
 
   it('lists Laureate in the rank popover', async () => {
     const user = userEvent.setup();
-    renderWithGame(<ScoreBar onOpenModal={onOpenModal} onOpenStats={onOpenStats} />, {
+    renderWithGame(<ScoreBar onOpenModal={onOpenModal} onOpenStats={onOpenStats} epochRef={epochRef} />, {
       initialActions: [PUZZLE_LOADED, DICT_LOADED],
     });
     await user.click(screen.getByRole('button', { name: /Show rank thresholds/i }));
@@ -139,11 +144,10 @@ describe('ScoreBar Grand Colophon day-after hint', () => {
       completed: true,
     };
     appendHistory(entry);
-    renderWithGame(<ScoreBar onOpenModal={onOpenModal} onOpenStats={onOpenStats} />, {
+    renderWithGame(<ScoreBar onOpenModal={onOpenModal} onOpenStats={onOpenStats} epochRef={epochRef} />, {
       initialActions: [PUZZLE_LOADED, DICT_LOADED],
     });
-    expect(screen.getByText(/Grand Colophon yesterday/i)).toBeInTheDocument();
-    expect(screen.getByText(/30 pts/i)).toBeInTheDocument();
+    expect(screen.getByText(/Grand Colophon yesterday · 30 pts/i)).toBeInTheDocument();
   });
 
   it('does not show hint when yesterday\'s game did not find all words', () => {
@@ -158,7 +162,7 @@ describe('ScoreBar Grand Colophon day-after hint', () => {
       completed: true,
     };
     appendHistory(entry);
-    renderWithGame(<ScoreBar onOpenModal={onOpenModal} onOpenStats={onOpenStats} />, {
+    renderWithGame(<ScoreBar onOpenModal={onOpenModal} onOpenStats={onOpenStats} epochRef={epochRef} />, {
       initialActions: [PUZZLE_LOADED, DICT_LOADED],
     });
     expect(screen.queryByText(/Grand Colophon yesterday/i)).toBeNull();
@@ -176,7 +180,7 @@ describe('ScoreBar Grand Colophon day-after hint', () => {
       completed: true,
     };
     appendHistory(entry);
-    renderWithGame(<ScoreBar onOpenModal={onOpenModal} onOpenStats={onOpenStats} />, {
+    renderWithGame(<ScoreBar onOpenModal={onOpenModal} onOpenStats={onOpenStats} epochRef={epochRef} />, {
       initialActions: [PUZZLE_LOADED, DICT_LOADED],
     });
     expect(screen.queryByText(/Grand Colophon yesterday/i)).toBeNull();

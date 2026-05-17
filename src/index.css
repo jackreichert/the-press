@@ -701,6 +701,42 @@ body {
   align-items: center;
 }
 
+.score-bar__right {
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+}
+
+.share-inline {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--color-ink);
+  opacity: 0.45;
+  padding: 0;
+  min-width: 44px;
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: opacity 100ms ease-out;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .share-inline:hover { opacity: 0.9; }
+}
+
+.share-inline--copied {
+  opacity: 1;
+  color: var(--color-accent);
+}
+
+.share-inline:focus-visible {
+  outline: 2px solid var(--color-ink);
+  outline-offset: 2px;
+  border-radius: 2px;
+}
+
 .streak-counter {
   font-family: var(--font-serif);
   font-size: 13px;
