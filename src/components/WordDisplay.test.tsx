@@ -1,9 +1,28 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { screen, act, fireEvent, waitFor } from '@testing-library/react';
 import { renderWithGame } from '../test/helpers';
 import { WordDisplay } from './WordDisplay';
 import { ActionRow } from './ActionRow';
+import { useGameDispatch, useGameState } from '../context/GameContext';
 import type { PuzzleEntry } from '../types';
+
+// Mirrors the document-level keyboard listener in App.tsx for tests that need it.
+function KeyboardConnector(): null {
+  const dispatch = useGameDispatch();
+  const { gameOver } = useGameState();
+  useEffect(() => {
+    function handle(e: KeyboardEvent): void {
+      if (e.ctrlKey || e.metaKey || e.altKey || gameOver) return;
+      const key = e.key.toLowerCase();
+      if (/^[a-z]$/.test(key)) { e.preventDefault(); dispatch({ type: 'LETTER_APPEND', letter: key }); }
+      else if (e.key === 'Backspace') { e.preventDefault(); dispatch({ type: 'LETTER_DELETE' }); }
+      else if (e.key === 'Enter') { e.preventDefault(); dispatch({ type: 'WORD_SUBMIT' }); }
+    }
+    document.addEventListener('keydown', handle);
+    return () => document.removeEventListener('keydown', handle);
+  }, [dispatch, gameOver]);
+  return null;
+}
 
 const TEST_PUZZLE: PuzzleEntry = {
   index: 0,
@@ -102,6 +121,61 @@ describe('WordDisplay error animation', () => {
     act(() => { vi.advanceTimersByTime(701); });
 
     expect(screen.getByText('—')).toBeInTheDocument();
+  });
+
+  it('blocks letters typed during the 700ms shake window', () => {
+    const LETTER_P = { type: 'LETTER_APPEND' as const, letter: 'p' };
+    const LETTER_I = { type: 'LETTER_APPEND' as const, letter: 'i' };
+    const LETTER_N = { type: 'LETTER_APPEND' as const, letter: 'n' };
+    renderWithGame(
+      <>
+        <KeyboardConnector />
+        <WordDisplay />
+        <ActionRow />
+      </>,
+      { initialActions: [PUZZLE_LOADED, DICT_LOADED, LETTER_P, LETTER_I, LETTER_N] },
+    );
+    // Submit "PIN" → too short error
+    fireEvent.click(screen.getByRole('button', { name: /Submit word/i }));
+    expect(screen.getByRole('alert')).toHaveTextContent('Too short');
+
+    // Player tries to type new letters during the shake window — should be blocked
+    act(() => {
+      document.dispatchEvent(new KeyboardEvent('keydown', { key: 'd', bubbles: true }));
+      document.dispatchEvent(new KeyboardEvent('keydown', { key: 'r', bubbles: true }));
+    });
+
+    // The word display should still show the original errored word, not "PINDR"
+    expect(screen.getByText('PIN')).toBeInTheDocument();
+
+    // After 700ms the errored word clears to a clean slate
+    act(() => { vi.advanceTimersByTime(701); });
+    expect(screen.getByText('—')).toBeInTheDocument();
+  });
+
+  it('accepts letters again immediately after the shake window ends', () => {
+    const LETTER_P = { type: 'LETTER_APPEND' as const, letter: 'p' };
+    const LETTER_I = { type: 'LETTER_APPEND' as const, letter: 'i' };
+    const LETTER_N = { type: 'LETTER_APPEND' as const, letter: 'n' };
+    renderWithGame(
+      <>
+        <KeyboardConnector />
+        <WordDisplay />
+        <ActionRow />
+      </>,
+      { initialActions: [PUZZLE_LOADED, DICT_LOADED, LETTER_P, LETTER_I, LETTER_N] },
+    );
+    fireEvent.click(screen.getByRole('button', { name: /Submit word/i }));
+
+    // Advance past the clear
+    act(() => { vi.advanceTimersByTime(701); });
+    expect(screen.getByText('—')).toBeInTheDocument();
+
+    // Typing should work again
+    act(() => {
+      document.dispatchEvent(new KeyboardEvent('keydown', { key: 'd', bubbles: true }));
+    });
+    expect(screen.getByText('D')).toBeInTheDocument();
   });
 });
 

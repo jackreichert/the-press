@@ -18,12 +18,19 @@ export function WordDisplay(): React.JSX.Element {
   const [foundPts, setFoundPts] = useState(0);
   const [foundPangram, setFoundPangram] = useState(false);
   const prevFoundRef = useRef<string[]>([]);
+  // Snapshot the errored word length so STRIP_PREFIX only removes those characters,
+  // leaving any letters the player typed during the shake window.
+  const errorLengthRef = useRef(0);
 
   useEffect(() => {
     if (state.errorKey > 0) {
+      errorLengthRef.current = state.currentWord.length;
       setShaking(true);
       const shakeTimer = setTimeout(() => setShaking(false), 400);
-      const clearTimer = setTimeout(() => dispatch({ type: 'WORD_CLEAR' }), 700);
+      const clearTimer = setTimeout(
+        () => dispatch({ type: 'STRIP_PREFIX', length: errorLengthRef.current }),
+        700,
+      );
       return () => {
         clearTimeout(shakeTimer);
         clearTimeout(clearTimer);

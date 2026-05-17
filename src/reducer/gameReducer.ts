@@ -25,6 +25,8 @@ export interface GameState {
   errorMsg: string | null;
   /** Increments on every error dispatch — shake useEffect depends on this, not errorMsg string. */
   errorKey: number;
+  /** True during the 700ms shake window — blocks LETTER_APPEND / LETTER_DELETE. */
+  errorPending: boolean;
   gameOver: boolean;
   /** True when the player chose to reveal remaining words rather than finding them. */
   revealed: boolean;
@@ -43,6 +45,7 @@ export type GameAction =
   | { type: 'LETTER_APPEND'; letter: string }
   | { type: 'LETTER_DELETE' }
   | { type: 'WORD_CLEAR' }
+  | { type: 'STRIP_PREFIX'; length: number }
   | { type: 'WORD_SUBMIT' }
   | { type: 'SHUFFLE' }
   | { type: 'SCHEDULE_ERROR' }
@@ -65,6 +68,7 @@ export const initialState: GameState = {
   maxScore: 0,
   errorMsg: null,
   errorKey: 0,
+  errorPending: false,
   gameOver: false,
   revealed: false,
   hasPendingToday: false,
@@ -116,6 +120,7 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
     }
 
     case 'LETTER_APPEND':
+      if (state.errorPending) return state;
       return {
         ...state,
         currentWord: state.currentWord + action.letter.toLowerCase(),
@@ -123,6 +128,7 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
       };
 
     case 'LETTER_DELETE':
+      if (state.errorPending) return state;
       return {
         ...state,
         currentWord: state.currentWord.slice(0, -1),
@@ -131,6 +137,9 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
 
     case 'WORD_CLEAR':
       return { ...state, currentWord: '', errorMsg: null };
+
+    case 'STRIP_PREFIX':
+      return { ...state, currentWord: state.currentWord.slice(action.length), errorMsg: null, errorPending: false };
 
     case 'WORD_SUBMIT':
       return handleSubmit(state);
@@ -176,12 +185,16 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
 // ─── Submit handler ───────────────────────────────────────────────────────────
 
 function handleSubmit(state: GameState): GameState {
+  if (state.errorPending) return state;
+
   // Pitfall 2: guard dictLoaded first — dict may be null during load
   if (!state.dictLoaded || !state.dict || !state.puzzle) {
     return withError(state, 'Loading dictionary...');
   }
 
   const word = state.currentWord.toLowerCase();
+
+  if (word.length === 0) return state;
 
   if (word.length < 4) {
     return withError(state, 'Too short');
@@ -224,5 +237,6 @@ function withError(state: GameState, msg: string): GameState {
     ...state,
     errorMsg: msg,
     errorKey: state.errorKey + 1,  // Pitfall 3: increment so shake re-triggers on same error
+    errorPending: true,
   };
 }

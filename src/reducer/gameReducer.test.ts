@@ -117,7 +117,67 @@ describe('WORD_CLEAR', () => {
   });
 });
 
+describe('errorPending input block', () => {
+  it('LETTER_APPEND is ignored while errorPending is true', () => {
+    const withError = { ...loadedState(), currentWord: 'pin', errorPending: true };
+    const s = gameReducer(withError, { type: 'LETTER_APPEND', letter: 'd' });
+    expect(s.currentWord).toBe('pin');
+  });
+
+  it('LETTER_DELETE is ignored while errorPending is true', () => {
+    const withError = { ...loadedState(), currentWord: 'pin', errorPending: true };
+    const s = gameReducer(withError, { type: 'LETTER_DELETE' });
+    expect(s.currentWord).toBe('pin');
+  });
+
+  it('STRIP_PREFIX clears errorPending', () => {
+    const withError = { ...loadedState(), currentWord: 'pin', errorPending: true };
+    const s = gameReducer(withError, { type: 'STRIP_PREFIX', length: 3 });
+    expect(s.errorPending).toBe(false);
+  });
+
+  it('withError sets errorPending via WORD_SUBMIT on invalid word', () => {
+    const s = gameReducer(typeWord(loadedState(), 'pin'), { type: 'WORD_SUBMIT' });
+    expect(s.errorPending).toBe(true);
+  });
+
+  it('WORD_SUBMIT is a no-op while errorPending is true', () => {
+    const withError = { ...loadedState(), currentWord: 'pin', errorPending: true, errorKey: 1 };
+    const s = gameReducer(withError, { type: 'WORD_SUBMIT' });
+    expect(s.errorKey).toBe(1);  // no new error triggered
+    expect(s.currentWord).toBe('pin');  // unchanged
+  });
+});
+
+describe('STRIP_PREFIX', () => {
+  it('removes the first N characters, preserving the rest', () => {
+    const s = gameReducer({ ...initialState, currentWord: 'pindrip' }, { type: 'STRIP_PREFIX', length: 3 });
+    expect(s.currentWord).toBe('drip');
+  });
+
+  it('returns empty string when length equals word length', () => {
+    const s = gameReducer({ ...initialState, currentWord: 'pin' }, { type: 'STRIP_PREFIX', length: 3 });
+    expect(s.currentWord).toBe('');
+  });
+
+  it('returns empty string when length exceeds word length', () => {
+    const s = gameReducer({ ...initialState, currentWord: 'pi' }, { type: 'STRIP_PREFIX', length: 5 });
+    expect(s.currentWord).toBe('');
+  });
+
+  it('clears errorMsg', () => {
+    const s = gameReducer({ ...initialState, currentWord: 'pin', errorMsg: 'Too short' }, { type: 'STRIP_PREFIX', length: 3 });
+    expect(s.errorMsg).toBeNull();
+  });
+});
+
 describe('WORD_SUBMIT', () => {
+  it('is a no-op when currentWord is empty', () => {
+    const s = gameReducer(loadedState(), { type: 'WORD_SUBMIT' });
+    expect(s.errorMsg).toBeNull();
+    expect(s.errorKey).toBe(0);
+  });
+
   it('rejects word shorter than 4 chars with "Too short"', () => {
     const s = gameReducer(typeWord(loadedState(), 'pin'), { type: 'WORD_SUBMIT' });
     expect(s.errorMsg).toBe('Too short');
@@ -165,11 +225,13 @@ describe('WORD_SUBMIT', () => {
     expect(s.errorMsg).toBe('Already found');
   });
 
-  it('increments errorKey even for same repeated error (shake re-trigger)', () => {
+  it('increments errorKey even for same repeated error (shake re-trigger after window clears)', () => {
     let s = gameReducer(typeWord(loadedState(), 'pin'), { type: 'WORD_SUBMIT' });
     expect(s.errorKey).toBe(1);
+    // Simulate the 700ms window ending (STRIP_PREFIX clears errorPending)
+    s = gameReducer(s, { type: 'STRIP_PREFIX', length: 3 });
     s = gameReducer(typeWord(s, 'pin'), { type: 'WORD_SUBMIT' });
-    expect(s.errorKey).toBe(2);  // same error string 'Too short' but key still increments
+    expect(s.errorKey).toBe(2);
   });
 
   it('sets gameOver when last word is submitted', () => {
