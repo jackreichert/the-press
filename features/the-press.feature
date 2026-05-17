@@ -199,6 +199,12 @@ Feature: The Press — Daily Word Puzzle
       Then the score bar shows "Grand Colophon yesterday · N pts"
       And the hint disappears the following day
 
+    Scenario: Score button shows pts out of laureate target, not total max
+      Given the puzzle has a max score of 30 (laureate target = 26)
+      And the player has scored 15 points
+      Then the score button reads "N words · 15/26 pts ▾"
+      And the denominator 30 does not appear in the score button
+
   # ─── Shuffle ─────────────────────────────────────────────────────────────────
 
   Feature: Shuffle

@@ -60,6 +60,15 @@ describe('ScoreBar score-count button', () => {
     expect(screen.getByText(/0 words · 0\/\d+ pts/)).toBeInTheDocument();
   });
 
+  it('shows pts out of laureate target (84% of maxScore), not total maxScore', () => {
+    // maxScore for TEST_WORDS = 30; laureateTarget = ceil(0.84 * 30) = 26
+    renderWithGame(<ScoreBar onOpenModal={onOpenModal} onOpenStats={onOpenStats} epochRef={epochRef} />, {
+      initialActions: [PUZZLE_LOADED, DICT_LOADED],
+    });
+    expect(screen.getByText('0 words · 0/26 pts ▾')).toBeInTheDocument();
+    expect(screen.queryByText(/\/30 pts/)).toBeNull();
+  });
+
   it('calls onOpenModal when score button is clicked', async () => {
     const user = userEvent.setup();
     renderWithGame(<ScoreBar onOpenModal={onOpenModal} onOpenStats={onOpenStats} epochRef={epochRef} />, {

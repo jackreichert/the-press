@@ -78,6 +78,8 @@ export function ScoreBar({ onOpenModal, onOpenStats, epochRef }: ScoreBarProps):
     return null;
   })();
 
+  const laureateTarget = maxScore > 0 ? Math.ceil(0.84 * maxScore) : 0;
+
   const [shareCopied, setShareCopied] = useState(false);
 
   function buildShareText(): string {
@@ -91,7 +93,6 @@ export function ScoreBar({ onOpenModal, onOpenStats, epochRef }: ScoreBarProps):
       : '—';
     const filled = maxScore > 0 ? Math.round((score / maxScore) * 10) : 0;
     const bar = '▓'.repeat(filled) + '░'.repeat(10 - filled);
-    const laureateTarget = Math.ceil(0.84 * maxScore);
     const pangramCount = puzzle ? foundWords.filter(w => isFoundWordPangram(w, puzzle)).length : 0;
     const pangramLine = pangramCount > 0 ? ` · ✦ ${pangramCount}` : '';
     const rule = '━━━━━━━━━━━━━━━━━━━━━';
@@ -179,9 +180,9 @@ export function ScoreBar({ onOpenModal, onOpenStats, epochRef }: ScoreBarProps):
           className="score-count"
           onClick={onOpenModal}
           type="button"
-          aria-label={`${foundWords.length} words found, score ${score} of ${maxScore}. Tap to see found words.`}
+          aria-label={`${foundWords.length} words found, score ${score} of ${laureateTarget}. Tap to see found words.`}
         >
-          {foundWords.length} words · {score}/{maxScore} pts ▾
+          {foundWords.length} words · {score}/{laureateTarget} pts ▾
         </button>
         <div className="score-bar__right">
           {foundWords.length > 0 && (
