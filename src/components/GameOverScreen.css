@@ -1,0 +1,154 @@
+/* ─── Game-over screen ───────────────────────────────────────────────────── */
+
+@keyframes game-over-item-enter {
+  from { translate: 0 8px; }
+  to   { translate: 0 0; }
+}
+
+.game-over {
+  text-align: center;
+  padding: var(--space-xl) 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-md);
+}
+
+.game-over__rank {
+  font-family: var(--font-fraktur);
+  font-size: 44px;
+  font-weight: 400;
+  color: var(--color-accent);
+  line-height: 1.0;
+  padding: var(--space-sm) var(--space-xl);
+  /* Broadsheet headline rule treatment */
+  border-top: 1px solid var(--color-accent);
+  border-bottom: 1px solid var(--color-accent);
+  width: 100%;
+  animation: game-over-item-enter 350ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.game-over__score {
+  font-size: 17px;
+  font-weight: 400;
+  letter-spacing: 0.06em;
+  color: var(--color-ink);
+  opacity: 0.8;
+  animation: game-over-item-enter 350ms cubic-bezier(0.16, 1, 0.3, 1) 70ms both;
+}
+
+/* ─── Reveal + Play Today ────────────────────────────────────────────────── */
+
+.reveal-btn {
+  display: block;
+  margin: var(--space-sm) auto 0;
+  font-family: var(--font-serif);
+  font-size: 13px;
+  color: var(--color-ink);
+  opacity: 0.5;
+  background: none;
+  border: none;
+  cursor: pointer;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  padding: 12px 0;
+  min-height: 44px;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .reveal-btn:hover { opacity: 0.9; }
+}
+
+.reveal-btn:focus-visible {
+  outline: 2px solid var(--color-ink);
+  outline-offset: 2px;
+  border-radius: 1px;
+  opacity: 1;
+}
+
+.play-today-btn {
+  font-family: var(--font-serif);
+  font-size: 16px;
+  font-weight: 600;
+  padding: var(--space-sm) var(--space-xl);
+  background: var(--color-accent);
+  color: var(--color-bg);
+  border: none;
+  border-radius: 3px;
+  cursor: pointer;
+  margin-top: var(--space-sm);
+  transition: transform 100ms ease-out;
+  animation: game-over-item-enter 350ms cubic-bezier(0.16, 1, 0.3, 1) 200ms both;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .play-today-btn:hover { opacity: 0.9; }
+}
+.play-today-btn:active { transform: scale(0.97); }
+.play-today-btn:focus-visible { outline: 2px solid var(--color-ink); outline-offset: 2px; }
+
+/* ─── Grand Colophon game-over ───────────────────────────────────────────── */
+
+.game-over__rank--colophon {
+  color: var(--color-pangram);
+  border-color: var(--color-pangram);
+}
+
+.game-over__colophon-badge {
+  font-size: 13px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--color-pangram);
+  opacity: 0.85;
+  animation: game-over-item-enter 350ms cubic-bezier(0.16, 1, 0.3, 1) 50ms both;
+}
+
+/* ─── Missed words (revealed) ────────────────────────────────────────────── */
+
+.game-over__missed {
+  width: 100%;
+  text-align: left;
+  border-top: 1px solid var(--color-border);
+  padding-top: var(--space-md);
+  margin-top: var(--space-sm);
+  animation: game-over-item-enter 350ms cubic-bezier(0.16, 1, 0.3, 1) 140ms both;
+}
+
+.game-over__missed-label {
+  font-size: 11px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--color-ink);
+  opacity: 0.45;
+  margin-bottom: var(--space-xs);
+}
+
+.game-over__missed-list {
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-xs) var(--space-md);
+}
+
+.game-over__missed-word {
+  font-size: 15px;
+  color: var(--color-ink);
+  opacity: 0.35;
+}
+
+.game-over__missed-word--found {
+  opacity: 1;
+  font-weight: 600;
+  color: var(--color-accent);
+}
+
+.game-over__missed-word--pangram {
+  opacity: 0.5;
+  font-weight: 600;
+  color: var(--color-pangram, #b87a00);
+}
+
+.game-over__missed-word--found.game-over__missed-word--pangram {
+  opacity: 1;
+  color: var(--color-pangram, #b87a00);
+}

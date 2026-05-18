@@ -1,0 +1,145 @@
+/* ─── Word display — composing stick ────────────────────────────────────── */
+
+.word-display-area {
+  text-align: center;
+  min-height: 64px;
+  padding-bottom: var(--space-sm);
+  /* Composing tray baseline rail */
+  border-bottom: 1px solid var(--color-border);
+}
+
+.word-display {
+  font-family: var(--font-tile); /* IM Fell English — letters being set in type */
+  font-size: 32px;
+  font-weight: 400;             /* IM Fell English has weight 400 only */
+  line-height: 1.1;
+  letter-spacing: 0.12em;       /* Wide typesetter tracking */
+  color: var(--color-ink);
+  min-height: 1.1em;
+}
+
+@keyframes composing-idle {
+  0%, 100% { opacity: 0.35; }
+  50%       { opacity: 0.18; }
+}
+
+.word-display--placeholder {
+  animation: composing-idle 2.6s ease-in-out infinite;
+}
+
+.error-msg {
+  font-size: 14px;
+  font-weight: 400;
+  color: var(--color-accent);
+  margin-top: var(--space-xs);
+  min-height: 1.5em;
+  letter-spacing: 0.04em;
+}
+
+/* ─── Shake animation ────────────────────────────────────────────────────── */
+
+@keyframes tile-shuffle {
+  0%   { transform: scale(1)    rotate(0deg);  }
+  30%  { transform: scale(0.82) rotate(-5deg); }
+  60%  { transform: scale(0.82) rotate(5deg);  }
+  100% { transform: scale(1)    rotate(0deg);  }
+}
+
+.tile--shuffling {
+  animation: tile-shuffle 0.35s ease-in-out;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tile--shuffling { animation: none; }
+}
+
+@keyframes shake {
+  0%   { transform: translateX(0); }
+  20%  { transform: translateX(-6px); }
+  40%  { transform: translateX(6px); }
+  60%  { transform: translateX(-4px); }
+  80%  { transform: translateX(4px); }
+  100% { transform: translateX(0); }
+}
+
+.word-display.shake {
+  animation: shake 0.3s ease-out;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .word-display.shake {
+    animation: none;
+  }
+  .word-display--flash {
+    transition: none;
+  }
+}
+
+/* ─── Valid-word flash ───────────────────────────────────────────────────── */
+
+.word-display--flash {
+  color: var(--color-accent);
+  transition: color 150ms ease-out;
+}
+
+/* ─── Word found recognition ─────────────────────────────────────────────── */
+
+@keyframes word-rise {
+  0%   { opacity: 0.8; transform: translateY(2px)  scale(0.93); }
+  35%  { opacity: 1;   transform: translateY(-6px) scale(1.06); }
+  100% { opacity: 0;   transform: translateY(-16px) scale(1);   }
+}
+
+@keyframes word-rise-pangram {
+  0%   { opacity: 0.8; transform: translateY(2px)  scale(0.93); }
+  30%  { opacity: 1;   transform: translateY(-4px) scale(1.12); }
+  100% { opacity: 0;   transform: translateY(-20px) scale(1);   }
+}
+
+@keyframes label-fade {
+  0%   { opacity: 0; transform: translateY(4px);  }
+  20%  { opacity: 1; transform: translateY(0);    }
+  70%  { opacity: 1; transform: translateY(0);    }
+  100% { opacity: 0; transform: translateY(-4px); }
+}
+
+.word-display--found {
+  color: var(--color-accent);
+  animation: word-rise 0.6s ease-out forwards;
+}
+
+.word-display--pangram {
+  color: var(--color-pangram, #b87a00);
+  animation: word-rise-pangram 0.6s ease-out forwards;
+}
+
+.found-label {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--color-accent);
+  margin-top: var(--space-xs);
+  min-height: 1.5em;
+  animation: label-fade 0.6s ease-out forwards;
+}
+
+.found-label--pangram {
+  color: var(--color-pangram, #b87a00);
+  font-size: 16px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .word-display--found,
+  .word-display--pangram     { animation: none; opacity: 1; }
+  .found-label               { animation: none; opacity: 1; }
+  .found-word                { animation: none; }
+  .loading-state             { animation: none; }
+  .word-display--placeholder { animation: none; opacity: 0.35; }
+  .rank-progress__fill       { transition: none; }
+  .game-over__rank,
+  .game-over__score,
+  .game-over__missed,
+  .share-btn,
+  .play-today-btn            { animation: none; translate: 0 0; }
+  .letter-grid               { transition: none; opacity: 1; }
+  .modal-overlay             { transition: none; opacity: 1; }
+}

@@ -4,6 +4,7 @@
  * Dismissible — "Keep Playing" lets them continue toward Grand Colophon.
  */
 
+import './EditorWinModal.css';
 import React, { useRef } from 'react';
 import { useGameState } from '../context/GameContext';
 import { isFoundWordPangram } from '../utils/puzzle';

@@ -5,6 +5,7 @@
  * A subtle inline hint shows pts needed for the next rank.
  */
 
+import './ScoreBar.css';
 import React, { useMemo, useState, useRef, useEffect } from 'react';
 import { getRank, getProgressPct, getRankLadder, RANK } from '../utils/scoring';
 import { useGameState } from '../context/GameContext';

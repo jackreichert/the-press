@@ -7,6 +7,7 @@
  * Tile taps dispatch LETTER_APPEND directly.
  */
 
+import './LetterGrid.css';
 import React, { useState, useEffect, useRef } from 'react';
 import { LetterTile } from './LetterTile';
 import { useGameState, useGameDispatch } from '../context/GameContext';

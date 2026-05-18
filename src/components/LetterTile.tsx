@@ -4,6 +4,7 @@
  * GAME-02: min 48px touch target (56px for center tile via .tile--center class).
  */
 
+import './LetterTile.css';
 import React from 'react';
 
 interface LetterTileProps {

@@ -6,6 +6,7 @@
  * Structure mirrors FoundWordsModal exactly.
  */
 
+import './StatsModal.css';
 import React, { useRef } from 'react';
 import { computeStats } from '../utils/stats';
 import { readHistory } from '../storage';

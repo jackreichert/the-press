@@ -5,6 +5,7 @@
  * When hasPendingToday: shows "Play Today's Puzzle →" button.
  */
 
+import './GameOverScreen.css';
 import React from 'react';
 import { useGameState } from '../context/GameContext';
 import { isFoundWordPangram } from '../utils/puzzle';

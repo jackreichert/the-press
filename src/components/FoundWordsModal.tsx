@@ -7,6 +7,7 @@
  * GAME-05: Pangram detection via isFoundWordPangram().
  */
 
+import './FoundWordsModal.css';
 import React, { useRef } from 'react';
 import { useGameState } from '../context/GameContext';
 import { isFoundWordPangram } from '../utils/puzzle';

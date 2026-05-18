@@ -5,6 +5,7 @@
  * Pitfall 3: depends on errorKey (not errorMsg string) for shake re-trigger.
  */
 
+import './WordDisplay.css';
 import React, { useState, useEffect, useRef } from 'react';
 import { useGameState, useGameDispatch } from '../context/GameContext';
 import { isFoundWordPangram } from '../utils/puzzle';
