@@ -19,14 +19,13 @@ import { formatShareDate, buildProgressBar, useShare } from '../utils/share';
 interface ScoreBarProps {
   onOpenModal: () => void;
   onOpenStats: () => void;
-  epochRef: React.RefObject<string | null>;
 }
 
 // ─── Component ────────────────────────────────────────────────────────────────
 
-export function ScoreBar({ onOpenModal, onOpenStats, epochRef }: ScoreBarProps): React.JSX.Element {
+export function ScoreBar({ onOpenModal, onOpenStats }: ScoreBarProps): React.JSX.Element {
   const state = useGameState();
-  const { score, maxScore, foundWords, allWords, puzzle, gameOver, revealed } = state;
+  const { score, maxScore, foundWords, allWords, puzzle, gameOver, revealed, epoch } = state;
   const [ladderOpen, setLadderOpen] = useState(false);
   const rankBtnRef = useRef<HTMLButtonElement>(null);
   const popoverRef = useRef<HTMLDivElement>(null);
@@ -90,8 +89,8 @@ export function ScoreBar({ onOpenModal, onOpenStats, epochRef }: ScoreBarProps):
   const { copied: shareCopied, showFallback: shareShowFallback, fallbackText: shareFallbackText, handleShare: shareHandleShare } = useShare();
 
   function buildShareText(): string {
-    const date = epochRef.current && puzzle
-      ? formatShareDate(getPuzzleDateStr(epochRef.current, puzzle.index))
+    const date = epoch && puzzle
+      ? formatShareDate(getPuzzleDateStr(epoch, puzzle.index))
       : '—';
     const bar = buildProgressBar(score, maxScore);
     const pangramCount = puzzle ? foundWords.filter(w => isFoundWordPangram(w, puzzle)).length : 0;

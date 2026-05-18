@@ -13,13 +13,12 @@ import { formatShareDate, buildProgressBar, useShare } from '../utils/share';
 import { RANK } from '../utils/scoring';
 
 interface GameOverScreenProps {
-  epochRef: React.RefObject<string | null>;
   onPlayToday?: () => void;
 }
 
-export function GameOverScreen({ epochRef, onPlayToday }: GameOverScreenProps): React.JSX.Element {
+export function GameOverScreen({ onPlayToday }: GameOverScreenProps): React.JSX.Element {
   const state = useGameState();
-  const { score, maxScore, foundWords, allWords, puzzle, revealed } = state;
+  const { score, maxScore, foundWords, allWords, puzzle, revealed, epoch } = state;
 
   const pangramCount = puzzle
     ? foundWords.filter(w => isFoundWordPangram(w, puzzle)).length
@@ -31,8 +30,8 @@ export function GameOverScreen({ epochRef, onPlayToday }: GameOverScreenProps): 
   const { copied, showFallback, fallbackText, handleShare: shareHandleShare } = useShare();
 
   function buildShareText(): string {
-    const date = (epochRef.current && puzzle)
-      ? formatShareDate(getPuzzleDateStr(epochRef.current, puzzle.index))
+    const date = (epoch && puzzle)
+      ? formatShareDate(getPuzzleDateStr(epoch, puzzle.index))
       : '—';
     const bar = buildProgressBar(score, maxScore);
     const rankLine = revealed ? RANK.UNRANKED : `✦ ${RANK.GRAND_COLOPHON.toUpperCase()}`;

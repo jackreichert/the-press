@@ -12,6 +12,10 @@
  * No Phase 3 file calls window.localStorage directly — they all import from this module.
  */
 
+import type { PersistedState, HistoryEntry, PendingPuzzle } from './types';
+// Re-export so existing consumers that import these types from storage still compile.
+export type { PersistedState, HistoryEntry, PendingPuzzle } from './types';
+
 // ─── Base64 helpers ───────────────────────────────────────────────────────────
 
 /**
@@ -56,46 +60,6 @@ function detectLocalStorage(): boolean {
 
 const lsAvailable = detectLocalStorage();
 
-/** In-memory fallback store used when localStorage is unavailable. */
-const memStore = new Map<string, string>();
-
-// ─── Low-level access ─────────────────────────────────────────────────────────
-
-/** Module-private: read a raw string value from storage. Returns null if not found. */
-function storageGet(key: string): string | null {
-  try {
-    return lsAvailable ? window.localStorage.getItem(key) : (memStore.get(key) ?? null);
-  } catch {
-    return memStore.get(key) ?? null;
-  }
-}
-
-/** Module-private: write a raw string value to storage. Falls back to memStore on error. */
-function storageSet(key: string, value: string): void {
-  try {
-    if (lsAvailable) window.localStorage.setItem(key, value);
-    else memStore.set(key, value);
-  } catch {
-    memStore.set(key, value);
-  }
-}
-
-/** Module-private: remove a key from storage. */
-function storageRemove(key: string): void {
-  try {
-    if (lsAvailable) window.localStorage.removeItem(key);
-    else memStore.delete(key);
-  } catch {
-    memStore.delete(key);
-  }
-}
-
-// ─── Schema types ─────────────────────────────────────────────────────────────
-// Types are defined in types.ts and re-exported here for backward compatibility.
-
-export type { PersistedState, HistoryEntry, PendingPuzzle } from './types';
-import type { PersistedState, HistoryEntry, PendingPuzzle } from './types';
-
 // ─── Keys & versioning ────────────────────────────────────────────────────────
 
 const SCHEMA_VERSION = 1 as const;
@@ -106,80 +70,97 @@ const STORAGE_KEYS = {
   pending: 'thepress_pending_v1',
 } as const;
 
-// ─── Public helpers ───────────────────────────────────────────────────────────
+// ─── Storage adapter factory ──────────────────────────────────────────────────
+// Each factory call returns a fresh adapter with its own in-memory fallback Map.
+// This lets tests (or future isolated contexts) get completely independent storage
+// without sharing the module-level state.
+//
+// Usage in tests:
+//   const storage = createStorageAdapter();
+//   storage.appendHistory(entry);
+//   // ... assertions without touching module-level localStorage state
 
-/**
- * Read today's in-progress state.
- * Returns null if storage is unavailable, the key is missing, schema version
- * does not match (D-03), or the stored data is corrupt.
- */
-export function readState(): PersistedState | null {
-  const raw = storageGet(STORAGE_KEYS.state);
-  if (!raw) return null;
-  try {
-    const parsed = JSON.parse(fromBase64(raw)) as PersistedState;
-    if (parsed.v !== SCHEMA_VERSION) return null;
-    return parsed;
-  } catch {
-    return null;
+export interface StorageAdapter {
+  readState(): PersistedState | null;
+  saveState(data: Omit<PersistedState, 'v'>): void;
+  clearState(): void;
+  readHistory(): HistoryEntry[];
+  appendHistory(entry: HistoryEntry): void;
+  readPending(): PendingPuzzle | null;
+  savePending(data: Omit<PendingPuzzle, 'v'>): void;
+  clearPending(): void;
+}
+
+export function createStorageAdapter(): StorageAdapter {
+  const mem = new Map<string, string>();
+
+  function get(key: string): string | null {
+    try { return lsAvailable ? window.localStorage.getItem(key) : (mem.get(key) ?? null); }
+    catch { return mem.get(key) ?? null; }
   }
-}
-
-/**
- * Write today's in-progress state.
- * Automatically adds the v:1 schema version field (D-03).
- */
-export function saveState(data: Omit<PersistedState, 'v'>): void {
-  storageSet(STORAGE_KEYS.state, toBase64(JSON.stringify({ v: SCHEMA_VERSION, ...data })));
-}
-
-/**
- * Remove the in-progress state key from storage.
- * Called on new-day detection and after a completed game is written to history.
- */
-export function clearState(): void {
-  storageRemove(STORAGE_KEYS.state);
-}
-
-/**
- * Read the full history array.
- * Returns an empty array if storage is unavailable, the key is missing, or data is corrupt.
- * Never throws.
- */
-export function readHistory(): HistoryEntry[] {
-  const raw = storageGet(STORAGE_KEYS.history);
-  if (!raw) return [];
-  try {
-    const parsed = JSON.parse(fromBase64(raw)) as HistoryEntry[];
-    return Array.isArray(parsed) ? parsed : [];
-  } catch {
-    return [];
+  function set(key: string, value: string): void {
+    try { if (lsAvailable) window.localStorage.setItem(key, value); else mem.set(key, value); }
+    catch { mem.set(key, value); }
   }
+  function remove(key: string): void {
+    try { if (lsAvailable) window.localStorage.removeItem(key); else mem.delete(key); }
+    catch { mem.delete(key); }
+  }
+
+  const adapter: StorageAdapter = {
+    readState(): PersistedState | null {
+      const raw = get(STORAGE_KEYS.state);
+      if (!raw) return null;
+      try {
+        const parsed = JSON.parse(fromBase64(raw)) as PersistedState;
+        return parsed.v === SCHEMA_VERSION ? parsed : null;
+      } catch { return null; }
+    },
+    saveState(data: Omit<PersistedState, 'v'>): void {
+      set(STORAGE_KEYS.state, toBase64(JSON.stringify({ v: SCHEMA_VERSION, ...data })));
+    },
+    clearState(): void { remove(STORAGE_KEYS.state); },
+
+    readHistory(): HistoryEntry[] {
+      const raw = get(STORAGE_KEYS.history);
+      if (!raw) return [];
+      try {
+        const parsed = JSON.parse(fromBase64(raw)) as HistoryEntry[];
+        return Array.isArray(parsed) ? parsed : [];
+      } catch { return []; }
+    },
+    appendHistory(entry: HistoryEntry): void {
+      const history = adapter.readHistory();
+      history.push(entry);
+      set(STORAGE_KEYS.history, toBase64(JSON.stringify(history)));
+    },
+
+    readPending(): PendingPuzzle | null {
+      const raw = get(STORAGE_KEYS.pending);
+      if (!raw) return null;
+      try {
+        const parsed = JSON.parse(fromBase64(raw)) as PendingPuzzle;
+        return parsed.v === SCHEMA_VERSION ? parsed : null;
+      } catch { return null; }
+    },
+    savePending(data: Omit<PendingPuzzle, 'v'>): void {
+      set(STORAGE_KEYS.pending, toBase64(JSON.stringify({ v: SCHEMA_VERSION, ...data })));
+    },
+    clearPending(): void { remove(STORAGE_KEYS.pending); },
+  };
+  return adapter;
 }
 
-export function readPending(): PendingPuzzle | null {
-  const raw = storageGet(STORAGE_KEYS.pending);
-  if (!raw) return null;
-  try {
-    const parsed = JSON.parse(fromBase64(raw)) as PendingPuzzle;
-    return parsed.v === SCHEMA_VERSION ? parsed : null;
-  } catch { return null; }
-}
+// ─── Module-level default instance ───────────────────────────────────────────
+// All app imports (readState, saveState, etc.) delegate here. No call-site changes.
 
-export function savePending(data: Omit<PendingPuzzle, 'v'>): void {
-  storageSet(STORAGE_KEYS.pending, toBase64(JSON.stringify({ v: SCHEMA_VERSION, ...data })));
-}
+const _default = createStorageAdapter();
 
-export function clearPending(): void {
-  storageRemove(STORAGE_KEYS.pending);
-}
-
-/**
- * Append one entry to the history array.
- * Reads current history, pushes the new entry, then writes the updated array.
- */
-export function appendHistory(entry: HistoryEntry): void {
-  const history = readHistory();
-  history.push(entry);
-  storageSet(STORAGE_KEYS.history, toBase64(JSON.stringify(history)));
-}
+export function readState(): PersistedState | null        { return _default.readState(); }
+export function saveState(data: Omit<PersistedState, 'v'>): void { _default.saveState(data); }
+export function clearState(): void                        { _default.clearState(); }
+export function readHistory(): HistoryEntry[]             { return _default.readHistory(); }
+export function appendHistory(entry: HistoryEntry): void  { _default.appendHistory(entry); }
+export function readPending(): PendingPuzzle | null       { return _default.readPending(); }
+export function savePending(data: Omit<PendingPuzzle, 'v'>): void { _default.savePending(data); }
+export function clearPending(): void                      { _default.clearPending(); }

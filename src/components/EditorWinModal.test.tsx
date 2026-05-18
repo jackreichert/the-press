@@ -1,18 +1,12 @@
-import React, { createRef } from 'react';
+import React from 'react';
 import { screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { renderWithGame, TEST_WORDS, PUZZLE_LOADED, DICT_LOADED } from '../test/helpers';
+import { renderWithGame, TEST_WORDS, PUZZLE_LOADED, DICT_LOADED, SCHEDULE_LOADED } from '../test/helpers';
 import { EditorWinModal } from './EditorWinModal';
 // Restore most (not all) words so wordsLeft > 0
 const RESTORE_PARTIAL = { type: 'RESTORE_STATE' as const, foundWords: ['drip', 'pine', 'pier', 'pint', 'pride', 'print', 'printed', 'ripe'], score: 29 };
 // Restore all words (Laureate + Grand Colophon)
 const RESTORE_ALL = { type: 'RESTORE_STATE' as const, foundWords: TEST_WORDS, score: 30 };
-
-function makeEpochRef(epoch: string): React.RefObject<string | null> {
-  const ref = createRef<string | null>();
-  (ref as React.MutableRefObject<string | null>).current = epoch;
-  return ref;
-}
 
 const writeTextMock = vi.fn();
 const onKeepPlaying = vi.fn();
@@ -35,57 +29,51 @@ afterEach(() => {
 
 describe('EditorWinModal display', () => {
   it('shows "Laureate" headline', () => {
-    const epochRef = makeEpochRef('2026-01-01');
     renderWithGame(
-      <EditorWinModal epochRef={epochRef} onKeepPlaying={onKeepPlaying} />,
-      { initialActions: [PUZZLE_LOADED, DICT_LOADED, RESTORE_PARTIAL] },
+      <EditorWinModal onKeepPlaying={onKeepPlaying} />,
+      { initialActions: [PUZZLE_LOADED, DICT_LOADED, SCHEDULE_LOADED, RESTORE_PARTIAL] },
     );
     expect(screen.getByRole('heading', { name: 'Laureate' })).toBeInTheDocument();
   });
 
   it('shows "You\'ve reached" eyebrow text', () => {
-    const epochRef = makeEpochRef('2026-01-01');
     renderWithGame(
-      <EditorWinModal epochRef={epochRef} onKeepPlaying={onKeepPlaying} />,
-      { initialActions: [PUZZLE_LOADED, DICT_LOADED, RESTORE_PARTIAL] },
+      <EditorWinModal onKeepPlaying={onKeepPlaying} />,
+      { initialActions: [PUZZLE_LOADED, DICT_LOADED, SCHEDULE_LOADED, RESTORE_PARTIAL] },
     );
     expect(screen.getByText(/You've reached/i)).toBeInTheDocument();
   });
 
   it('shows score and word count', () => {
-    const epochRef = makeEpochRef('2026-01-01');
     renderWithGame(
-      <EditorWinModal epochRef={epochRef} onKeepPlaying={onKeepPlaying} />,
-      { initialActions: [PUZZLE_LOADED, DICT_LOADED, RESTORE_PARTIAL] },
+      <EditorWinModal onKeepPlaying={onKeepPlaying} />,
+      { initialActions: [PUZZLE_LOADED, DICT_LOADED, SCHEDULE_LOADED, RESTORE_PARTIAL] },
     );
     expect(screen.getByText(/29 pts/i)).toBeInTheDocument();
     expect(screen.getByText(/8 of 9 words/i)).toBeInTheDocument();
   });
 
   it('shows words-left hint when words remain', () => {
-    const epochRef = makeEpochRef('2026-01-01');
     renderWithGame(
-      <EditorWinModal epochRef={epochRef} onKeepPlaying={onKeepPlaying} />,
-      { initialActions: [PUZZLE_LOADED, DICT_LOADED, RESTORE_PARTIAL] },
+      <EditorWinModal onKeepPlaying={onKeepPlaying} />,
+      { initialActions: [PUZZLE_LOADED, DICT_LOADED, SCHEDULE_LOADED, RESTORE_PARTIAL] },
     );
     expect(screen.getByText(/1 word left/i)).toBeInTheDocument();
     expect(screen.getByText(/Grand Colophon/i)).toBeInTheDocument();
   });
 
   it('does not show words-left hint when all words found', () => {
-    const epochRef = makeEpochRef('2026-01-01');
     renderWithGame(
-      <EditorWinModal epochRef={epochRef} onKeepPlaying={onKeepPlaying} />,
-      { initialActions: [PUZZLE_LOADED, DICT_LOADED, RESTORE_ALL] },
+      <EditorWinModal onKeepPlaying={onKeepPlaying} />,
+      { initialActions: [PUZZLE_LOADED, DICT_LOADED, SCHEDULE_LOADED, RESTORE_ALL] },
     );
     expect(screen.queryByText(/word.*left/i)).toBeNull();
   });
 
   it('renders as a dialog', () => {
-    const epochRef = makeEpochRef('2026-01-01');
     renderWithGame(
-      <EditorWinModal epochRef={epochRef} onKeepPlaying={onKeepPlaying} />,
-      { initialActions: [PUZZLE_LOADED, DICT_LOADED, RESTORE_PARTIAL] },
+      <EditorWinModal onKeepPlaying={onKeepPlaying} />,
+      { initialActions: [PUZZLE_LOADED, DICT_LOADED, SCHEDULE_LOADED, RESTORE_PARTIAL] },
     );
     expect(screen.getByRole('dialog')).toBeInTheDocument();
   });
@@ -94,10 +82,9 @@ describe('EditorWinModal display', () => {
 describe('EditorWinModal Keep Playing button', () => {
   it('calls onKeepPlaying when "Keep Playing →" button is clicked', async () => {
     const user = userEvent.setup();
-    const epochRef = makeEpochRef('2026-01-01');
     renderWithGame(
-      <EditorWinModal epochRef={epochRef} onKeepPlaying={onKeepPlaying} />,
-      { initialActions: [PUZZLE_LOADED, DICT_LOADED, RESTORE_PARTIAL] },
+      <EditorWinModal onKeepPlaying={onKeepPlaying} />,
+      { initialActions: [PUZZLE_LOADED, DICT_LOADED, SCHEDULE_LOADED, RESTORE_PARTIAL] },
     );
     await user.click(screen.getByRole('button', { name: 'Keep Playing →' }));
     expect(onKeepPlaying).toHaveBeenCalledTimes(1);
@@ -105,10 +92,9 @@ describe('EditorWinModal Keep Playing button', () => {
 
   it('calls onKeepPlaying when the close (✕) button is clicked', async () => {
     const user = userEvent.setup();
-    const epochRef = makeEpochRef('2026-01-01');
     renderWithGame(
-      <EditorWinModal epochRef={epochRef} onKeepPlaying={onKeepPlaying} />,
-      { initialActions: [PUZZLE_LOADED, DICT_LOADED, RESTORE_PARTIAL] },
+      <EditorWinModal onKeepPlaying={onKeepPlaying} />,
+      { initialActions: [PUZZLE_LOADED, DICT_LOADED, SCHEDULE_LOADED, RESTORE_PARTIAL] },
     );
     await user.click(screen.getByRole('button', { name: 'Keep playing' }));
     expect(onKeepPlaying).toHaveBeenCalledTimes(1);
@@ -117,10 +103,9 @@ describe('EditorWinModal Keep Playing button', () => {
 
 describe('EditorWinModal share', () => {
   it('has a Share Result button', () => {
-    const epochRef = makeEpochRef('2026-01-01');
     renderWithGame(
-      <EditorWinModal epochRef={epochRef} onKeepPlaying={onKeepPlaying} />,
-      { initialActions: [PUZZLE_LOADED, DICT_LOADED, RESTORE_PARTIAL] },
+      <EditorWinModal onKeepPlaying={onKeepPlaying} />,
+      { initialActions: [PUZZLE_LOADED, DICT_LOADED, SCHEDULE_LOADED, RESTORE_PARTIAL] },
     );
     expect(screen.getByRole('button', { name: /Share result/i })).toBeInTheDocument();
   });
@@ -133,10 +118,9 @@ describe('EditorWinModal share', () => {
       writable: true,
       enumerable: true,
     });
-    const epochRef = makeEpochRef('2026-01-01');
     renderWithGame(
-      <EditorWinModal epochRef={epochRef} onKeepPlaying={onKeepPlaying} />,
-      { initialActions: [PUZZLE_LOADED, DICT_LOADED, RESTORE_PARTIAL] },
+      <EditorWinModal onKeepPlaying={onKeepPlaying} />,
+      { initialActions: [PUZZLE_LOADED, DICT_LOADED, SCHEDULE_LOADED, RESTORE_PARTIAL] },
     );
     await user.click(screen.getByRole('button', { name: /Share result/i }));
     await waitFor(() => {
@@ -154,10 +138,9 @@ describe('EditorWinModal share', () => {
       writable: true,
       enumerable: true,
     });
-    const epochRef = makeEpochRef('2026-01-01');
     renderWithGame(
-      <EditorWinModal epochRef={epochRef} onKeepPlaying={onKeepPlaying} />,
-      { initialActions: [PUZZLE_LOADED, DICT_LOADED, RESTORE_PARTIAL] },
+      <EditorWinModal onKeepPlaying={onKeepPlaying} />,
+      { initialActions: [PUZZLE_LOADED, DICT_LOADED, SCHEDULE_LOADED, RESTORE_PARTIAL] },
     );
     await user.click(screen.getByRole('button', { name: /Share result/i }));
     await waitFor(() => expect(writeTextMock).toHaveBeenCalled());
@@ -176,10 +159,9 @@ describe('EditorWinModal share fallback', () => {
       writable: true,
       enumerable: true,
     });
-    const epochRef = makeEpochRef('2026-01-01');
     renderWithGame(
-      <EditorWinModal epochRef={epochRef} onKeepPlaying={onKeepPlaying} />,
-      { initialActions: [PUZZLE_LOADED, DICT_LOADED, RESTORE_PARTIAL] },
+      <EditorWinModal onKeepPlaying={onKeepPlaying} />,
+      { initialActions: [PUZZLE_LOADED, DICT_LOADED, SCHEDULE_LOADED, RESTORE_PARTIAL] },
     );
     await user.click(screen.getByRole('button', { name: /Share result/i }));
     await waitFor(() => {
@@ -190,10 +172,9 @@ describe('EditorWinModal share fallback', () => {
 
 describe('EditorWinModal words-left phrasing', () => {
   it('uses singular "word" when exactly 1 word remains', () => {
-    const epochRef = makeEpochRef('2026-01-01');
     renderWithGame(
-      <EditorWinModal epochRef={epochRef} onKeepPlaying={onKeepPlaying} />,
-      { initialActions: [PUZZLE_LOADED, DICT_LOADED, RESTORE_PARTIAL] },
+      <EditorWinModal onKeepPlaying={onKeepPlaying} />,
+      { initialActions: [PUZZLE_LOADED, DICT_LOADED, SCHEDULE_LOADED, RESTORE_PARTIAL] },
     );
     // RESTORE_PARTIAL has 8 of 9 words → 1 left
     expect(screen.getByText(/1 word left/)).toBeInTheDocument();
@@ -202,9 +183,8 @@ describe('EditorWinModal words-left phrasing', () => {
 
   it('uses plural "words" when more than 1 word remains', () => {
     const RESTORE_FEW = { type: 'RESTORE_STATE' as const, foundWords: ['drip', 'pine', 'pier', 'pint', 'pride', 'print'], score: 13 };
-    const epochRef = makeEpochRef('2026-01-01');
     renderWithGame(
-      <EditorWinModal epochRef={epochRef} onKeepPlaying={onKeepPlaying} />,
+      <EditorWinModal onKeepPlaying={onKeepPlaying} />,
       { initialActions: [PUZZLE_LOADED, DICT_LOADED, RESTORE_FEW] },
     );
     expect(screen.getByText(/3 words left/)).toBeInTheDocument();

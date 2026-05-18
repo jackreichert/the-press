@@ -33,6 +33,8 @@ export interface GameState {
   revealed: boolean;
   /** True when today's puzzle is waiting — the player is finishing a previous day first. */
   hasPendingToday: boolean;
+  /** Game epoch string (e.g. "2026-05-12") — set once when schedule.json loads. */
+  epoch: string | null;
   dictLoaded: boolean;
   scheduleError: boolean;
   dictError: boolean;
@@ -54,7 +56,8 @@ export type GameAction =
   | { type: 'RESTORE_STATE'; foundWords: string[]; score: number }
   | { type: 'REVEAL_REMAINING' }
   | { type: 'SET_PENDING_TODAY' }
-  | { type: 'SWITCH_PUZZLE'; puzzle: PuzzleEntry; allWords: string[]; maxScore: number; dict: Set<string> };
+  | { type: 'SWITCH_PUZZLE'; puzzle: PuzzleEntry; allWords: string[]; maxScore: number; dict: Set<string> }
+  | { type: 'SCHEDULE_LOADED'; epoch: string };
 
 // ─── Initial state ────────────────────────────────────────────────────────────
 
@@ -74,6 +77,7 @@ export const initialState: GameState = {
   gameOver: false,
   revealed: false,
   hasPendingToday: false,
+  epoch: null,
   dictLoaded: false,
   scheduleError: false,
   dictError: false,
@@ -173,6 +177,9 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
         dictLoaded: true,
       };
     }
+
+    case 'SCHEDULE_LOADED':
+      return { ...state, epoch: action.epoch };
 
     case 'SCHEDULE_ERROR':
       return { ...state, scheduleError: true };

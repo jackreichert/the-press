@@ -15,6 +15,7 @@ export const TEST_PUZZLE: PuzzleEntry = {
 export const TEST_WORDS = ['drip', 'pine', 'pier', 'pint', 'pride', 'print', 'printed', 'ripe', 'trip'];
 export const PUZZLE_LOADED = { type: 'PUZZLE_LOADED' as const, puzzle: TEST_PUZZLE };
 export const DICT_LOADED = { type: 'DICT_LOADED' as const, words: TEST_WORDS };
+export const SCHEDULE_LOADED = { type: 'SCHEDULE_LOADED' as const, epoch: '2026-01-01' };
 
 // ─── KeyboardConnector ────────────────────────────────────────────────────────
 // Mirrors the document-level keyboard listener in App.tsx so tests can

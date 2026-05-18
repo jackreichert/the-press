@@ -12,12 +12,11 @@ import { useFocusTrap } from '../hooks/useFocusTrap';
 import { formatShareDate, buildProgressBar, useShare } from '../utils/share';
 
 interface EditorWinModalProps {
-  epochRef: React.RefObject<string | null>;
   onKeepPlaying: () => void;
 }
 
-export function EditorWinModal({ epochRef, onKeepPlaying }: EditorWinModalProps): React.JSX.Element {
-  const { score, maxScore, foundWords, allWords, puzzle } = useGameState();
+export function EditorWinModal({ onKeepPlaying }: EditorWinModalProps): React.JSX.Element {
+  const { score, maxScore, foundWords, allWords, puzzle, epoch } = useGameState();
   const cardRef = useRef<HTMLDivElement>(null);
   const { copied, showFallback, fallbackText, handleShare: shareHandleShare } = useShare();
 
@@ -28,8 +27,8 @@ export function EditorWinModal({ epochRef, onKeepPlaying }: EditorWinModalProps)
   const wordsLeft = allWords.length - foundWords.length;
 
   function buildShareText(): string {
-    const date = epochRef.current && puzzle
-      ? formatShareDate(getPuzzleDateStr(epochRef.current, puzzle.index))
+    const date = epoch && puzzle
+      ? formatShareDate(getPuzzleDateStr(epoch, puzzle.index))
       : '—';
     const pangramLine = pangramCount > 0 ? ` · ✦ ${pangramCount}` : '';
     const rule = '━━━━━━━━━━━━━━━━━━━━━';
