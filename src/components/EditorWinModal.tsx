@@ -10,7 +10,8 @@ import { useGameState } from '../context/GameContext';
 import { isFoundWordPangram } from '../utils/puzzle';
 import { getPuzzleDateStr } from '../utils/date';
 import { useFocusTrap } from '../hooks/useFocusTrap';
-import { formatShareDate, buildProgressBar, useShare } from '../utils/share';
+import { formatShareDate, buildProgressBar, buildShareText, useShare, type ShareContext } from '../utils/share';
+import { RANK } from '../utils/scoring';
 
 interface EditorWinModalProps {
   onKeepPlaying: () => void;
@@ -27,25 +28,15 @@ export function EditorWinModal({ onKeepPlaying }: EditorWinModalProps): React.JS
   const pangramCount = puzzle ? foundWords.filter(w => isFoundWordPangram(w, puzzle)).length : 0;
   const wordsLeft = allWords.length - foundWords.length;
 
-  function buildShareText(): string {
-    const date = epoch && puzzle
-      ? formatShareDate(getPuzzleDateStr(epoch, puzzle.index))
-      : '—';
-    const pangramLine = pangramCount > 0 ? ` · ✦ ${pangramCount}` : '';
-    const rule = '━━━━━━━━━━━━━━━━━━━━━';
-    return [
-      `The Press · ${date}`,
-      rule,
-      `  EDITOR IN CHIEF`,
-      `  ${bar} ${score} pts`,
-      `  ${foundWords.length} words found${pangramLine}`,
-      rule,
-      `  thepress.app`,
-    ].join('\n');
-  }
-
   function handleShare(): Promise<void> {
-    return shareHandleShare(buildShareText());
+    const ctx: ShareContext = {
+      date: epoch && puzzle ? formatShareDate(getPuzzleDateStr(epoch, puzzle.index)) : '—',
+      rankLine: RANK.LAUREATE.toUpperCase(),
+      barLine: `${bar} ${score} pts`,
+      wordsLine: `${foundWords.length} words found`,
+      pangramLine: pangramCount > 0 ? ` · ✦ ${pangramCount}` : '',
+    };
+    return shareHandleShare(buildShareText(ctx));
   }
 
   return (

@@ -9,7 +9,7 @@ import { useGameState, useGameDispatch } from './context/GameContext';
 import { getPuzzleDateStr } from './utils/date';
 import { getRank, RANK } from './utils/scoring';
 import { saveState, clearState, appendHistory, readHistory } from './storage';
-import type { HistoryEntry } from './types';
+import type { HistoryEntry, PuzzleEntry } from './types';
 import { ScoreBar } from './components/ScoreBar';
 import { WordDisplay } from './components/WordDisplay';
 import { LetterGrid } from './components/LetterGrid';
@@ -18,6 +18,24 @@ import { FoundWordsModal } from './components/FoundWordsModal';
 import { GameOverScreen } from './components/GameOverScreen';
 import { EditorWinModal } from './components/EditorWinModal';
 import { StatsModal } from './components/StatsModal';
+
+// ─── Pure helpers ─────────────────────────────────────────────────────────────
+
+export function buildHistoryEntry(
+  epoch: string,
+  puzzle: PuzzleEntry,
+  state: { score: number; foundWords: string[]; allWords: string[]; revealed: boolean; maxScore: number },
+): HistoryEntry {
+  const isGrandColophon = !state.revealed && state.foundWords.length === state.allWords.length;
+  return {
+    date: getPuzzleDateStr(epoch, puzzle.index),
+    score: state.score,
+    rank: isGrandColophon ? RANK.GRAND_COLOPHON : getRank(state.score, state.maxScore).name,
+    foundCount: state.foundWords.length,
+    totalCount: state.allWords.length,
+    completed: !state.revealed,
+  };
+}
 
 // ─── Props ────────────────────────────────────────────────────────────────────
 
@@ -95,26 +113,15 @@ export function GameLayout({ onPlayToday, newDayAvailable }: GameLayoutProps): R
   // STOR-02: append history entry when game is complete
   useEffect(() => {
     if (!state.gameOver || !state.puzzle || !state.epoch) return;
-    const date = getPuzzleDateStr(state.epoch, state.puzzle.index);
+    const entry = buildHistoryEntry(state.epoch, state.puzzle, state);
     // Guard: if this date is already in history the game-over was restored from
     // localStorage (Grand Colophon reload), not a new win — skip re-appending.
-    if (readHistory().some(e => e.date === date)) return;
-    const isGrandColophon = !state.revealed && state.foundWords.length === state.allWords.length;
-    const rankName = isGrandColophon
-      ? RANK.GRAND_COLOPHON
-      : getRank(state.score, state.maxScore).name;
-    const entry: HistoryEntry = {
-      date,
-      score: state.score,
-      rank: rankName,
-      foundCount: state.foundWords.length,
-      totalCount: state.allWords.length,
-      completed: !state.revealed,
-    };
+    if (readHistory().some(e => e.date === entry.date)) return;
     appendHistory(entry);
     // For Grand Colophon preserve the saved state so the player can reload and
     // see the win screen for the rest of the day. STOR-01 already wrote it.
     // For revealed endings clear immediately — no reason to restore "better luck".
+    const isGrandColophon = entry.completed && entry.foundCount === entry.totalCount;
     if (!isGrandColophon) {
       clearState();
     }

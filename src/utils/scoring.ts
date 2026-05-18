@@ -23,18 +23,23 @@ export const RANK_TIERS = [
   { name: 'Laureate',        threshold: 89 },
 ] as const;
 
-/** Exported rank name constants — use these instead of string literals for comparisons. */
+/**
+ * Rank name constants derived from RANK_TIERS — single source of truth.
+ * Adding or renaming a tier in RANK_TIERS automatically updates these constants.
+ * GRAND_COLOPHON and UNRANKED are not tiers but are used in share text and UI,
+ * so they live here as the canonical strings.
+ */
 export const RANK = {
-  PRINTERS_DEVIL: "Printer's Devil",
-  APPRENTICE:     'Apprentice',
-  JOURNEYMAN:     'Journeyman',
-  TYPESETTER:     'Typesetter',
-  EDITOR:         'Editor',
-  WORDSMITH:      'Wordsmith',
-  NOVELIST:       'Novelist',
-  LAUREATE:       'Laureate',
-  GRAND_COLOPHON: 'Grand Colophon',
-  UNRANKED:       '—',
+  PRINTERS_DEVIL:  RANK_TIERS[0].name,
+  APPRENTICE:      RANK_TIERS[1].name,
+  JOURNEYMAN:      RANK_TIERS[2].name,
+  TYPESETTER:      RANK_TIERS[3].name,
+  EDITOR:          RANK_TIERS[4].name,
+  WORDSMITH:       RANK_TIERS[5].name,
+  NOVELIST:        RANK_TIERS[6].name,
+  LAUREATE:        RANK_TIERS[7].name,
+  GRAND_COLOPHON:  'Grand Colophon',   // special end state — not a scored tier
+  UNRANKED:        '—',               // pre-game / dict not loaded
 } as const;
 
 export type RankName = typeof RANK[keyof typeof RANK];
@@ -76,7 +81,7 @@ export interface RankResult {
 
 /**
  * Return the player's current rank name and tier thresholds for the progress bar.
- * Editor in Chief is the top rank. Grand Colophon is not surfaced in the UI.
+ * Laureate is the top visible rank. Grand Colophon is not surfaced in the UI.
  * Returns name '—' with current=0,next=0 when maxScore is 0 (dict not loaded).
  * D-15 threshold formula: Math.floor(score / maxScore * 100).
  */
@@ -87,7 +92,6 @@ export function getRank(score: number, maxScore: number): RankResult {
   for (let i = 0; i < RANK_TIERS.length; i++) {
     if (pct >= RANK_TIERS[i].threshold) tierIdx = i;
   }
-  if (tierIdx === -1) return { name: RANK_TIERS[0].name, current: 0, next: RANK_TIERS[0].threshold, nextName: RANK_TIERS[0].name };
   const tier = RANK_TIERS[tierIdx];
   const nextTier = RANK_TIERS[tierIdx + 1];
   return { name: tier.name, current: tier.threshold, next: nextTier?.threshold ?? 100, nextName: nextTier?.name ?? '' };

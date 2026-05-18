@@ -83,18 +83,40 @@ export const initialState: GameState = {
   dictError: false,
 };
 
+// ─── Private helpers ──────────────────────────────────────────────────────────
+
+/** Extract the 6 non-center letters in lowercase display order from a puzzle. */
+function buildSurroundingOrder(puzzle: PuzzleEntry): string[] {
+  return puzzle.letters
+    .filter(l => l !== puzzle.centerLetter)
+    .map(l => l.toLowerCase());
+}
+
+/**
+ * Validate a submitted word against the current game state.
+ * Returns an error message string, or null if the word is valid.
+ */
+function validateWord(state: GameState, word: string): string | null {
+  if (!state.dictLoaded || !state.dict || !state.puzzle) {
+    return 'Loading dictionary...';
+  }
+  if (word.length < 4) return 'Too short';
+  const centerLower = state.puzzle.centerLetter.toLowerCase();
+  if (!word.includes(centerLower)) return 'Missing center letter';
+  if (!state.allWordsSet.has(word)) return 'Not a word';
+  if (state.foundWords.includes(word)) return 'Already found';
+  return null;
+}
+
 // ─── Reducer ──────────────────────────────────────────────────────────────────
 
 export function gameReducer(state: GameState, action: GameAction): GameState {
   switch (action.type) {
     case 'PUZZLE_LOADED': {
-      const surrounding = action.puzzle.letters
-        .filter(l => l !== action.puzzle.centerLetter)
-        .map(l => l.toLowerCase());
       return {
         ...state,
         puzzle: action.puzzle,
-        surroundingOrder: surrounding,
+        surroundingOrder: buildSurroundingOrder(action.puzzle),
         scheduleError: false,
       };
     }
@@ -163,13 +185,10 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
       return { ...state, hasPendingToday: true };
 
     case 'SWITCH_PUZZLE': {
-      const surrounding = action.puzzle.letters
-        .filter(l => l !== action.puzzle.centerLetter)
-        .map(l => l.toLowerCase());
       return {
         ...initialState,
         puzzle: action.puzzle,
-        surroundingOrder: surrounding,
+        surroundingOrder: buildSurroundingOrder(action.puzzle),
         dict: action.dict,
         allWords: action.allWords,
         allWordsSet: new Set(action.allWords),
@@ -196,36 +215,13 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
 
 function handleSubmit(state: GameState): GameState {
   if (state.errorPending) return state;
-
-  // Pitfall 2: guard dictLoaded first — dict may be null during load
-  if (!state.dictLoaded || !state.dict || !state.puzzle) {
-    return withError(state, 'Loading dictionary...');
-  }
-
   const word = state.currentWord.toLowerCase();
-
   if (word.length === 0) return state;
-
-  if (word.length < 4) {
-    return withError(state, 'Too short');
-  }
-
-  const centerLower = state.puzzle.centerLetter.toLowerCase();
-  if (!word.includes(centerLower)) {
-    return withError(state, 'Missing center letter');
-  }
-
-  // Check puzzle-valid word set (not full dict) — allWords are pre-filtered to use only puzzle letters
-  if (!state.allWordsSet.has(word)) {
-    return withError(state, 'Not a word');
-  }
-
-  if (state.foundWords.includes(word)) {
-    return withError(state, 'Already found');
-  }
+  const err = validateWord(state, word);
+  if (err) return withError(state, err);
 
   // Valid word — compute score
-  const pangramWord = isFoundWordPangram(word, state.puzzle);
+  const pangramWord = isFoundWordPangram(word, state.puzzle!);
   const points = scoreWord(word, pangramWord);
   const newScore = state.score + points;
   const newFoundWords = [...state.foundWords, word];

@@ -141,6 +141,46 @@ describe('ScoreBar next-rank hint', () => {
   });
 });
 
+describe('ScoreBar inline share button', () => {
+  const writeTextMock = vi.fn().mockResolvedValue(undefined);
+
+  beforeEach(() => {
+    writeTextMock.mockReset();
+    writeTextMock.mockResolvedValue(undefined);
+    Object.defineProperty(navigator, 'clipboard', {
+      value: { writeText: writeTextMock },
+      configurable: true,
+      writable: true,
+    });
+  });
+
+  it('share button not visible before any words found', () => {
+    renderWithGame(<ScoreBar onOpenModal={onOpenModal} onOpenStats={onOpenStats} />, {
+      initialActions: [PUZZLE_LOADED, DICT_LOADED, SCHEDULE_LOADED],
+    });
+    expect(screen.queryByRole('button', { name: /Share result/i })).toBeNull();
+  });
+
+  it('share button appears after scoring and copies text on click', async () => {
+    const user = userEvent.setup();
+    Object.defineProperty(navigator, 'clipboard', {
+      value: { writeText: writeTextMock },
+      configurable: true,
+      writable: true,
+    });
+    renderWithGame(<ScoreBar onOpenModal={onOpenModal} onOpenStats={onOpenStats} />, {
+      initialActions: [
+        PUZZLE_LOADED, DICT_LOADED, SCHEDULE_LOADED,
+        { type: 'RESTORE_STATE', foundWords: ['drip', 'pine', 'printed'], score: 1 + 4 + 14 },
+      ],
+    });
+    const shareBtn = screen.getByRole('button', { name: /Share result/i });
+    await user.click(shareBtn);
+    expect(writeTextMock).toHaveBeenCalledTimes(1);
+    expect(writeTextMock).toHaveBeenCalledWith(expect.stringContaining('thepress.app'));
+  });
+});
+
 describe('ScoreBar Grand Colophon rank', () => {
   const ALL_WORDS_ACTIONS = [
     PUZZLE_LOADED,
@@ -168,6 +208,18 @@ describe('ScoreBar Grand Colophon rank', () => {
       initialActions: ALL_WORDS_ACTIONS,
     });
     expect(screen.queryByText(/pts to/i)).toBeNull();
+  });
+
+  it('shows Laureate (not Grand Colophon) when gameOver via reveal', () => {
+    // gameOver=true AND revealed=true → isGrandColophon=false → rank stays at Laureate
+    renderWithGame(<ScoreBar onOpenModal={onOpenModal} onOpenStats={onOpenStats} />, {
+      initialActions: [
+        PUZZLE_LOADED, DICT_LOADED,
+        { type: 'RESTORE_STATE', foundWords: ['drip', 'pine'], score: 2 },
+        { type: 'REVEAL_REMAINING' },
+      ],
+    });
+    expect(screen.queryByText('Grand Colophon')).toBeNull();
   });
 
   it('does not show "Grand Colophon" rank before all words are found', () => {

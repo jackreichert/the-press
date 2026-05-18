@@ -10,7 +10,7 @@ import React from 'react';
 import { useGameState } from '../context/GameContext';
 import { isFoundWordPangram } from '../utils/puzzle';
 import { getPuzzleDateStr } from '../utils/date';
-import { formatShareDate, buildProgressBar, useShare } from '../utils/share';
+import { formatShareDate, buildProgressBar, buildShareText, useShare, type ShareContext } from '../utils/share';
 import { RANK } from '../utils/scoring';
 
 interface GameOverScreenProps {
@@ -30,27 +30,15 @@ export function GameOverScreen({ onPlayToday }: GameOverScreenProps): React.JSX.
 
   const { copied, showFallback, fallbackText, handleShare: shareHandleShare } = useShare();
 
-  function buildShareText(): string {
-    const date = (epoch && puzzle)
-      ? formatShareDate(getPuzzleDateStr(epoch, puzzle.index))
-      : '—';
-    const bar = buildProgressBar(score, maxScore);
-    const rankLine = revealed ? RANK.UNRANKED : `✦ ${RANK.GRAND_COLOPHON.toUpperCase()}`;
-    const pangramLine = pangramCount > 0 ? `  ✦ ${pangramCount} pangram${pangramCount !== 1 ? 's' : ''}` : '';
-    const rule = '━━━━━━━━━━━━━━━━━━━━━';
-    return [
-      `The Press · ${date}`,
-      rule,
-      `  ${rankLine}`,
-      `  ${bar} ${score} pts`,
-      `  All ${foundWords.length} words${pangramLine}`,
-      rule,
-      `  thepress.app`,
-    ].join('\n');
-  }
-
   function handleShare(): Promise<void> {
-    return shareHandleShare(buildShareText());
+    const ctx: ShareContext = {
+      date: epoch && puzzle ? formatShareDate(getPuzzleDateStr(epoch, puzzle.index)) : '—',
+      rankLine: revealed ? RANK.UNRANKED : `✦ ${RANK.GRAND_COLOPHON.toUpperCase()}`,
+      barLine: `${buildProgressBar(score, maxScore)} ${score} pts`,
+      wordsLine: `All ${foundWords.length} words`,
+      pangramLine: pangramCount > 0 ? `  ✦ ${pangramCount} pangram${pangramCount !== 1 ? 's' : ''}` : '',
+    };
+    return shareHandleShare(buildShareText(ctx));
   }
 
   return (

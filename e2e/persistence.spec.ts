@@ -43,8 +43,8 @@ test('page reload restores found words and score', async ({ page }) => {
   // Submit one word — triggers the saveState useEffect (STOR-01)
   await submitWord(page, 'drip');
 
-  // Confirm the ScoreBar shows 1/9 (format: "Score: 1 · 1/9 words ▾")
-  await expect(page.locator('button.score-count')).toContainText('1/9');
+  // Confirm the ScoreBar shows "1 words" in the score button
+  await expect(page.locator('button.score-count')).toContainText('1 words');
 
   // Re-freeze clock BEFORE reload so puzzle index stays 0 after load
   await page.clock.setSystemTime(new Date('2026-01-01T12:00:00'));
@@ -54,11 +54,11 @@ test('page reload restores found words and score', async ({ page }) => {
   // Wait for DICT_LOADED + RESTORE_STATE (dict loads after puzzle — Submit enables when ready)
   await page.waitForSelector('[aria-label="Submit word"]:not([disabled])');
 
-  // Found word count should be restored — ScoreBar shows 1/9
-  await expect(page.locator('button.score-count')).toContainText('1/9');
+  // Found word count should be restored — ScoreBar still shows "1 words"
+  await expect(page.locator('button.score-count')).toContainText('1 words');
 });
 
-test('game-over clears state — reload starts fresh with Score: 0', async ({ page }) => {
+test('grand colophon win persists — reload shows win screen again', async ({ page }) => {
   // Complete the game by submitting all 9 words
   const words = ['drip', 'pint', 'pier', 'ripe', 'pine', 'trip', 'print', 'pride', 'printed'];
   let submittedCount = 0;
@@ -76,15 +76,15 @@ test('game-over clears state — reload starts fresh with Score: 0', async ({ pa
     );
   }
 
-  // Wait for game-over screen (STOR-02: clearState called here)
+  // Wait for Grand Colophon screen
   await page.locator('div.game-over').waitFor({ timeout: 5_000 });
+  await expect(page.locator('div.game-over')).toContainText('Grand Colophon');
 
   // Re-freeze clock BEFORE reload
   await page.clock.setSystemTime(new Date('2026-01-01T12:00:00'));
   await page.reload();
-  await page.waitForSelector('[aria-label="Center letter P"]', { timeout: 10_000 });
-  await page.waitForSelector('[aria-label="Submit word"]:not([disabled])');
 
-  // State was cleared on game-over — score starts at 0 on reload
-  await expect(page.locator('button.score-count')).toContainText('Score: 0');
+  // Grand Colophon state is preserved for same-day reload — win screen shows again
+  await page.locator('div.game-over').waitFor({ timeout: 10_000 });
+  await expect(page.locator('div.game-over')).toContainText('Grand Colophon');
 });

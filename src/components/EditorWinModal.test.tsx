@@ -110,7 +110,7 @@ describe('EditorWinModal share', () => {
     expect(screen.getByRole('button', { name: /Share result/i })).toBeInTheDocument();
   });
 
-  it('copies share text containing EDITOR IN CHIEF on share click', async () => {
+  it('copies share text containing LAUREATE on share click', async () => {
     const user = userEvent.setup();
     Object.defineProperty(navigator, 'clipboard', {
       value: { writeText: writeTextMock },
@@ -126,7 +126,7 @@ describe('EditorWinModal share', () => {
     await waitFor(() => {
       expect(screen.getByRole('button', { name: /Copied to clipboard/i })).toBeInTheDocument();
     });
-    expect(writeTextMock).toHaveBeenCalledWith(expect.stringContaining('EDITOR IN CHIEF'));
+    expect(writeTextMock).toHaveBeenCalledWith(expect.stringContaining('LAUREATE'));
     expect(writeTextMock).toHaveBeenCalledWith(expect.stringContaining('thepress.app'));
   });
 

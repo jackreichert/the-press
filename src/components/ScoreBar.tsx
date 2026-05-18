@@ -7,13 +7,32 @@
 
 import './ScoreBar.css';
 import React, { useMemo, useState, useRef, useEffect } from 'react';
-import { getRank, getProgressPct, getRankLadder, RANK } from '../utils/scoring';
+import { getRank, getProgressPct, getRankLadder, RANK, type RankResult } from '../utils/scoring';
 import { useGameState } from '../context/GameContext';
 import { computeStats } from '../utils/stats';
 import { readHistory } from '../storage';
 import { isFoundWordPangram } from '../utils/puzzle';
-import { getPuzzleDateStr } from '../utils/date';
-import { formatShareDate, buildProgressBar, useShare } from '../utils/share';
+import { getPuzzleDateStr, getLocalDateStr } from '../utils/date';
+import { formatShareDate, buildProgressBar, buildShareText, useShare, type ShareContext } from '../utils/share';
+
+// ─── Pure helpers ─────────────────────────────────────────────────────────────
+
+function computeNextHint(
+  score: number,
+  maxScore: number,
+  gameOver: boolean,
+  rank: RankResult,
+  ptsToNext: number,
+  ladder: { pts: number }[] | null,
+): string | null {
+  if (!maxScore || gameOver || rank.name === RANK.LAUREATE) return null;
+  if (score === 0 && ladder) {
+    const pts = ladder[0].pts;
+    return `${pts} pt${pts === 1 ? '' : 's'} to ${RANK.PRINTERS_DEVIL}`;
+  }
+  if (ptsToNext > 0 && rank.nextName) return `${ptsToNext} pt${ptsToNext === 1 ? '' : 's'} to ${rank.nextName}`;
+  return null;
+}
 
 // ─── Props ────────────────────────────────────────────────────────────────────
 
@@ -46,7 +65,7 @@ export function ScoreBar({ onOpenModal, onOpenStats }: ScoreBarProps): React.JSX
     if (last.foundCount !== last.totalCount) return null;
     const d = new Date();
     d.setDate(d.getDate() - 1);
-    const ys = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+    const ys = getLocalDateStr(d);
     return last.date === ys ? last.score : null;
   }, [history]);
 
@@ -75,41 +94,22 @@ export function ScoreBar({ onOpenModal, onOpenStats }: ScoreBarProps): React.JSX
 
   // Inline next-rank hint
   const ptsToNext = maxScore > 0 ? Math.ceil((rank.next / 100) * maxScore) - score : 0;
-  const nextHint = (() => {
-    if (!maxScore || gameOver || rank.name === RANK.LAUREATE) return null;
-    if (score === 0 && ladder) {
-      const pdPts = ladder[0].pts;
-      return `${pdPts} pt${pdPts === 1 ? '' : 's'} to Printer's Devil`;
-    }
-    if (ptsToNext > 0 && rank.nextName) return `${ptsToNext} pt${ptsToNext === 1 ? '' : 's'} to ${rank.nextName}`;
-    return null;
-  })();
+  const nextHint = computeNextHint(score, maxScore, gameOver, rank, ptsToNext, ladder);
 
   const laureateTarget = maxScore > 0 ? Math.ceil(0.89 * maxScore) : 0;
+  const pangramCount = puzzle ? foundWords.filter(w => isFoundWordPangram(w, puzzle)).length : 0;
 
   const { copied: shareCopied, showFallback: shareShowFallback, fallbackText: shareFallbackText, handleShare: shareHandleShare } = useShare();
 
-  function buildShareText(): string {
-    const date = epoch && puzzle
-      ? formatShareDate(getPuzzleDateStr(epoch, puzzle.index))
-      : '—';
-    const bar = buildProgressBar(score, maxScore);
-    const pangramCount = puzzle ? foundWords.filter(w => isFoundWordPangram(w, puzzle)).length : 0;
-    const pangramLine = pangramCount > 0 ? ` · ✦ ${pangramCount}` : '';
-    const rule = '━━━━━━━━━━━━━━━━━━━━━';
-    return [
-      `The Press · ${date}`,
-      rule,
-      `  ${displayRankName.toUpperCase()}`,
-      `  ${bar}`,
-      `  ${foundWords.length} words · ${isGrandColophon ? `${score}` : `${score}/${laureateTarget}`} pts${pangramLine}`,
-      rule,
-      `  thepress.app`,
-    ].join('\n');
-  }
-
   function handleShare(): Promise<void> {
-    return shareHandleShare(buildShareText());
+    const ctx: ShareContext = {
+      date: epoch && puzzle ? formatShareDate(getPuzzleDateStr(epoch, puzzle.index)) : '—',
+      rankLine: displayRankName.toUpperCase(),
+      barLine: buildProgressBar(score, maxScore),
+      wordsLine: `${foundWords.length} words · ${isGrandColophon ? `${score}` : `${score}/${laureateTarget}`} pts`,
+      pangramLine: pangramCount > 0 ? ` · ✦ ${pangramCount}` : '',
+    };
+    return shareHandleShare(buildShareText(ctx));
   }
 
   return (
