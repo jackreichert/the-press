@@ -45,7 +45,7 @@ interface ScoreBarProps {
 
 export function ScoreBar({ onOpenModal, onOpenStats }: ScoreBarProps): React.JSX.Element {
   const state = useGameState();
-  const { score, maxScore, foundWords, allWords, puzzle, gameOver, revealed, epoch } = state;
+  const { score, maxScore, foundWords, puzzle, gameOver, revealed, epoch } = state;
   const [ladderOpen, setLadderOpen] = useState(false);
   const rankBtnRef = useRef<HTMLButtonElement>(null);
   const popoverRef = useRef<HTMLDivElement>(null);
