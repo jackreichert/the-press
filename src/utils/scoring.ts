@@ -12,7 +12,7 @@ import { puzzleMaskFromLetters, wordMask, isPangram } from './puzzle';
 // ─── Rank tiers ───────────────────────────────────────────────────────────────
 // Use `as const` — enum is forbidden by erasableSyntaxOnly in tsconfig.app.json
 
-const RANK_TIERS = [
+export const RANK_TIERS = [
   { name: "Printer's Devil", threshold: 0  },
   { name: 'Apprentice',      threshold: 2  },
   { name: 'Journeyman',      threshold: 5  },
@@ -22,6 +22,25 @@ const RANK_TIERS = [
   { name: 'Novelist',        threshold: 68 },
   { name: 'Laureate',        threshold: 89 },
 ] as const;
+
+/** Exported rank name constants — use these instead of string literals for comparisons. */
+export const RANK = {
+  PRINTERS_DEVIL: "Printer's Devil",
+  APPRENTICE:     'Apprentice',
+  JOURNEYMAN:     'Journeyman',
+  TYPESETTER:     'Typesetter',
+  EDITOR:         'Editor',
+  WORDSMITH:      'Wordsmith',
+  NOVELIST:       'Novelist',
+  LAUREATE:       'Laureate',
+  GRAND_COLOPHON: 'Grand Colophon',
+  UNRANKED:       '—',
+} as const;
+
+export type RankName = typeof RANK[keyof typeof RANK];
+
+/** Percentage threshold at which the player reaches Laureate rank. */
+export const LAUREATE_THRESHOLD_PCT = 89;
 
 // ─── Scoring formulas ─────────────────────────────────────────────────────────
 
@@ -61,12 +80,7 @@ export interface RankResult {
  * Returns name '—' with current=0,next=0 when maxScore is 0 (dict not loaded).
  * D-15 threshold formula: Math.floor(score / maxScore * 100).
  */
-export function getRank(
-  score: number,
-  maxScore: number,
-  _foundCount?: number,
-  _totalCount?: number,
-): RankResult {
+export function getRank(score: number, maxScore: number): RankResult {
   if (maxScore === 0 || score === 0) return { name: '—', current: 0, next: 0, nextName: '' };
   const pct = Math.floor((score / maxScore) * 100);
   let tierIdx = -1;

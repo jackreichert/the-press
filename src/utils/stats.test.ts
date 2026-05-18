@@ -61,6 +61,16 @@ describe('computeStats', () => {
     expect(computeStats(history).streak).toBe(1);  // only today counts toward streak
   });
 
+  it('returns correct streak when yesterday is the tail of a multi-day chain', () => {
+    // today = May 15 but no entry for today; yesterday (May 14) and the day before (May 13) both have entries
+    vi.setSystemTime(new Date(2026, 4, 15, 12, 0, 0));  // May 15 local
+    const history = [
+      makeEntry('2026-05-13', 5),
+      makeEntry('2026-05-14', 10),
+    ];
+    expect(computeStats(history).streak).toBe(2);
+  });
+
   it('computes avgScore as a rounded integer', () => {
     // No fake timer needed — streak not relevant here
     vi.useRealTimers();

@@ -5,11 +5,12 @@
  * When hasPendingToday: shows "Play Today's Puzzle →" button.
  */
 
-import React, { useState } from 'react';
+import React from 'react';
 import { useGameState } from '../context/GameContext';
-import { getProgressPct } from '../utils/scoring';
 import { isFoundWordPangram } from '../utils/puzzle';
 import { getPuzzleDateStr } from '../utils/date';
+import { formatShareDate, buildProgressBar, useShare } from '../utils/share';
+import { RANK } from '../utils/scoring';
 
 interface GameOverScreenProps {
   epochRef: React.RefObject<string | null>;
@@ -27,18 +28,14 @@ export function GameOverScreen({ epochRef, onPlayToday }: GameOverScreenProps): 
   const foundSet = new Set(foundWords);
   const sortedAllWords = revealed ? [...allWords].sort() : [];
 
-  const [copied, setCopied] = useState(false);
-  const [showFallback, setShowFallback] = useState(false);
-  const [fallbackText, setFallbackText] = useState('');
+  const { copied, showFallback, fallbackText, handleShare: shareHandleShare } = useShare();
 
   function buildShareText(): string {
     const date = (epochRef.current && puzzle)
       ? formatShareDate(getPuzzleDateStr(epochRef.current, puzzle.index))
       : '—';
-    const fillPct = getProgressPct(score, maxScore);
-    const filled = Math.round(fillPct / 10);
-    const bar = '▓'.repeat(filled) + '░'.repeat(10 - filled);
-    const rankLine = revealed ? '—' : '✦ GRAND COLOPHON';
+    const bar = buildProgressBar(score, maxScore);
+    const rankLine = revealed ? RANK.UNRANKED : `✦ ${RANK.GRAND_COLOPHON.toUpperCase()}`;
     const pangramLine = pangramCount > 0 ? `  ✦ ${pangramCount} pangram${pangramCount !== 1 ? 's' : ''}` : '';
     const rule = '━━━━━━━━━━━━━━━━━━━━━';
     return [
@@ -52,38 +49,14 @@ export function GameOverScreen({ epochRef, onPlayToday }: GameOverScreenProps): 
     ].join('\n');
   }
 
-  function formatShareDate(iso: string): string {
-    const [year, month, day] = iso.split('-').map(Number);
-    const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-    return `${months[month - 1]} ${day}, ${year}`;
-  }
-
-  async function handleShare(): Promise<void> {
-    const text = buildShareText();
-    // Web Share API — shows native share sheet on mobile (iMessage, WhatsApp, etc.)
-    if (navigator.share) {
-      try {
-        await navigator.share({ text });
-        return;
-      } catch {
-        // User cancelled or share failed — fall through to clipboard
-      }
-    }
-    // Desktop fallback: copy to clipboard
-    try {
-      await navigator.clipboard.writeText(text);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
-    } catch {
-      setFallbackText(text);
-      setShowFallback(true);
-    }
+  function handleShare(): Promise<void> {
+    return shareHandleShare(buildShareText());
   }
 
   return (
     <div className="game-over">
       <div className={`game-over__rank${revealed ? '' : ' game-over__rank--colophon'}`}>
-        {revealed ? 'Better luck next time' : 'Grand Colophon'}
+        {revealed ? 'Better luck next time' : RANK.GRAND_COLOPHON}
       </div>
       {!revealed && <p className="game-over__colophon-badge">✦ All words found</p>}
       <div className="game-over__score">

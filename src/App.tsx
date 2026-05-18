@@ -21,9 +21,9 @@
 import React, { useEffect, useState, useCallback, useRef } from 'react';
 import { GameProvider, useGameState, useGameDispatch } from './context/GameContext';
 import { getTodayPuzzleIndex, getPuzzleDateStr } from './utils/date';
-import { getRank } from './utils/scoring';
+import { getRank, RANK } from './utils/scoring';
 import { readState, saveState, clearState, appendHistory, readHistory, readPending, savePending, clearPending } from './storage';
-import type { HistoryEntry } from './storage';
+import type { HistoryEntry } from './types';
 import { deriveWordSet } from './utils/puzzle';
 import { computeMaxScore } from './utils/scoring';
 import { ScoreBar } from './components/ScoreBar';
@@ -60,13 +60,13 @@ function GameLayout({ epochRef, onPlayToday, newDayAvailable }: GameLayoutProps)
 
   // Show Laureate win modal on rank transition — not on initial state restore.
   useEffect(() => {
-    if (rank.name === '—') return;
+    if (rank.name === RANK.UNRANKED) return;
     if (!initialRankSeenRef.current) {
       initialRankSeenRef.current = true;
       prevRankRef.current = rank.name;
       return;
     }
-    if (prevRankRef.current !== 'Laureate' && rank.name === 'Laureate') {
+    if (prevRankRef.current !== RANK.LAUREATE && rank.name === RANK.LAUREATE) {
       setEditorWinOpen(true);
     }
     prevRankRef.current = rank.name;
@@ -118,7 +118,7 @@ function GameLayout({ epochRef, onPlayToday, newDayAvailable }: GameLayoutProps)
     if (readHistory().some(e => e.date === date)) return;
     const isGrandColophon = !state.revealed && state.foundWords.length === state.allWords.length;
     const rankName = isGrandColophon
-      ? 'Grand Colophon'
+      ? RANK.GRAND_COLOPHON
       : getRank(state.score, state.maxScore).name;
     const entry: HistoryEntry = {
       date,
@@ -135,6 +135,8 @@ function GameLayout({ epochRef, onPlayToday, newDayAvailable }: GameLayoutProps)
     if (!isGrandColophon) {
       clearState();
     }
+    // Intentionally fire once when gameOver flips — all reads are stable at that
+    // point. Re-running on every downstream state change would double-append.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [state.gameOver]);
 
@@ -224,6 +226,36 @@ function GameLayout({ epochRef, onPlayToday, newDayAvailable }: GameLayoutProps)
   );
 }
 
+// ─── Carryover resolution ────────────────────────────────────────────────────
+
+interface ActivePuzzleResolution {
+  activePuzzle: PuzzleEntry;
+  activeIndex: number;
+  isCarryover: boolean;
+}
+
+/**
+ * Pure function — determines which puzzle to load and whether it is a carryover.
+ * Extracted to be unit-testable independently of the React loading effects.
+ */
+export function resolveActivePuzzle(
+  todayPuzzle: PuzzleEntry,
+  todayIndex: number,
+  schedule: Schedule,
+  stored: import('./types').PersistedState | null,
+  pending: import('./types').PendingPuzzle | null,
+): ActivePuzzleResolution {
+  const isCarryover = !!(stored && stored.puzzleIndex !== todayIndex && stored.foundWords.length > 0);
+  const isResumingCarryover = !!(pending && stored && stored.puzzleIndex !== todayIndex);
+  if (isCarryover || isResumingCarryover) {
+    const prevPuzzle = schedule.puzzles[stored!.puzzleIndex];
+    if (prevPuzzle) {
+      return { activePuzzle: prevPuzzle, activeIndex: stored!.puzzleIndex, isCarryover: true };
+    }
+  }
+  return { activePuzzle: todayPuzzle, activeIndex: todayIndex, isCarryover: false };
+}
+
 // ─── Data loader ──────────────────────────────────────────────────────────────
 
 /** Wrapper component: owns data loading side-effects; renders GameLayout inside GameProvider. */
@@ -287,31 +319,15 @@ function AppLoader(): React.JSX.Element {
           }
         }
 
-        const isCarryover = stored && stored.puzzleIndex !== todayIndex && stored.foundWords.length > 0;
-        const isResumingCarryover = pending && stored && stored.puzzleIndex !== todayIndex;
+        const { activePuzzle, activeIndex, isCarryover } = resolveActivePuzzle(
+          todayPuzzle, todayIndex, schedule, stored, pending,
+        );
 
-        let activePuzzle = todayPuzzle;
-        let activeIndex = todayIndex;
-
-        if (isCarryover || isResumingCarryover) {
-          // Load the unfinished previous puzzle instead of today's
-          const prevPuzzle = schedule.puzzles[stored!.puzzleIndex];
-          if (prevPuzzle) {
-            activePuzzle = prevPuzzle;
-            activeIndex = stored!.puzzleIndex;
-            // Store today's puzzle for later
-            todayDataRef.current = { puzzle: todayPuzzle, words: [], index: todayIndex };
-            if (!pending) savePending({ puzzleIndex: todayIndex });
-          }
-        }
+        if (isCarryover && !pending) savePending({ puzzleIndex: todayIndex });
 
         if (!cancelled) {
           dispatch({ type: 'PUZZLE_LOADED', puzzle: activePuzzle });
           epochRef.current = schedule.epoch;
-          // Pre-store today's puzzle reference so onPlayToday has it before dict loads
-          if (!todayDataRef.current) {
-            todayDataRef.current = { puzzle: todayPuzzle, words: [], index: todayIndex };
-          }
         }
 
         fetch(`${import.meta.env.BASE_URL}dictionary.json`)
@@ -321,8 +337,10 @@ function AppLoader(): React.JSX.Element {
           })
           .then((words: string[]) => {
             if (!cancelled) {
-              // Update todayDataRef with the loaded word list
-              if (todayDataRef.current) todayDataRef.current.words = words;
+              // Assign complete object once words are available — avoids the partial
+              // {puzzle, words:[]} init pattern that could cause onPlayToday to run
+              // deriveWordSet with an empty word list if called before this point.
+              todayDataRef.current = { puzzle: todayPuzzle, words, index: todayIndex };
 
               dispatch({ type: 'DICT_LOADED', words });
 

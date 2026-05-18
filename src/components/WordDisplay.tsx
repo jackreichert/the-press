@@ -85,7 +85,7 @@ export function WordDisplay(): React.JSX.Element {
 
   return (
     <div className="word-display-area">
-      <div className={wordClass}>
+      <div className={wordClass} data-testid="word-display">
         {foundWord ? foundWord.toUpperCase() : displayText}
       </div>
       {foundWord ? (

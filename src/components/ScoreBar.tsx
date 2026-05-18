@@ -6,12 +6,13 @@
  */
 
 import React, { useMemo, useState, useRef, useEffect } from 'react';
-import { getRank, getProgressPct, getRankLadder } from '../utils/scoring';
+import { getRank, getProgressPct, getRankLadder, RANK } from '../utils/scoring';
 import { useGameState } from '../context/GameContext';
 import { computeStats } from '../utils/stats';
 import { readHistory } from '../storage';
 import { isFoundWordPangram } from '../utils/puzzle';
 import { getPuzzleDateStr } from '../utils/date';
+import { formatShareDate, buildProgressBar, useShare } from '../utils/share';
 
 // ─── Props ────────────────────────────────────────────────────────────────────
 
@@ -30,16 +31,16 @@ export function ScoreBar({ onOpenModal, onOpenStats, epochRef }: ScoreBarProps):
   const rankBtnRef = useRef<HTMLButtonElement>(null);
   const popoverRef = useRef<HTMLDivElement>(null);
 
-  const rank = getRank(score, maxScore, foundWords.length, allWords.length);
+  const rank = getRank(score, maxScore);
   const isGrandColophon = gameOver && !revealed;
-  const displayRankName = isGrandColophon ? 'Grand Colophon' : rank.name;
+  const displayRankName = isGrandColophon ? RANK.GRAND_COLOPHON : rank.name;
   const fillPct = isGrandColophon ? 100 : getProgressPct(score, maxScore);
-  const streak = useMemo(() => computeStats(readHistory()).streak, []);
+  const history = useMemo(() => readHistory(), []);
+  const streak = useMemo(() => computeStats(history).streak, [history]);
   const ladder = useMemo(() => (maxScore > 0 ? getRankLadder(maxScore) : null), [maxScore]);
 
   // Show Grand Colophon score the day after someone found all words
   const yesterdayColophonScore = useMemo(() => {
-    const history = readHistory();
     if (history.length === 0) return null;
     const last = history[history.length - 1];
     if (last.foundCount !== last.totalCount) return null;
@@ -47,7 +48,7 @@ export function ScoreBar({ onOpenModal, onOpenStats, epochRef }: ScoreBarProps):
     d.setDate(d.getDate() - 1);
     const ys = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
     return last.date === ys ? last.score : null;
-  }, []);
+  }, [history]);
 
   // Close popover on outside click or Escape
   useEffect(() => {
@@ -75,7 +76,7 @@ export function ScoreBar({ onOpenModal, onOpenStats, epochRef }: ScoreBarProps):
   // Inline next-rank hint
   const ptsToNext = maxScore > 0 ? Math.ceil((rank.next / 100) * maxScore) - score : 0;
   const nextHint = (() => {
-    if (!maxScore || gameOver || rank.name === 'Laureate') return null;
+    if (!maxScore || gameOver || rank.name === RANK.LAUREATE) return null;
     if (score === 0 && ladder) {
       const pdPts = ladder[0].pts;
       return `${pdPts} pt${pdPts === 1 ? '' : 's'} to Printer's Devil`;
@@ -86,19 +87,13 @@ export function ScoreBar({ onOpenModal, onOpenStats, epochRef }: ScoreBarProps):
 
   const laureateTarget = maxScore > 0 ? Math.ceil(0.89 * maxScore) : 0;
 
-  const [shareCopied, setShareCopied] = useState(false);
+  const { copied: shareCopied, showFallback: shareShowFallback, fallbackText: shareFallbackText, handleShare: shareHandleShare } = useShare();
 
   function buildShareText(): string {
     const date = epochRef.current && puzzle
-      ? (() => {
-          const iso = getPuzzleDateStr(epochRef.current, puzzle.index);
-          const [y, m, d] = iso.split('-').map(Number);
-          const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-          return `${months[m - 1]} ${d}, ${y}`;
-        })()
+      ? formatShareDate(getPuzzleDateStr(epochRef.current, puzzle.index))
       : '—';
-    const filled = maxScore > 0 ? Math.round((score / maxScore) * 10) : 0;
-    const bar = '▓'.repeat(filled) + '░'.repeat(10 - filled);
+    const bar = buildProgressBar(score, maxScore);
     const pangramCount = puzzle ? foundWords.filter(w => isFoundWordPangram(w, puzzle)).length : 0;
     const pangramLine = pangramCount > 0 ? ` · ✦ ${pangramCount}` : '';
     const rule = '━━━━━━━━━━━━━━━━━━━━━';
@@ -113,16 +108,8 @@ export function ScoreBar({ onOpenModal, onOpenStats, epochRef }: ScoreBarProps):
     ].join('\n');
   }
 
-  async function handleShare(): Promise<void> {
-    const text = buildShareText();
-    if (navigator.share) {
-      try { await navigator.share({ text }); return; } catch { /* fall through */ }
-    }
-    try {
-      await navigator.clipboard.writeText(text);
-      setShareCopied(true);
-      setTimeout(() => setShareCopied(false), 2000);
-    } catch { /* silent fail */ }
+  function handleShare(): Promise<void> {
+    return shareHandleShare(buildShareText());
   }
 
   return (
@@ -215,6 +202,15 @@ export function ScoreBar({ onOpenModal, onOpenStats, epochRef }: ScoreBarProps):
           </button>
         </div>
       </div>
+      {shareShowFallback && (
+        <textarea
+          className="share-fallback"
+          readOnly
+          value={shareFallbackText}
+          aria-label="Share text — select all and copy"
+          rows={3}
+        />
+      )}
     </div>
   );
 }

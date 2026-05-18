@@ -4,12 +4,12 @@
  * Dismissible — "Keep Playing" lets them continue toward Grand Colophon.
  */
 
-import React, { useRef, useState } from 'react';
+import React, { useRef } from 'react';
 import { useGameState } from '../context/GameContext';
-import { getProgressPct } from '../utils/scoring';
 import { isFoundWordPangram } from '../utils/puzzle';
 import { getPuzzleDateStr } from '../utils/date';
 import { useFocusTrap } from '../hooks/useFocusTrap';
+import { formatShareDate, buildProgressBar, useShare } from '../utils/share';
 
 interface EditorWinModalProps {
   epochRef: React.RefObject<string | null>;
@@ -19,27 +19,17 @@ interface EditorWinModalProps {
 export function EditorWinModal({ epochRef, onKeepPlaying }: EditorWinModalProps): React.JSX.Element {
   const { score, maxScore, foundWords, allWords, puzzle } = useGameState();
   const cardRef = useRef<HTMLDivElement>(null);
-  const [copied, setCopied] = useState(false);
-  const [showFallback, setShowFallback] = useState(false);
-  const [fallbackText, setFallbackText] = useState('');
+  const { copied, showFallback, fallbackText, handleShare: shareHandleShare } = useShare();
 
   useFocusTrap(cardRef, onKeepPlaying);
 
-  const fillPct = getProgressPct(score, maxScore);
-  const filled = Math.round(fillPct / 10);
-  const bar = '▓'.repeat(filled) + '░'.repeat(10 - filled);
+  const bar = buildProgressBar(score, maxScore);
   const pangramCount = puzzle ? foundWords.filter(w => isFoundWordPangram(w, puzzle)).length : 0;
   const wordsLeft = allWords.length - foundWords.length;
 
-  function formatDate(iso: string): string {
-    const [year, month, day] = iso.split('-').map(Number);
-    const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-    return `${months[month - 1]} ${day}, ${year}`;
-  }
-
   function buildShareText(): string {
     const date = epochRef.current && puzzle
-      ? formatDate(getPuzzleDateStr(epochRef.current, puzzle.index))
+      ? formatShareDate(getPuzzleDateStr(epochRef.current, puzzle.index))
       : '—';
     const pangramLine = pangramCount > 0 ? ` · ✦ ${pangramCount}` : '';
     const rule = '━━━━━━━━━━━━━━━━━━━━━';
@@ -54,19 +44,8 @@ export function EditorWinModal({ epochRef, onKeepPlaying }: EditorWinModalProps)
     ].join('\n');
   }
 
-  async function handleShare(): Promise<void> {
-    const text = buildShareText();
-    if (navigator.share) {
-      try { await navigator.share({ text }); return; } catch { /* cancelled — fall through */ }
-    }
-    try {
-      await navigator.clipboard.writeText(text);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
-    } catch {
-      setFallbackText(text);
-      setShowFallback(true);
-    }
+  function handleShare(): Promise<void> {
+    return shareHandleShare(buildShareText());
   }
 
   return (

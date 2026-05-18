@@ -80,39 +80,31 @@ function storageSet(key: string, value: string): void {
   }
 }
 
+/** Module-private: remove a key from storage. */
+function storageRemove(key: string): void {
+  try {
+    if (lsAvailable) window.localStorage.removeItem(key);
+    else memStore.delete(key);
+  } catch {
+    memStore.delete(key);
+  }
+}
+
 // ─── Schema types ─────────────────────────────────────────────────────────────
+// Types are defined in types.ts and re-exported here for backward compatibility.
 
-/** Today's in-progress game state persisted to localStorage. D-04. */
-export interface PersistedState {
-  v: 1;
-  puzzleIndex: number;
-  foundWords: string[];
-  score: number;
-}
+export type { PersistedState, HistoryEntry, PendingPuzzle } from './types';
+import type { PersistedState, HistoryEntry, PendingPuzzle } from './types';
 
-/** One completed (or partial) day's result. D-05. */
-export interface HistoryEntry {
-  date: string;        // "YYYY-MM-DD" local time
-  score: number;
-  rank: string;
-  foundCount: number;
-  totalCount: number;
-  completed: boolean;
-}
+// ─── Keys & versioning ────────────────────────────────────────────────────────
 
-// ─── Keys ─────────────────────────────────────────────────────────────────────
+const SCHEMA_VERSION = 1 as const;
 
 const STORAGE_KEYS = {
   state:   'thepress_state_v1',
   history: 'thepress_history_v1',
   pending: 'thepress_pending_v1',
 } as const;
-
-/** Today's puzzle index, stored when the user is finishing a previous day's puzzle first. */
-export interface PendingPuzzle {
-  v: 1;
-  puzzleIndex: number;
-}
 
 // ─── Public helpers ───────────────────────────────────────────────────────────
 
@@ -126,7 +118,7 @@ export function readState(): PersistedState | null {
   if (!raw) return null;
   try {
     const parsed = JSON.parse(fromBase64(raw)) as PersistedState;
-    if (parsed.v !== 1) return null;
+    if (parsed.v !== SCHEMA_VERSION) return null;
     return parsed;
   } catch {
     return null;
@@ -138,7 +130,7 @@ export function readState(): PersistedState | null {
  * Automatically adds the v:1 schema version field (D-03).
  */
 export function saveState(data: Omit<PersistedState, 'v'>): void {
-  storageSet(STORAGE_KEYS.state, toBase64(JSON.stringify({ v: 1, ...data })));
+  storageSet(STORAGE_KEYS.state, toBase64(JSON.stringify({ v: SCHEMA_VERSION, ...data })));
 }
 
 /**
@@ -146,10 +138,7 @@ export function saveState(data: Omit<PersistedState, 'v'>): void {
  * Called on new-day detection and after a completed game is written to history.
  */
 export function clearState(): void {
-  try {
-    if (lsAvailable) window.localStorage.removeItem(STORAGE_KEYS.state);
-    else memStore.delete(STORAGE_KEYS.state);
-  } catch { /* noop */ }
+  storageRemove(STORAGE_KEYS.state);
 }
 
 /**
@@ -173,19 +162,16 @@ export function readPending(): PendingPuzzle | null {
   if (!raw) return null;
   try {
     const parsed = JSON.parse(fromBase64(raw)) as PendingPuzzle;
-    return parsed.v === 1 ? parsed : null;
+    return parsed.v === SCHEMA_VERSION ? parsed : null;
   } catch { return null; }
 }
 
 export function savePending(data: Omit<PendingPuzzle, 'v'>): void {
-  storageSet(STORAGE_KEYS.pending, toBase64(JSON.stringify({ v: 1, ...data })));
+  storageSet(STORAGE_KEYS.pending, toBase64(JSON.stringify({ v: SCHEMA_VERSION, ...data })));
 }
 
 export function clearPending(): void {
-  try {
-    if (lsAvailable) window.localStorage.removeItem(STORAGE_KEYS.pending);
-    else memStore.delete(STORAGE_KEYS.pending);
-  } catch { /* noop */ }
+  storageRemove(STORAGE_KEYS.pending);
 }
 
 /**

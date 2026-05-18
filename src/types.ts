@@ -29,3 +29,31 @@ export interface Schedule {
 
 /** public/dictionary.json is a sorted JSON array of lowercase strings */
 export type DictionaryFile = string[];
+
+// ─── Persistence domain types ─────────────────────────────────────────────────
+// Defined here so domain utilities (stats, share) can import them without
+// depending on the storage adapter.
+
+/** Today's in-progress game state persisted to localStorage. */
+export interface PersistedState {
+  v: 1;
+  puzzleIndex: number;
+  foundWords: string[];
+  score: number;
+}
+
+/** One completed (or partial) day's result in the history array. */
+export interface HistoryEntry {
+  date: string;        // "YYYY-MM-DD" local time
+  score: number;
+  rank: string;
+  foundCount: number;
+  totalCount: number;
+  completed: boolean;
+}
+
+/** Today's puzzle index, stored when the user is finishing a previous day's puzzle first. */
+export interface PendingPuzzle {
+  v: 1;
+  puzzleIndex: number;
+}

@@ -45,10 +45,19 @@ test('full play-through: submitting all 9 words reaches game-over with Grand Col
   // All 9 fixture words — drip+pint+pier+ripe+pine+trip=6pts, print+pride=10pts, printed=14pts → 30pts
   const words = ['drip', 'pint', 'pier', 'ripe', 'pine', 'trip', 'print', 'pride', 'printed'];
 
+  let submittedCount = 0;
   for (const word of words) {
     await submitWord(page, word);
-    // Brief pause to let React state settle between submissions
-    await page.waitForTimeout(50);
+    submittedCount += 1;
+    // Wait for the score count to reflect the newly submitted word
+    await page.waitForFunction(
+      (count: number) => {
+        const btn = document.querySelector('button.score-count');
+        return btn !== null && btn.textContent !== null && btn.textContent.includes(`${count} word`);
+      },
+      submittedCount,
+      { timeout: 3000 },
+    );
   }
 
   // Game-over screen replaces the letter grid when all words are found (D-18)

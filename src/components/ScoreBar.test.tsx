@@ -1,20 +1,10 @@
 import React, { createRef } from 'react';
 import { screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { renderWithGame } from '../test/helpers';
+import { renderWithGame, TEST_PUZZLE, TEST_WORDS, PUZZLE_LOADED, DICT_LOADED } from '../test/helpers';
 import { ScoreBar } from './ScoreBar';
 import { appendHistory } from '../storage';
-import type { PuzzleEntry } from '../types';
 import type { HistoryEntry } from '../storage';
-
-const TEST_PUZZLE: PuzzleEntry = {
-  index: 0,
-  letters: ['D', 'E', 'I', 'N', 'P', 'R', 'T'],
-  centerLetter: 'P',
-};
-const TEST_WORDS = ['drip', 'pine', 'pier', 'pint', 'pride', 'print', 'printed', 'ripe', 'trip'];
-const PUZZLE_LOADED = { type: 'PUZZLE_LOADED' as const, puzzle: TEST_PUZZLE };
-const DICT_LOADED = { type: 'DICT_LOADED' as const, words: TEST_WORDS };
 
 const onOpenModal = vi.fn();
 const onOpenStats = vi.fn();
@@ -80,6 +70,7 @@ describe('ScoreBar score-count button', () => {
 });
 
 describe('ScoreBar streak counter', () => {
+  afterEach(() => { localStorage.clear(); });
   it('shows streak 0 with empty history', () => {
     renderWithGame(<ScoreBar onOpenModal={onOpenModal} onOpenStats={onOpenStats} epochRef={epochRef} />, {
       initialActions: [PUZZLE_LOADED, DICT_LOADED],
@@ -195,6 +186,7 @@ describe('ScoreBar Grand Colophon rank', () => {
 describe('ScoreBar Grand Colophon day-after hint', () => {
   afterEach(() => {
     vi.useRealTimers();
+    localStorage.clear();
   });
 
   it('shows Grand Colophon hint the day after all words were found', () => {

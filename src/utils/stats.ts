@@ -8,7 +8,7 @@
  * D-11: avgScore is a rounded integer.
  */
 
-import type { HistoryEntry } from '../storage';
+import type { HistoryEntry } from '../types';
 
 // ─── Local date helper ────────────────────────────────────────────────────────
 
@@ -28,17 +28,22 @@ function computeStreak(history: HistoryEntry[]): number {
   const playedDates = new Set(
     history.filter(e => e.date <= todayStr).map(e => e.date)
   );
-  // D-08: start from today if played; otherwise try yesterday
+  // D-08: start from today if played; otherwise try yesterday.
+  // Use local calendar arithmetic (not ms subtraction) to avoid DST boundary errors.
+  const yesterday = (() => {
+    const d = new Date();
+    return new Date(d.getFullYear(), d.getMonth(), d.getDate() - 1);
+  })();
   const startDate = playedDates.has(todayStr)
     ? todayStr
-    : getLocalDateStr(new Date(Date.now() - 86400000));
+    : getLocalDateStr(yesterday);
   if (!playedDates.has(startDate)) return 0;
-  const parts = startDate.split('-').map(Number);
-  let cursor = new Date(parts[0], parts[1] - 1, parts[2]).getTime();
+  const [sy, sm, sd] = startDate.split('-').map(Number);
+  let cursorDate = new Date(sy, sm - 1, sd);
   let streak = 0;
-  while (playedDates.has(getLocalDateStr(new Date(cursor)))) {
+  while (playedDates.has(getLocalDateStr(cursorDate))) {
     streak++;
-    cursor -= 86400000;
+    cursorDate = new Date(cursorDate.getFullYear(), cursorDate.getMonth(), cursorDate.getDate() - 1);
   }
   return streak;
 }

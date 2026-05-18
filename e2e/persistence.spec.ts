@@ -61,10 +61,19 @@ test('page reload restores found words and score', async ({ page }) => {
 test('game-over clears state — reload starts fresh with Score: 0', async ({ page }) => {
   // Complete the game by submitting all 9 words
   const words = ['drip', 'pint', 'pier', 'ripe', 'pine', 'trip', 'print', 'pride', 'printed'];
+  let submittedCount = 0;
   for (const word of words) {
     await submitWord(page, word);
-    // Brief pause to let React state settle between submissions
-    await page.waitForTimeout(50);
+    submittedCount += 1;
+    // Wait for the score count to reflect the newly submitted word
+    await page.waitForFunction(
+      (count: number) => {
+        const btn = document.querySelector('button.score-count');
+        return btn !== null && btn.textContent !== null && btn.textContent.includes(`${count} word`);
+      },
+      submittedCount,
+      { timeout: 3000 },
+    );
   }
 
   // Wait for game-over screen (STOR-02: clearState called here)

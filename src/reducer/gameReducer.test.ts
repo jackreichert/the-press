@@ -1,13 +1,6 @@
 import { gameReducer, initialState } from './gameReducer';
 import type { GameState } from './gameReducer';
-import type { PuzzleEntry } from '../types';
-
-const TEST_PUZZLE: PuzzleEntry = {
-  index: 0,
-  letters: ['D', 'E', 'I', 'N', 'P', 'R', 'T'],
-  centerLetter: 'P',
-};
-const TEST_WORDS = ['drip', 'pine', 'pier', 'pint', 'pride', 'print', 'printed', 'ripe', 'trip'];
+import { TEST_PUZZLE, TEST_WORDS } from '../test/helpers';
 
 /** Build state after PUZZLE_LOADED + DICT_LOADED — the minimum needed to accept words */
 function loadedState(): GameState {

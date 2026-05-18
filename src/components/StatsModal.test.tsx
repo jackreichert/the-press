@@ -8,6 +8,8 @@ import type { HistoryEntry } from '../storage';
 // StatsModal does NOT use GameContext — plain render() is fine (D-06)
 
 describe('StatsModal stats display', () => {
+  afterEach(() => { localStorage.clear(); });
+
   it('shows all zeros with empty history', () => {
     render(<StatsModal onClose={vi.fn()} />);
     expect(screen.getByLabelText(/0 days/)).toBeInTheDocument();

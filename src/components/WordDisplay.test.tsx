@@ -1,37 +1,8 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import { screen, act, fireEvent, waitFor } from '@testing-library/react';
-import { renderWithGame } from '../test/helpers';
+import { renderWithGame, KeyboardConnector, PUZZLE_LOADED, DICT_LOADED } from '../test/helpers';
 import { WordDisplay } from './WordDisplay';
 import { ActionRow } from './ActionRow';
-import { useGameDispatch, useGameState } from '../context/GameContext';
-import type { PuzzleEntry } from '../types';
-
-// Mirrors the document-level keyboard listener in App.tsx for tests that need it.
-function KeyboardConnector(): null {
-  const dispatch = useGameDispatch();
-  const { gameOver } = useGameState();
-  useEffect(() => {
-    function handle(e: KeyboardEvent): void {
-      if (e.ctrlKey || e.metaKey || e.altKey || gameOver) return;
-      const key = e.key.toLowerCase();
-      if (/^[a-z]$/.test(key)) { e.preventDefault(); dispatch({ type: 'LETTER_APPEND', letter: key }); }
-      else if (e.key === 'Backspace') { e.preventDefault(); dispatch({ type: 'LETTER_DELETE' }); }
-      else if (e.key === 'Enter') { e.preventDefault(); dispatch({ type: 'WORD_SUBMIT' }); }
-    }
-    document.addEventListener('keydown', handle);
-    return () => document.removeEventListener('keydown', handle);
-  }, [dispatch, gameOver]);
-  return null;
-}
-
-const TEST_PUZZLE: PuzzleEntry = {
-  index: 0,
-  letters: ['D', 'E', 'I', 'N', 'P', 'R', 'T'],
-  centerLetter: 'P',
-};
-const TEST_WORDS = ['drip', 'pine', 'pier', 'pint', 'pride', 'print', 'printed', 'ripe', 'trip'];
-const PUZZLE_LOADED = { type: 'PUZZLE_LOADED' as const, puzzle: TEST_PUZZLE };
-const DICT_LOADED = { type: 'DICT_LOADED' as const, words: TEST_WORDS };
 
 beforeEach(() => {
   vi.useFakeTimers();
@@ -80,7 +51,7 @@ describe('WordDisplay error animation', () => {
 
     fireEvent.click(screen.getByRole('button', { name: /Submit word/i }));
 
-    const wordDiv = document.querySelector('.word-display') as HTMLElement;
+    const wordDiv = screen.getByTestId('word-display');
     expect(wordDiv).toHaveClass('shake');
     expect(screen.getByRole('alert')).toHaveTextContent('Too short');
   });
@@ -99,7 +70,7 @@ describe('WordDisplay error animation', () => {
     fireEvent.click(screen.getByRole('button', { name: /Submit word/i }));
 
     act(() => { vi.advanceTimersByTime(401); });
-    const wordDiv = document.querySelector('.word-display') as HTMLElement;
+    const wordDiv = screen.getByTestId('word-display');
     expect(wordDiv).not.toHaveClass('shake');
   });
 
@@ -180,7 +151,7 @@ describe('WordDisplay found-word flash', () => {
     fireEvent.click(screen.getByRole('button', { name: /Submit word/i }));
     // Flush React effects — fake timers are active so we flush with act instead of waitFor
     await act(async () => { await Promise.resolve(); });
-    const wordDiv = document.querySelector('.word-display') as HTMLElement;
+    const wordDiv = screen.getByTestId('word-display');
     expect(wordDiv).toHaveClass('word-display--found');
     expect(wordDiv).toHaveTextContent('DRIP');
   });
@@ -193,9 +164,9 @@ describe('WordDisplay found-word flash', () => {
     );
     fireEvent.click(screen.getByRole('button', { name: /Submit word/i }));
     await act(async () => { await Promise.resolve(); });
-    expect(document.querySelector('.word-display--found')).toBeTruthy();
+    expect(screen.getByTestId('word-display')).toHaveClass('word-display--found');
     act(() => { vi.advanceTimersByTime(951); });
-    expect(document.querySelector('.word-display--placeholder')).toBeTruthy();
+    expect(screen.getByTestId('word-display')).toHaveClass('word-display--placeholder');
   });
 
   it('shows +N pts label (role=status) when word is found', async () => {

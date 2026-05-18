@@ -1,18 +1,9 @@
 import React, { createRef } from 'react';
 import { screen, act, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { renderWithGame } from '../test/helpers.tsx';
+import { renderWithGame, TEST_WORDS, PUZZLE_LOADED, DICT_LOADED } from '../test/helpers';
 import { GameOverScreen } from './GameOverScreen';
-import type { PuzzleEntry } from '../types';
 
-const TEST_PUZZLE: PuzzleEntry = {
-  index: 0,
-  letters: ['D','E','I','N','P','R','T'],
-  centerLetter: 'P',
-};
-const TEST_WORDS = ['drip','pine','pier','pint','pride','print','printed','ripe','trip'];
-const PUZZLE_LOADED = { type: 'PUZZLE_LOADED' as const, puzzle: TEST_PUZZLE };
-const DICT_LOADED = { type: 'DICT_LOADED' as const, words: TEST_WORDS };
 const RESTORE_ALL = {
   type: 'RESTORE_STATE' as const,
   foundWords: TEST_WORDS,

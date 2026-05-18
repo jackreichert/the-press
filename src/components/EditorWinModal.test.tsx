@@ -1,18 +1,8 @@
 import React, { createRef } from 'react';
 import { screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { renderWithGame } from '../test/helpers';
+import { renderWithGame, TEST_WORDS, PUZZLE_LOADED, DICT_LOADED } from '../test/helpers';
 import { EditorWinModal } from './EditorWinModal';
-import type { PuzzleEntry } from '../types';
-
-const TEST_PUZZLE: PuzzleEntry = {
-  index: 0,
-  letters: ['D', 'E', 'I', 'N', 'P', 'R', 'T'],
-  centerLetter: 'P',
-};
-const TEST_WORDS = ['drip', 'pine', 'pier', 'pint', 'pride', 'print', 'printed', 'ripe', 'trip'];
-const PUZZLE_LOADED = { type: 'PUZZLE_LOADED' as const, puzzle: TEST_PUZZLE };
-const DICT_LOADED  = { type: 'DICT_LOADED' as const, words: TEST_WORDS };
 // Restore most (not all) words so wordsLeft > 0
 const RESTORE_PARTIAL = { type: 'RESTORE_STATE' as const, foundWords: ['drip', 'pine', 'pier', 'pint', 'pride', 'print', 'printed', 'ripe'], score: 29 };
 // Restore all words (Laureate + Grand Colophon)

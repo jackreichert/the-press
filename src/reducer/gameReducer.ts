@@ -18,6 +18,7 @@ export interface GameState {
   surroundingOrder: string[];  // 6 non-center letters in current display order
   dict: Set<string> | null;
   allWords: string[];          // all valid words for this puzzle (derived at dict load)
+  allWordsSet: Set<string>;    // O(1) membership test for allWords
   currentWord: string;
   foundWords: string[];
   score: number;
@@ -62,6 +63,7 @@ export const initialState: GameState = {
   surroundingOrder: [],
   dict: null,
   allWords: [],
+  allWordsSet: new Set<string>(),
   currentWord: '',
   foundWords: [],
   score: 0,
@@ -101,6 +103,7 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
         ...state,
         dict: new Set(action.words),
         allWords: words,
+        allWordsSet: new Set(words),
         maxScore,
         dictLoaded: true,
         dictError: false,
@@ -165,6 +168,7 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
         surroundingOrder: surrounding,
         dict: action.dict,
         allWords: action.allWords,
+        allWordsSet: new Set(action.allWords),
         maxScore: action.maxScore,
         dictLoaded: true,
       };
@@ -205,7 +209,7 @@ function handleSubmit(state: GameState): GameState {
   }
 
   // Check puzzle-valid word set (not full dict) — allWords are pre-filtered to use only puzzle letters
-  if (!state.allWords.includes(word)) {
+  if (!state.allWordsSet.has(word)) {
     return withError(state, 'Not a word');
   }
 

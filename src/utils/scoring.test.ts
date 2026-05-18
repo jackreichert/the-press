@@ -41,7 +41,7 @@ describe('computeMaxScore', () => {
 
 describe('getRank', () => {
   it('returns a dash rank when maxScore is 0 (dictionary not loaded yet)', () => {
-    expect(getRank(0, 0, 0, 0)).toEqual({ name: '—', current: 0, next: 0, nextName: '' });
+    expect(getRank(0, 0)).toEqual({ name: '—', current: 0, next: 0, nextName: '' });
   });
 
   it('returns Laureate when score equals max (100% — top visible rank)', () => {
@@ -58,7 +58,7 @@ describe('getRank', () => {
   it('returns dash rank when score is 0 (no rank earned yet)', () => {
     // Before the first word is found, no rank has been earned — show '—' just like
     // when the dictionary hasn't loaded.
-    const result = getRank(0, 30, 0, 9);
+    const result = getRank(0, 30);
     expect(result.name).toBe('—');
   });
 
@@ -102,4 +102,21 @@ describe('getProgressPct', () => {
   it('clamps to 100 if score somehow exceeds max', () => {
     expect(getProgressPct(40, 30)).toBe(100);
   });
+});
+
+describe('getRank boundary values', () => {
+  it('pct exactly 2 → Apprentice', () => { expect(getRank(2, 100).name).toBe('Apprentice'); });
+  it('pct exactly 5 → Journeyman', () => { expect(getRank(5, 100).name).toBe('Journeyman'); });
+  it('pct exactly 22 → Typesetter', () => { expect(getRank(22, 100).name).toBe('Typesetter'); });
+  it('pct exactly 35 → Editor', () => { expect(getRank(35, 100).name).toBe('Editor'); });
+  it('pct exactly 50 → Wordsmith', () => { expect(getRank(50, 100).name).toBe('Wordsmith'); });
+  it('pct exactly 68 → Novelist', () => { expect(getRank(68, 100).name).toBe('Novelist'); });
+  it('pct exactly 89 → Laureate', () => { expect(getRank(89, 100).name).toBe('Laureate'); });
+  it('pct 88 → Novelist (one below Laureate)', () => { expect(getRank(88, 100).name).toBe('Novelist'); });
+  it('pct 67 → Wordsmith (one below Novelist)', () => { expect(getRank(67, 100).name).toBe('Wordsmith'); });
+  it('pct 49 → Editor (one below Wordsmith)', () => { expect(getRank(49, 100).name).toBe('Editor'); });
+  it('pct 34 → Typesetter (one below Editor)', () => { expect(getRank(34, 100).name).toBe('Typesetter'); });
+  it('pct 21 → Journeyman (one below Typesetter)', () => { expect(getRank(21, 100).name).toBe('Journeyman'); });
+  it('pct 4 → Apprentice (one below Journeyman)', () => { expect(getRank(4, 100).name).toBe('Apprentice'); });
+  it("pct 1 → Printer's Devil (one below Apprentice)", () => { expect(getRank(1, 100).name).toBe("Printer's Devil"); });
 });
