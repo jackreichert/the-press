@@ -41,3 +41,6 @@ playwright-report/
 
 # Claude Code internals (worktrees, local settings)
 .claude/
+
+# Local planning symlink — points to private Obsidian vault, not for sharing
+.planning
