@@ -76,11 +76,15 @@ export function ScoreBar({ onOpenModal, onOpenStats, epochRef }: ScoreBarProps):
   const ptsToNext = maxScore > 0 ? Math.ceil((rank.next / 100) * maxScore) - score : 0;
   const nextHint = (() => {
     if (!maxScore || gameOver || rank.name === 'Laureate') return null;
+    if (score === 0 && ladder) {
+      const pdPts = ladder[0].pts;
+      return `${pdPts} pt${pdPts === 1 ? '' : 's'} to Printer's Devil`;
+    }
     if (ptsToNext > 0 && rank.nextName) return `${ptsToNext} pt${ptsToNext === 1 ? '' : 's'} to ${rank.nextName}`;
     return null;
   })();
 
-  const laureateTarget = maxScore > 0 ? Math.ceil(0.84 * maxScore) : 0;
+  const laureateTarget = maxScore > 0 ? Math.ceil(0.89 * maxScore) : 0;
 
   const [shareCopied, setShareCopied] = useState(false);
 

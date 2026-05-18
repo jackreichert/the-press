@@ -182,14 +182,14 @@ Feature: The Press — Daily Word Puzzle
 
     Scenario: Rank advances as score percentage increases
       Given the player's score is 35% of max
-      Then the rank shows "Editor"
+      Then the rank shows "Wordsmith"
 
     Scenario: Progress bar reflects overall score percentage
       Given the player's score is 50% of max
       Then the progress bar fill is approximately 50%
 
     Scenario: Laureate is the highest visible rank
-      Given the player's score is at least 84% of max
+      Given the player's score is at least 89% of max
       Then the rank shows "Laureate"
       And Grand Colophon does not appear anywhere in the UI
 
@@ -257,7 +257,7 @@ Feature: The Press — Daily Word Puzzle
   Feature: Laureate winning screen
 
     Scenario: Laureate win modal appears on rank transition
-      Given the player's score crosses 84% of max during a session
+      Given the player's score crosses 89% of max during a session
       Then the Laureate win modal appears as an overlay
       And it shows "Laureate" in the headline
       And it shows the player's current score and word count
@@ -289,6 +289,18 @@ Feature: The Press — Daily Word Puzzle
       Given the player finds the last remaining word
       Then the letter grid and action row disappear
       And the Grand Colophon screen appears showing "Grand Colophon" and "✦ All words found"
+
+    Scenario: Grand Colophon win persists across same-day reloads
+      Given the player has achieved Grand Colophon today
+      When the player reloads the page
+      Then the Grand Colophon screen is shown immediately (no fresh start)
+      And no history entry is double-appended
+
+    Scenario: Grand Colophon state is cleared on the following day
+      Given the player achieved Grand Colophon yesterday
+      When the player opens the game today (a new day)
+      Then today's fresh puzzle loads (not yesterday's completed puzzle)
+      And the stale Grand Colophon state is not treated as a carryover
 
     Scenario: Grand Colophon share text
       Given the player finished on 2026-05-15 with all words found, score 30, 1 pangram

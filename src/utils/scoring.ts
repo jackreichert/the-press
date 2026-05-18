@@ -13,14 +13,14 @@ import { puzzleMaskFromLetters, wordMask, isPangram } from './puzzle';
 // Use `as const` — enum is forbidden by erasableSyntaxOnly in tsconfig.app.json
 
 const RANK_TIERS = [
-  { name: "Printer's Devil", threshold: 2  },
-  { name: 'Apprentice',      threshold: 5  },
-  { name: 'Journeyman',      threshold: 12 },
+  { name: "Printer's Devil", threshold: 0  },
+  { name: 'Apprentice',      threshold: 2  },
+  { name: 'Journeyman',      threshold: 5  },
   { name: 'Typesetter',      threshold: 22 },
   { name: 'Editor',          threshold: 35 },
   { name: 'Wordsmith',       threshold: 50 },
   { name: 'Novelist',        threshold: 68 },
-  { name: 'Laureate',        threshold: 84 },
+  { name: 'Laureate',        threshold: 89 },
 ] as const;
 
 // ─── Scoring formulas ─────────────────────────────────────────────────────────
@@ -67,13 +67,13 @@ export function getRank(
   _foundCount?: number,
   _totalCount?: number,
 ): RankResult {
-  if (maxScore === 0) return { name: '—', current: 0, next: 0, nextName: '' };
+  if (maxScore === 0 || score === 0) return { name: '—', current: 0, next: 0, nextName: '' };
   const pct = Math.floor((score / maxScore) * 100);
   let tierIdx = -1;
   for (let i = 0; i < RANK_TIERS.length; i++) {
     if (pct >= RANK_TIERS[i].threshold) tierIdx = i;
   }
-  if (tierIdx === -1) return { name: RANK_TIERS[0].name, current: 0, next: RANK_TIERS[0].threshold, nextName: RANK_TIERS[1].name };
+  if (tierIdx === -1) return { name: RANK_TIERS[0].name, current: 0, next: RANK_TIERS[0].threshold, nextName: RANK_TIERS[0].name };
   const tier = RANK_TIERS[tierIdx];
   const nextTier = RANK_TIERS[tierIdx + 1];
   return { name: tier.name, current: tier.threshold, next: nextTier?.threshold ?? 100, nextName: nextTier?.name ?? '' };
@@ -94,6 +94,6 @@ export function getProgressPct(score: number, maxScore: number): number {
 export function getRankLadder(maxScore: number): { name: string; pts: number }[] {
   return RANK_TIERS.map(t => ({
     name: t.name,
-    pts: Math.ceil((t.threshold / 100) * maxScore),
+    pts: Math.max(1, Math.ceil((t.threshold / 100) * maxScore)),
   }));
 }

@@ -22,7 +22,7 @@ import React, { useEffect, useState, useCallback, useRef } from 'react';
 import { GameProvider, useGameState, useGameDispatch } from './context/GameContext';
 import { getTodayPuzzleIndex, getPuzzleDateStr } from './utils/date';
 import { getRank } from './utils/scoring';
-import { readState, saveState, clearState, appendHistory, readPending, savePending, clearPending } from './storage';
+import { readState, saveState, clearState, appendHistory, readHistory, readPending, savePending, clearPending } from './storage';
 import type { HistoryEntry } from './storage';
 import { deriveWordSet } from './utils/puzzle';
 import { computeMaxScore } from './utils/scoring';
@@ -113,7 +113,11 @@ function GameLayout({ epochRef, onPlayToday, newDayAvailable }: GameLayoutProps)
   useEffect(() => {
     if (!state.gameOver || !state.puzzle || !epochRef.current) return;
     const date = getPuzzleDateStr(epochRef.current, state.puzzle.index);
-    const rankName = (!state.revealed && state.foundWords.length === state.allWords.length)
+    // Guard: if this date is already in history the game-over was restored from
+    // localStorage (Grand Colophon reload), not a new win — skip re-appending.
+    if (readHistory().some(e => e.date === date)) return;
+    const isGrandColophon = !state.revealed && state.foundWords.length === state.allWords.length;
+    const rankName = isGrandColophon
       ? 'Grand Colophon'
       : getRank(state.score, state.maxScore).name;
     const entry: HistoryEntry = {
@@ -125,7 +129,12 @@ function GameLayout({ epochRef, onPlayToday, newDayAvailable }: GameLayoutProps)
       completed: !state.revealed,
     };
     appendHistory(entry);
-    clearState();
+    // For Grand Colophon preserve the saved state so the player can reload and
+    // see the win screen for the rest of the day. STOR-01 already wrote it.
+    // For revealed endings clear immediately — no reason to restore "better luck".
+    if (!isGrandColophon) {
+      clearState();
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [state.gameOver]);
 
@@ -262,8 +271,22 @@ function AppLoader(): React.JSX.Element {
         }
 
         // Check for a carryover: stored state from a previous day still in progress
-        const stored = readState();
+        const rawStored = readState();
         const pending = readPending();
+
+        // Grand Colophon state is kept in localStorage for same-day reload. When the
+        // day rolls over and the stored puzzle is from a previous day that is already
+        // in history (completed), discard it so today's puzzle loads cleanly.
+        let stored = rawStored;
+        if (rawStored && rawStored.puzzleIndex !== todayIndex) {
+          const storedDate = getPuzzleDateStr(schedule.epoch, rawStored.puzzleIndex);
+          if (readHistory().some(e => e.date === storedDate)) {
+            clearState();
+            clearPending();
+            stored = null;
+          }
+        }
+
         const isCarryover = stored && stored.puzzleIndex !== todayIndex && stored.foundWords.length > 0;
         const isResumingCarryover = pending && stored && stored.puzzleIndex !== todayIndex;
 

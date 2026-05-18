@@ -1,6 +1,6 @@
 /**
  * src/components/EditorWinModal.tsx
- * Celebratory overlay shown the first time the player reaches Laureate (84%+ score).
+ * Celebratory overlay shown the first time the player reaches Laureate (89%+ score).
  * Dismissible — "Keep Playing" lets them continue toward Grand Colophon.
  */
 

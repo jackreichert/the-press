@@ -47,7 +47,7 @@ describe('getRank', () => {
   it('returns Laureate when score equals max (100% — top visible rank)', () => {
     const result = getRank(30, 30);
     expect(result.name).toBe('Laureate');
-    expect(result.current).toBe(84);
+    expect(result.current).toBe(89);
     expect(result.nextName).toBe('');
   });
 
@@ -55,17 +55,33 @@ describe('getRank', () => {
     expect(getRank(30, 30).name).toBe('Laureate');
   });
 
-  it("returns Printer's Devil with current=0 and next=2 when score is below the 2% threshold", () => {
-    // 0/30 = 0% — below the Printer's Devil threshold of 2%
+  it('returns dash rank when score is 0 (no rank earned yet)', () => {
+    // Before the first word is found, no rank has been earned — show '—' just like
+    // when the dictionary hasn't loaded.
     const result = getRank(0, 30, 0, 9);
-    expect(result.name).toBe("Printer's Devil");
-    expect(result.current).toBe(0);
-    expect(result.next).toBe(2);
+    expect(result.name).toBe('—');
   });
 
-  it("returns Printer's Devil when score is at 3% (above the 2% entry threshold)", () => {
-    // 1/30 = 3% — Printer's Devil threshold is 2%, so that tier is active
-    const result = getRank(1, 30, 1, 9);
+  it("returns Printer's Devil immediately after scoring the first point", () => {
+    // PD threshold is 0%, so any score > 0 qualifies.
+    // Use maxScore=100: score=1 → pct=1 ≥ 0 (PD) but < 2 (Apprentice) → PD.
+    const result = getRank(1, 100);
+    expect(result.name).toBe("Printer's Devil");
+    expect(result.nextName).toBe('Apprentice');
+  });
+
+  it("hint targets Journeyman after reaching Apprentice, keeping the jump small", () => {
+    // At score 6 (2.1% of 280) rank = Apprentice. Next = Journeyman at 5%.
+    // ptsToNext = ceil(5/100*280)-6 = 14-6 = 8. Label changes (Apprentice→Journeyman),
+    // so the jump from 6→8 signals a rank-up rather than a confusing same-label jump.
+    const result = getRank(6, 280);
+    expect(result.name).toBe('Apprentice');
+    expect(result.nextName).toBe('Journeyman');
+  });
+
+  it("returns Printer's Devil when score > 0 and below Apprentice threshold", () => {
+    // maxScore=100, score=1 → pct=1. PD threshold=0 → PD; Apprentice threshold=2 → not yet.
+    const result = getRank(1, 100);
     expect(result.name).toBe("Printer's Devil");
   });
 });

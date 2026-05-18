@@ -36,12 +36,12 @@ describe('ScoreBar rank display', () => {
     expect(screen.getByText('—')).toBeInTheDocument();
   });
 
-  it("shows Printer's Devil rank at 0 score after dict loaded", () => {
+  it('shows dash rank at 0 score after dict loaded (no rank earned yet)', () => {
     renderWithGame(<ScoreBar onOpenModal={onOpenModal} onOpenStats={onOpenStats} epochRef={epochRef} />, {
       initialActions: [PUZZLE_LOADED, DICT_LOADED],
     });
-    // pct=0 → below first tier threshold → Printer's Devil
-    expect(screen.getByText("Printer's Devil")).toBeInTheDocument();
+    expect(screen.getAllByText('—').length).toBeGreaterThan(0);
+    expect(screen.queryByText("Printer's Devil")).toBeNull();
   });
 
   it('renders a progressbar element', () => {
@@ -60,12 +60,12 @@ describe('ScoreBar score-count button', () => {
     expect(screen.getByText(/0 words · 0\/\d+ pts/)).toBeInTheDocument();
   });
 
-  it('shows pts out of laureate target (84% of maxScore), not total maxScore', () => {
-    // maxScore for TEST_WORDS = 30; laureateTarget = ceil(0.84 * 30) = 26
+  it('shows pts out of laureate target (89% of maxScore), not total maxScore', () => {
+    // maxScore for TEST_WORDS = 30; laureateTarget = ceil(0.89 * 30) = ceil(26.7) = 27
     renderWithGame(<ScoreBar onOpenModal={onOpenModal} onOpenStats={onOpenStats} epochRef={epochRef} />, {
       initialActions: [PUZZLE_LOADED, DICT_LOADED],
     });
-    expect(screen.getByText('0 words · 0/26 pts ▾')).toBeInTheDocument();
+    expect(screen.getByText('0 words · 0/27 pts ▾')).toBeInTheDocument();
     expect(screen.queryByText(/\/30 pts/)).toBeNull();
   });
 
@@ -133,6 +133,25 @@ describe('ScoreBar rank popover', () => {
     });
     await user.click(screen.getByRole('button', { name: /Show rank thresholds/i }));
     expect(screen.getByText('Laureate')).toBeInTheDocument();
+  });
+});
+
+describe('ScoreBar next-rank hint', () => {
+  it("shows '1 pt to Printer's Devil' before the first word is found", () => {
+    renderWithGame(<ScoreBar onOpenModal={onOpenModal} onOpenStats={onOpenStats} epochRef={epochRef} />, {
+      initialActions: [PUZZLE_LOADED, DICT_LOADED],
+    });
+    expect(screen.getByText("1 pt to Printer's Devil")).toBeInTheDocument();
+  });
+
+  it('shows pts-to-next-rank hint after scoring', () => {
+    // score=1 (drip, 4-letter = 1pt), maxScore=30. Apprentice threshold=2%: ceil(0.6)=1pt.
+    // 1pt already reaches Apprentice (pct=3>=2), so hint targets Journeyman (5%).
+    renderWithGame(<ScoreBar onOpenModal={onOpenModal} onOpenStats={onOpenStats} epochRef={epochRef} />, {
+      initialActions: [PUZZLE_LOADED, DICT_LOADED, { type: 'RESTORE_STATE', foundWords: ['drip'], score: 1 }],
+    });
+    expect(screen.queryByText(/Printer's Devil/)).toBeNull();
+    expect(screen.getByText(/pts? to /i)).toBeInTheDocument();
   });
 });
 
